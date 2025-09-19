@@ -121,7 +121,7 @@ export default function RevenuesScreen() {
   const totalRemaining = revenues.reduce((sum, rev) => sum + rev.remainingAmount, 0);
 
   return (
-    <LinearGradient colors={['#10B981', '#059669']} style={styles.container}>
+    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('revenues')}</Text>
         <Text style={styles.headerSubtitle}>{t('manage_income_sources')}</Text>
@@ -187,7 +187,7 @@ export default function RevenuesScreen() {
           setModalVisible(true);
         }}
       >
-        <Plus size={28} color="#FFFFFF" />
+        <Plus size={28} color="#0A2540" />
       </TouchableOpacity>
 
       <Modal
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 20,
-    backgroundColor: '#10B981',
+    backgroundColor: '#F5F7FA',
     width: 60,
     height: 60,
     borderRadius: 30,

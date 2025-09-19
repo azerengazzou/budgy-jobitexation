@@ -169,7 +169,7 @@ export default function GoalsScreen() {
   };
 
   return (
-    <LinearGradient colors={['#8B5CF6', '#7C3AED']} style={styles.container}>
+    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('financial_goals')}</Text>
         <Text style={styles.headerSubtitle}>{t('achieve_your_dreams')}</Text>
@@ -184,7 +184,7 @@ export default function GoalsScreen() {
         {goals.map((goal) => {
           const progress = goal.targetAmount > 0 ? goal.currentAmount / goal.targetAmount : 0;
           const daysRemaining = calculateDaysRemaining(goal.deadline);
-          
+
           return (
             <View key={goal.id} style={styles.goalCard}>
               <View style={styles.goalHeader}>
@@ -223,7 +223,7 @@ export default function GoalsScreen() {
                     {daysRemaining > 0 ? `${daysRemaining} ${t('days_left')}` : t('overdue')}
                   </Text>
                 </View>
-                
+
                 {Platform.OS === 'android' ? (
                   <ProgressBarAndroid
                     styleAttr="Horizontal"
@@ -236,7 +236,7 @@ export default function GoalsScreen() {
                     <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
                   </View>
                 )}
-                
+
                 <Text style={styles.progressPercentage}>
                   {(progress * 100).toFixed(1)}% {t('completed')}
                 </Text>
@@ -262,7 +262,7 @@ export default function GoalsScreen() {
           setModalVisible(true);
         }}
       >
-        <Plus size={28} color="#FFFFFF" />
+        <Plus size={28} color="#0A2540" />
       </TouchableOpacity>
 
       <Modal
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 20,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#F5F7FA',
     width: 60,
     height: 60,
     borderRadius: 30,

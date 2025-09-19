@@ -78,7 +78,7 @@ export default function ExpensesScreen() {
 
     const amount = parseFloat(formData.amount);
     const revenue = revenues.find(r => r.id === formData.revenueSourceId);
-    
+
     if (!revenue || revenue.remainingAmount < amount) {
       Alert.alert(t('error'), t('insufficient_funds'));
       return;
@@ -168,7 +168,7 @@ export default function ExpensesScreen() {
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
   return (
-    <LinearGradient colors={['#F97316', '#EA580C']} style={styles.container}>
+    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('expenses')}</Text>
         <Text style={styles.headerSubtitle}>{t('track_your_spending')}</Text>
@@ -231,7 +231,7 @@ export default function ExpensesScreen() {
           setModalVisible(true);
         }}
       >
-        <Plus size={28} color="#FFFFFF" />
+        <Plus size={28} color="#0A2540" />
       </TouchableOpacity>
 
       {/* Add/Edit Expense Modal */}
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#FED7AA',
+    color: '#F5F7FA',
   },
   summaryCard: {
     backgroundColor: '#FFFFFF',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   categoryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#F97316',
+    color: '#0A2540',
   },
   content: {
     flex: 1,
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 20,
-    backgroundColor: '#F97316',
+    backgroundColor: '#F5F7FA',
     width: 60,
     height: 60,
     borderRadius: 30,
