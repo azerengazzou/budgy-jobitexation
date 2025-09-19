@@ -1,0 +1,274 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  RefreshControl,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { PieChart, BarChart } from 'react-native-chart-kit';
+import { storageService } from '@/services/storage';
+import { DollarSign, TrendingUp, Target, PiggyBank } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
+
+const screenWidth = Dimensions.get('window').width;
+
+export default function Dashboard() {
+  const { t } = useTranslation();
+  const [data, setData] = useState<{
+    totalRevenues: number;
+    totalExpenses: number;
+    totalSavings: number;
+    activeGoals: number;
+    expensesByCategory: { name: string; amount: number }[];
+    monthlyData: any[];
+  }>({
+    totalRevenues: 0,
+    totalExpenses: 0,
+    totalSavings: 0,
+    activeGoals: 0,
+    expensesByCategory: [],
+    monthlyData: [],
+  });
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadDashboardData = async () => {
+    try {
+      const revenues = await storageService.getRevenues();
+      const expenses = await storageService.getExpenses();
+      const savings = await storageService.getSavings();
+      const goals = await storageService.getGoals();
+
+      const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
+      const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+      const totalSavings = savings.reduce((sum, sav) => sum + sav.amount, 0);
+      const activeGoals = goals.filter(goal => !goal.completed).length;
+
+      // Group expenses by category
+      const expensesByCategory = expenses.reduce<{ name: string; amount: number; }[]>((acc, expense) => {
+        const existing = acc.find(item => item.name === expense.category);
+        if (existing) {
+          existing.amount += expense.amount;
+        } else {
+          acc.push({ name: expense.category, amount: expense.amount });
+        }
+        return acc;
+      }, []);
+
+      setData({
+        totalRevenues,
+        totalExpenses,
+        totalSavings,
+        activeGoals,
+        expensesByCategory,
+        monthlyData: [],
+      });
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadDashboardData();
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const pieChartData = data.expensesByCategory.map((item, index) => ({
+    name: item.name,
+    amount: item.amount,
+    color: `hsl(${index * 45}, 70%, 60%)`,
+    legendFontColor: '#374151',
+    legendFontSize: 12,
+  }));
+
+  const remainingBalance = data.totalRevenues - data.totalExpenses;
+
+  return (
+    <LinearGradient
+      colors={['#0A2540', '#4A90E2']}
+      style={styles.container}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>{t('dashboard')}</Text>
+          <Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>
+        </View>
+
+        <View style={styles.metricsContainer}>
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <DollarSign size={24} color="#10B981" />
+              <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
+            </View>
+            <Text style={styles.metricValue}>€{data.totalRevenues.toFixed(2)}</Text>
+          </View>
+
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <TrendingUp size={24} color="#EF4444" />
+              <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
+            </View>
+            <Text style={styles.metricValue}>€{data.totalExpenses.toFixed(2)}</Text>
+          </View>
+
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <PiggyBank size={24} color="#F59E0B" />
+              <Text style={styles.metricTitle}>{t('savings')}</Text>
+            </View>
+            <Text style={styles.metricValue}>€{data.totalSavings.toFixed(2)}</Text>
+          </View>
+
+          <View style={styles.metricCard}>
+            <View style={styles.metricHeader}>
+              <Target size={24} color="#8B5CF6" />
+              <Text style={styles.metricTitle}>{t('active_goals')}</Text>
+            </View>
+            <Text style={styles.metricValue}>{data.activeGoals}</Text>
+          </View>
+        </View>
+
+        <View style={styles.balanceCard}>
+          <Text style={styles.balanceTitle}>{t('remaining_balance')}</Text>
+          <Text style={[
+            styles.balanceAmount,
+            { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
+          ]}>
+            €{remainingBalance.toFixed(2)}
+          </Text>
+        </View>
+
+        {pieChartData.length > 0 && (
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>{t('expenses_by_category')}</Text>
+            <PieChart
+              data={pieChartData}
+              width={screenWidth - 60}
+              height={220}
+              chartConfig={{
+                backgroundColor: '#FFFFFF',
+                backgroundGradientFrom: '#FFFFFF',
+                backgroundGradientTo: '#FFFFFF',
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+              accessor="amount"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+            />
+          </View>
+        )}
+      </ScrollView>
+    </LinearGradient>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  header: {
+    marginBottom: 30,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 5,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#BFDBFE',
+  },
+  metricsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  metricCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    width: '48%',
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  metricHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  metricTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginLeft: 8,
+  },
+  metricValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  balanceCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 25,
+    marginBottom: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  balanceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 10,
+  },
+  balanceAmount: {
+    fontSize: 36,
+    fontWeight: 'bold',
+  },
+  chartCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+});
