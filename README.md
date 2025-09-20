@@ -71,8 +71,6 @@ A comprehensive React Native mobile application for managing personal finances, 
 - **Expo Print** for PDF generation
 - **Expo Notifications** for push notifications
 
-## Setup Instructions
-
 ### Prerequisites
 
 1. **Node.js** (version 18 or higher)
@@ -82,12 +80,6 @@ A comprehensive React Native mobile application for managing personal finances, 
    npm install -g @expo/cli
    ```
 
-### Installation
- **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-   
 ### Building for Production
 
 1. **Build APK for Android:**
