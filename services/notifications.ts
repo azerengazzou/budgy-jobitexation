@@ -7,6 +7,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: false,
     shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -24,15 +26,15 @@ class NotificationService {
     if (Device.isDevice) {
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
-      
+
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      
+
       return finalStatus === 'granted';
     }
-    
+
     return false;
   }
 
@@ -43,29 +45,29 @@ class NotificationService {
     // Cancel existing notifications
     await this.cancelNotifications();
 
-    // Daily expense reminder
+    // ✅ Daily expense reminder (calendar trigger)
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'MyBudget Reminder',
-        body: 'Don\'t forget to log your expenses today!',
+        body: "Don't forget to log your expenses today!",
       },
       trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.CALENDAR, // ✅ TS-safe
         hour: 20,
         minute: 0,
         repeats: true,
       },
     });
 
-    // Weekly savings reminder
+    // ✅ Weekly savings reminder (time interval trigger)
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Savings Goal',
         body: 'How about adding some money to your savings this week?',
       },
       trigger: {
-        weekday: 1, // Monday
-        hour: 9,
-        minute: 0,
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, // ✅ TS-safe
+        seconds: 60 * 60 * 24 * 7, // one week
         repeats: true,
       },
     });
@@ -84,7 +86,7 @@ class NotificationService {
         title: 'Budget Alert!',
         body: `You've spent €${amount.toFixed(2)} in ${category}, exceeding your limit of €${limit.toFixed(2)}`,
       },
-      trigger: null, // Send immediately
+      trigger: null, // send immediately
     });
   }
 }
