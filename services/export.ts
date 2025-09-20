@@ -14,9 +14,9 @@ class ExportService {
         storageService.getUserProfile(),
       ]);
 
-      const currentMonth = new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long' 
+      const currentMonth = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long'
       });
 
       const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
@@ -205,8 +205,8 @@ class ExportService {
           <div class="section">
             <h2>Financial Goals</h2>
             ${goals.map(goal => {
-              const progress = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount * 100) : 0;
-              return `
+        const progress = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount * 100) : 0;
+        return `
                 <div class="list-item">
                   <span>
                     <strong>${goal.name}</strong><br>
@@ -218,7 +218,7 @@ class ExportService {
                   </span>
                 </div>
               `;
-            }).join('')}
+      }).join('')}
           </div>
 
           <div class="footer">
@@ -233,15 +233,21 @@ class ExportService {
         base64: false,
       });
 
-      // Save to device and share
+      const documentDirectory = FileSystem.deleteLegacyDocumentDirectoryAndroid;
+      if (!documentDirectory) {
+        throw new Error('Document directory is not available');
+      }
+
       const fileName = `MyBudget_Report_${currentMonth.replace(' ', '_')}.pdf`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-      
+      const fileUri = `${documentDirectory}${fileName}`;
+
+      // Move PDF to document directory
       await FileSystem.moveAsync({
         from: uri,
         to: fileUri,
       });
 
+      // Share PDF if available
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri, {
           mimeType: 'application/pdf',

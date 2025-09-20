@@ -1,30 +1,10 @@
+import { Expense } from '@/app/(tabs)/interfaces/expenses';
+import { Goal } from '@/app/(tabs)/interfaces/goals';
+import { Revenue } from '@/app/(tabs)/interfaces/revenues';
+import { UserProfile } from '@/app/(tabs)/interfaces/settings';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Settings } from 'react-native';
 
-interface UserProfile {
-  firstName: string;
-  lastName: string;
-  profession: string;
-  salary: number;
-}
-
-interface Revenue {
-  id: string;
-  name: string;
-  amount: number;
-  type: string;
-  remainingAmount: number;
-  createdAt: string;
-}
-
-interface Expense {
-  id: string;
-  amount: number;
-  category: string;
-  description: string;
-  revenueSourceId: string;
-  date: string;
-  createdAt: string;
-}
 
 interface Saving {
   id: string;
@@ -34,22 +14,6 @@ interface Saving {
   type: 'manual' | 'goal' | 'automatic';
 }
 
-interface Goal {
-  id: string;
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  description: string;
-  completed: boolean;
-  createdAt: string;
-}
-
-interface Settings {
-  currency: string;
-  language: string;
-  notificationsEnabled: boolean;
-}
 
 const STORAGE_KEYS = {
   USER_PROFILE: 'user_profile',
@@ -232,7 +196,7 @@ class StorageService {
     if (lastProcessedMonth !== currentMonth) {
       // This is a new month, process carry-over
       const revenues = await this.getRevenues();
-      
+
       // Reset remaining amounts for new month but keep the original amounts
       const updatedRevenues = revenues.map(revenue => ({
         ...revenue,
