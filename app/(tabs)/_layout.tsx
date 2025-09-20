@@ -1,6 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, TrendingUp, Target, Settings, ChartPie as PieChart } from 'lucide-react-native';
-import { View } from 'react-native';
+import { Home, TrendingUp, Target, Settings, ChartPie as PieChart } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (

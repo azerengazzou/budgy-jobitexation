@@ -14,7 +14,7 @@ export default function RootLayout() {
     const initializeApp = async () => {
       // Process monthly carry-over
       await storageService.processMonthlyCarryOver();
-      
+
       // Setup notifications
       await notificationService.requestPermissions();
     };

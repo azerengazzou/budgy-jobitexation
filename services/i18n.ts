@@ -10,7 +10,7 @@ const resources = {
       expenses: 'Expenses',
       goals: 'Goals',
       settings: 'Settings',
-      
+
       // Common
       save: 'Save',
       cancel: 'Cancel',
@@ -20,7 +20,7 @@ const resources = {
       confirm_delete: 'Confirm Delete',
       error: 'Error',
       success: 'Success',
-      
+
       // Dashboard
       financial_overview: 'Financial Overview',
       total_revenues: 'Total Revenues',
@@ -29,7 +29,7 @@ const resources = {
       active_goals: 'Active Goals',
       remaining_balance: 'Remaining Balance',
       expenses_by_category: 'Expenses by Category',
-      
+
       // Revenues
       manage_income_sources: 'Manage Your Income Sources',
       total_income: 'Total Income',
@@ -43,7 +43,7 @@ const resources = {
       business: 'Business',
       investment: 'Investment',
       other: 'Other',
-      
+
       // Expenses
       track_your_spending: 'Track Your Spending',
       add_expense: 'Add Expense',
@@ -53,7 +53,7 @@ const resources = {
       description: 'Description',
       select_income_source: 'Select Income Source',
       insufficient_funds: 'Insufficient funds in selected income source',
-      
+
       // Goals
       financial_goals: 'Financial Goals',
       achieve_your_dreams: 'Achieve Your Dreams',
@@ -70,7 +70,7 @@ const resources = {
       contribute_to_goal: 'Contribute to Goal',
       enter_contribution_amount: 'Enter contribution amount',
       invalid_contribution_amount: 'Invalid contribution amount',
-      
+
       // Settings
       customize_your_experience: 'Customize Your Experience',
       profile: 'Profile',
@@ -89,7 +89,7 @@ const resources = {
       current_savings: 'Current Savings',
       amount_to_add_or_subtract: 'Amount to add (+) or subtract (-)',
       adjust: 'Adjust',
-      
+
       // Onboarding
       welcome_to_mybudget: 'Welcome to MyBudget',
       lets_set_up_your_profile: 'Let\'s set up your profile to get started',
@@ -99,26 +99,26 @@ const resources = {
       salary_optional: 'Monthly Salary (Optional)',
       get_started: 'Get Started',
       your_data_stays_private: 'Your data stays private and secure on your device',
-      
+
       // Languages
       language_en: 'English',
       language_fr: 'French',
       language_ar: 'Arabic',
-      
+
       // Validation
       please_fill_all_fields: 'Please fill all required fields',
       name_required: 'First and last name are required',
       category_name_required: 'Category name is required',
       invalid_amount: 'Please enter a valid amount',
-      
+
       // Confirmations
       delete_revenue_confirmation: 'Are you sure you want to delete this revenue source?',
       delete_expense_confirmation: 'Are you sure you want to delete this expense?',
       delete_goal_confirmation: 'Are you sure you want to delete this goal?',
-      
+
       // Success messages
       report_exported_successfully: 'Report exported successfully',
-      
+
       // Error messages
       failed_to_save_revenue: 'Failed to save revenue',
       failed_to_save_expense: 'Failed to save expense',
@@ -135,7 +135,7 @@ const resources = {
       expenses: 'Dépenses',
       goals: 'Objectifs',
       settings: 'Paramètres',
-      
+
       // Common
       save: 'Enregistrer',
       cancel: 'Annuler',
@@ -145,7 +145,7 @@ const resources = {
       confirm_delete: 'Confirmer la suppression',
       error: 'Erreur',
       success: 'Succès',
-      
+
       // Dashboard
       financial_overview: 'Aperçu financier',
       total_revenues: 'Revenus totaux',
@@ -154,7 +154,7 @@ const resources = {
       active_goals: 'Objectifs actifs',
       remaining_balance: 'Solde restant',
       expenses_by_category: 'Dépenses par catégorie',
-      
+
       // Other translations...
       welcome_to_mybudget: 'Bienvenue dans MyBudget',
       lets_set_up_your_profile: 'Configurons votre profil pour commencer',
@@ -173,7 +173,7 @@ const resources = {
       expenses: 'المصروفات',
       goals: 'الأهداف',
       settings: 'الإعدادات',
-      
+
       // Common
       save: 'حفظ',
       cancel: 'إلغاء',
@@ -183,7 +183,7 @@ const resources = {
       confirm_delete: 'تأكيد الحذف',
       error: 'خطأ',
       success: 'نجح',
-      
+
       // Dashboard
       financial_overview: 'نظرة عامة مالية',
       total_revenues: 'إجمالي الإيرادات',
@@ -192,7 +192,7 @@ const resources = {
       active_goals: 'الأهداف النشطة',
       remaining_balance: 'الرصيد المتبقي',
       expenses_by_category: 'المصروفات حسب الفئة',
-      
+
       // Other translations...
       welcome_to_mybudget: 'مرحباً بك في ميزانيتي',
       lets_set_up_your_profile: 'دعنا نقوم بإعداد ملفك الشخصي للبدء',

@@ -1,5 +1,6 @@
 import { Link, Stack } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { styles } from './(tabs)/styles/notFound.styles';
 
 export default function NotFoundScreen() {
   return (
@@ -14,20 +15,3 @@ export default function NotFoundScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: 600,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-});
