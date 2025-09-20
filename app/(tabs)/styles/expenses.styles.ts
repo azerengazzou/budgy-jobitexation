@@ -1,0 +1,195 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    header: {
+        paddingTop: 60,
+        paddingHorizontal: 20,
+        paddingBottom: 30,
+    },
+    headerTitle: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        marginBottom: 5,
+    },
+    headerSubtitle: {
+        fontSize: 16,
+        color: '#F5F7FA',
+    },
+    summaryCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        padding: 20,
+        marginHorizontal: 20,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+        alignItems: 'center',
+    },
+    summaryLabel: {
+        fontSize: 16,
+        color: '#6B7280',
+        marginBottom: 5,
+    },
+    summaryValue: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#1F2937',
+    },
+    categoryActions: {
+        paddingHorizontal: 20,
+        marginBottom: 20,
+    },
+    categoryButton: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 15,
+        alignItems: 'center',
+    },
+    categoryButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#0A2540',
+    },
+    content: {
+        flex: 1,
+        paddingHorizontal: 20,
+    },
+    expenseCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    expenseHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    expenseIcon: {
+        marginRight: 15,
+    },
+    expenseDetails: {
+        flex: 1,
+    },
+    expenseCategory: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#1F2937',
+    },
+    expenseDescription: {
+        fontSize: 14,
+        color: '#6B7280',
+        marginVertical: 2,
+    },
+    expenseDate: {
+        fontSize: 12,
+        color: '#9CA3AF',
+    },
+    expenseActions: {
+        alignItems: 'flex-end',
+    },
+    expenseAmount: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#EF4444',
+        marginBottom: 5,
+    },
+    actionButtons: {
+        flexDirection: 'row',
+    },
+    actionButton: {
+        padding: 5,
+        marginLeft: 5,
+    },
+    fab: {
+        position: 'absolute',
+        bottom: 30,
+        right: 20,
+        backgroundColor: '#F5F7FA',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    modal: {
+        justifyContent: 'center',
+        margin: 20,
+    },
+    modalContent: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 25,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#1F2937',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 12,
+        padding: 15,
+        marginBottom: 15,
+        fontSize: 16,
+    },
+    pickerContainer: {
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 12,
+        marginBottom: 15,
+    },
+    picker: {
+        height: 50,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    cancelButton: {
+        flex: 1,
+        backgroundColor: '#F3F4F6',
+        borderRadius: 12,
+        padding: 15,
+        marginRight: 10,
+    },
+    cancelButtonText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#6B7280',
+    },
+    saveButton: {
+        flex: 1,
+        backgroundColor: '#F97316',
+        borderRadius: 12,
+        padding: 15,
+        marginLeft: 10,
+    },
+    saveButtonText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#FFFFFF',
+    },
+});
