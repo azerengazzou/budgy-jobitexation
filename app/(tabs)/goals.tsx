@@ -109,6 +109,22 @@ export default function GoalsScreen() {
   };
 
   const handleContributeToGoal = async (goal: Goal) => {
+    const handleContribution = async (amount?: string) => {
+      const contribution = parseFloat(amount || '0');
+      if (contribution > 0 && contribution <= savings) {
+        const updatedGoal = {
+          ...goal,
+          currentAmount: Math.min(goal.currentAmount + contribution, goal.targetAmount),
+          completed: goal.currentAmount + contribution >= goal.targetAmount,
+        };
+        await storageService.updateGoal(updatedGoal);
+        await storageService.deductFromSavings(contribution);
+        await loadData();
+      } else {
+        Alert.alert(t('error'), t('invalid_contribution_amount'));
+      }
+    };
+
     Alert.prompt(
       t('contribute_to_goal'),
       t('enter_contribution_amount'),
@@ -116,20 +132,8 @@ export default function GoalsScreen() {
         { text: t('cancel'), style: 'cancel' },
         {
           text: t('contribute'),
-          onPress: async (amount) => {
-            const contribution = parseFloat(amount || '0');
-            if (contribution > 0 && contribution <= savings) {
-              const updatedGoal = {
-                ...goal,
-                currentAmount: Math.min(goal.currentAmount + contribution, goal.targetAmount),
-                completed: goal.currentAmount + contribution >= goal.targetAmount,
-              };
-              await storageService.updateGoal(updatedGoal);
-              await storageService.deductFromSavings(contribution);
-              await loadData();
-            } else {
-              Alert.alert(t('error'), t('invalid_contribution_amount'));
-            }
+          onPress: (amount?: string) => {
+            handleContribution(amount);
           },
         },
       ],
