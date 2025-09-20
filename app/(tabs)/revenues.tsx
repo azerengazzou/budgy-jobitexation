@@ -77,22 +77,19 @@ export default function RevenuesScreen() {
   };
 
   const handleDeleteRevenue = async (id: string) => {
-    Alert.alert(
-      t('confirm_delete'),
-      t('delete_revenue_confirmation'),
-      [
-        { text: t('cancel'), style: 'cancel' },
-        {
-          text: t('delete'),
-          style: 'destructive',
-          onPress: async () => {
-            await storageService.deleteRevenue(id);
-            await loadRevenues();
-          },
-        },
-      ]
-    );
+    console.log('Trying to delete:', id);
+
+    const revenuesBefore = await storageService.getRevenues();
+    console.log('Before deletion:', revenuesBefore);
+
+    await storageService.deleteRevenue(id);
+
+    const revenuesAfter = await storageService.getRevenues();
+    console.log('After deletion:', revenuesAfter);
+
+    setRevenues(revenuesAfter);
   };
+
 
   const resetForm = () => {
     setFormData({ name: '', amount: '', type: 'salary' });
