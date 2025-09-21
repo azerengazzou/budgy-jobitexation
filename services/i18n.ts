@@ -91,7 +91,7 @@ const resources = {
       adjust: 'Adjust',
 
       // Onboarding
-      welcome_to_mybudget: 'Welcome to MyBudget',
+      welcome_to_budgy: 'Budgy',
       lets_set_up_your_profile: 'Let\'s set up your profile to get started',
       first_name: 'First Name',
       last_name: 'Last Name',
@@ -156,7 +156,7 @@ const resources = {
       expenses_by_category: 'Dépenses par catégorie',
 
       // Other translations...
-      welcome_to_mybudget: 'Bienvenue dans MyBudget',
+      welcome_to_budgy: 'Budget',
       lets_set_up_your_profile: 'Configurons votre profil pour commencer',
       first_name: 'Prénom',
       last_name: 'Nom de famille',
@@ -194,7 +194,7 @@ const resources = {
       expenses_by_category: 'المصروفات حسب الفئة',
 
       // Other translations...
-      welcome_to_mybudget: 'مرحباً بك في ميزانيتي',
+      welcome_to_budgy: 'بدجي',
       lets_set_up_your_profile: 'دعنا نقوم بإعداد ملفك الشخصي للبدء',
       first_name: 'الاسم الأول',
       last_name: 'اسم العائلة',

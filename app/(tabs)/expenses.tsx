@@ -13,14 +13,14 @@ import { Picker } from '@react-native-picker/picker';
 import { Plus, CreditCard as Edit3, Trash2, ShoppingCart } from 'lucide-react-native';
 import { storageService } from '@/services/storage';
 import { useTranslation } from 'react-i18next';
+import { useData } from '@/contexts/DataContext';
 import { styles } from './styles/expenses.styles';
 import { Revenue } from './interfaces/revenues';
 import { Expense } from './interfaces/expenses';
 
 export default function ExpensesScreen() {
   const { t } = useTranslation();
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [revenues, setRevenues] = useState<Revenue[]>([]);
+  const { expenses, revenues, updateExpenses, updateRevenues } = useData();
   const [categories, setCategories] = useState<string[]>([
     'Rent', 'Food', 'Transport', 'Family', 'Children', 'Sports', 'Misc'
   ]);
@@ -35,32 +35,19 @@ export default function ExpensesScreen() {
     revenueSourceId: '',
   });
 
-  const loadData = async () => {
+  const loadCategories = async () => {
     try {
-      const [expensesData, revenuesData, categoriesData] = await Promise.all([
-        storageService.getExpenses(),
-        storageService.getRevenues(),
-        storageService.getCategories(),
-      ]);
-      setExpenses(expensesData);
-      setRevenues(
-        revenuesData.map((rev: any) => ({
-          ...rev,
-          type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(rev.type)
-            ? rev.type
-            : 'other',
-        }))
-      );
+      const categoriesData = await storageService.getCategories();
       if (categoriesData.length > 0) {
         setCategories(categoriesData);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('Error loading categories:', error);
     }
   };
 
   useEffect(() => {
-    loadData();
+    loadCategories();
   }, []);
 
   const handleSaveExpense = async () => {
@@ -96,7 +83,8 @@ export default function ExpensesScreen() {
         await storageService.deductFromRevenue(formData.revenueSourceId, amount);
       }
 
-      await loadData();
+      await updateExpenses();
+      await updateRevenues();
       setModalVisible(false);
       resetForm();
     } catch (error) {
@@ -104,20 +92,35 @@ export default function ExpensesScreen() {
     }
   };
 
-  const handleDeleteExpense = async (expense: Expense) => {
+  const handleDeleteExpense = (expense: Expense) => {
+    console.log('handleDeleteExpense called for:', expense.id);
     Alert.alert(
-      t('confirm_delete'),
-      t('delete_expense_confirmation'),
+      'Delete Expense',
+      'Are you sure you want to delete this expense?',
       [
-        { text: t('cancel'), style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' },
         {
-          text: t('delete'),
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
-            await storageService.deleteExpense(expense.id);
-            // Add amount back to revenue source
-            await storageService.addToRevenue(expense.revenueSourceId, expense.amount);
-            await loadData();
+            console.log('Delete confirmed, starting deletion process');
+            try {
+              console.log('Calling deleteExpense for ID:', expense.id);
+              await storageService.deleteExpense(expense.id);
+              console.log('Expense deleted successfully');
+
+              console.log('Adding amount back to revenue:', expense.revenueSourceId, expense.amount);
+              await storageService.addToRevenue(expense.revenueSourceId, expense.amount);
+              console.log('Amount added back successfully');
+
+              console.log('Reloading data...');
+              await updateExpenses();
+              await updateRevenues();
+              console.log('Data reloaded successfully');
+            } catch (error) {
+              console.error('Delete error:', error);
+              Alert.alert('Error', 'Failed to delete expense');
+            }
           },
         },
       ]
@@ -205,7 +208,10 @@ export default function ExpensesScreen() {
                     <Edit3 size={16} color="#6B7280" />
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => handleDeleteExpense(expense)}
+                    onPress={() => {
+                      console.log('Trash button tapped');
+                      handleDeleteExpense(expense);
+                    }}
                     style={styles.actionButton}
                   >
                     <Trash2 size={16} color="#EF4444" />

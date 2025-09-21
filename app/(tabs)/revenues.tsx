@@ -12,12 +12,13 @@ import Modal from 'react-native-modal';
 import { Plus, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
 import { storageService } from '@/services/storage';
 import { useTranslation } from 'react-i18next';
+import { useData } from '@/contexts/DataContext';
 import { styles } from './styles/revenues.styles';
 import { Revenue } from './interfaces/revenues';
 
 export default function RevenuesScreen() {
   const { t } = useTranslation();
-  const [revenues, setRevenues] = useState<Revenue[]>([]);
+  const { revenues, updateRevenues } = useData();
   const [isModalVisible, setModalVisible] = useState(false);
   const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
   const [formData, setFormData] = useState({
@@ -26,29 +27,11 @@ export default function RevenuesScreen() {
     type: 'salary' as Revenue['type'],
   });
 
-  const loadRevenues = async () => {
-    try {
-      const data = await storageService.getRevenues();
-      // Ensure 'type' is narrowed to the allowed values
-      const mappedData: Revenue[] = data.map((item: any) => ({
-        ...item,
-        type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(item.type)
-          ? item.type
-          : 'other',
-      }));
-      setRevenues(mappedData);
-    } catch (error) {
-      console.error('Error loading revenues:', error);
-    }
-  };
 
-  useEffect(() => {
-    loadRevenues();
-  }, []);
 
   const handleSaveRevenue = async () => {
     if (!formData.name || !formData.amount) {
-      Alert.alert(t('error'), t('please_fill_all_fields'));
+      Alert.alert('Error', 'Please fill all fields');
       return;
     }
 
@@ -68,26 +51,36 @@ export default function RevenuesScreen() {
         await storageService.addRevenue(revenue);
       }
 
-      await loadRevenues();
+      await updateRevenues();
       setModalVisible(false);
       resetForm();
     } catch (error) {
-      Alert.alert(t('error'), t('failed_to_save_revenue'));
+      console.error('Error saving revenue:', error);
+      Alert.alert('Error', 'Failed to save revenue');
     }
   };
 
-  const handleDeleteRevenue = async (id: string) => {
-    console.log('Trying to delete:', id);
-
-    const revenuesBefore = await storageService.getRevenues();
-    console.log('Before deletion:', revenuesBefore);
-
-    await storageService.deleteRevenue(id);
-
-    const revenuesAfter = await storageService.getRevenues();
-    console.log('After deletion:', revenuesAfter);
-
-    setRevenues(revenuesAfter);
+  const handleDeleteRevenue = (id: string) => {
+    Alert.alert(
+      'Delete Revenue',
+      'Are you sure you want to delete this revenue source?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await storageService.deleteRevenue(id);
+              await updateRevenues();
+            } catch (error) {
+              console.error('Error deleting revenue:', error);
+              Alert.alert('Error', 'Failed to delete revenue');
+            }
+          },
+        },
+      ]
+    );
   };
 
 
