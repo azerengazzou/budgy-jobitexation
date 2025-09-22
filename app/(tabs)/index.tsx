@@ -9,6 +9,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { storageService } from '@/services/storage';
+import { useData } from '@/contexts/DataContext';
 import { DollarSign, TrendingUp, Target, PiggyBank } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { styles } from './styles/dashboard.styles';
@@ -17,6 +18,7 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const { revenues, expenses, goals, savings, refreshData } = useData();
   const [data, setData] = useState<{
     totalRevenues: number;
     totalExpenses: number;
@@ -34,51 +36,41 @@ export default function Dashboard() {
   });
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadDashboardData = async () => {
-    try {
-      const revenues = await storageService.getRevenues();
-      const expenses = await storageService.getExpenses();
-      const savings = await storageService.getSavings();
-      const goals = await storageService.getGoals();
+  const calculateData = () => {
+    const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
+    const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const totalSavings = savings.reduce((sum, sav) => sum + sav.amount, 0);
+    const activeGoals = goals.filter(goal => !goal.completed).length;
 
-      const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
-      const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-      const totalSavings = savings.reduce((sum, sav) => sum + sav.amount, 0);
-      const activeGoals = goals.filter(goal => !goal.completed).length;
+    const expensesByCategory = expenses.reduce<{ name: string; amount: number; }[]>((acc, expense) => {
+      const existing = acc.find(item => item.name === expense.category);
+      if (existing) {
+        existing.amount += expense.amount;
+      } else {
+        acc.push({ name: expense.category, amount: expense.amount });
+      }
+      return acc;
+    }, []);
 
-      // Group expenses by category
-      const expensesByCategory = expenses.reduce<{ name: string; amount: number; }[]>((acc, expense) => {
-        const existing = acc.find(item => item.name === expense.category);
-        if (existing) {
-          existing.amount += expense.amount;
-        } else {
-          acc.push({ name: expense.category, amount: expense.amount });
-        }
-        return acc;
-      }, []);
-
-      setData({
-        totalRevenues,
-        totalExpenses,
-        totalSavings,
-        activeGoals,
-        expensesByCategory,
-        monthlyData: [],
-      });
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-    }
+    setData({
+      totalRevenues,
+      totalExpenses,
+      totalSavings,
+      activeGoals,
+      expensesByCategory,
+      monthlyData: [],
+    });
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadDashboardData();
+    await refreshData();
     setRefreshing(false);
   };
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    calculateData();
+  }, [revenues, expenses, goals, savings]);
 
   const pieChartData = data.expensesByCategory.map((item, index) => ({
     name: item.name,

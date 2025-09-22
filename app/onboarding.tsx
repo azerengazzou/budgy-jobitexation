@@ -50,7 +50,7 @@ export default function OnboardingScreen() {
     <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>{t('welcome_to_mybudget')}</Text>
+          <Text style={styles.title}>{t('welcome_to_budgy')}</Text>
           <Text style={styles.subtitle}>{t('lets_set_up_your_profile')}</Text>
         </View>
 
