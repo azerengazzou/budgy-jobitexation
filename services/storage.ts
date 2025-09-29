@@ -1,10 +1,13 @@
 import { Expense } from '@/app/(tabs)/interfaces/expenses';
 import { Goal } from '@/app/(tabs)/interfaces/goals';
-import { Revenue } from '@/app/(tabs)/interfaces/revenues';
 import { UserProfile } from '@/app/(tabs)/interfaces/settings';
+import { Revenue } from '@/app/(tabs)/revenues/components/interfaces/revenues';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Settings } from 'react-native';
-
+interface AppSettings {
+  currency: string;
+  language: string;
+  notificationsEnabled: boolean;
+}
 
 interface Saving {
   id: string;
@@ -182,12 +185,12 @@ class StorageService {
   }
 
   // Settings
-  async getSettings(): Promise<Settings | null> {
+  async getSettings(): Promise<AppSettings | null> {
     const data = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);
     return data ? JSON.parse(data) : null;
   }
 
-  async saveSettings(settings: Settings): Promise<void> {
+  async saveSettings(settings: AppSettings): Promise<void> {
     await AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
   }
 

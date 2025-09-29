@@ -1,222 +1,175 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Alert,
+    View,
+    Text,
+    ScrollView,
+    TouchableOpacity,
+    TextInput,
+    Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Modal from 'react-native-modal';
 import { Plus, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
 import { storageService } from '@/services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '@/contexts/DataContext';
-import { styles } from './styles/revenues.styles';
-import { Revenue } from './interfaces/revenues';
+import Modal from 'react-native-modal';
+import { Revenue, RevenueForm } from './revenues/components/interfaces/revenues';
+import { styles } from './revenues/components/style/revenues.styles';
+import { SummaryCard } from './revenues/components/SummaryCard';
+import { RevenueCard } from './revenues/components/RevenueCard';
+import { RevenueModal } from './revenues/components/RevenueModal';
 
 export default function RevenuesScreen() {
-  const { t } = useTranslation();
-  const { revenues, updateRevenues } = useData();
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    amount: '',
-    type: 'salary' as Revenue['type'],
-  });
+    const { t } = useTranslation();
+    const { revenues, updateRevenues } = useData();
 
-  const handleSaveRevenue = async () => {
-    if (!formData.name || !formData.amount) {
-      Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
-
-    try {
-      const revenue: Revenue = {
-        id: editingRevenue?.id || Date.now().toString(),
-        name: formData.name,
-        amount: parseFloat(formData.amount),
-        type: formData.type,
-        remainingAmount: editingRevenue?.remainingAmount || parseFloat(formData.amount),
-        createdAt: editingRevenue?.createdAt || new Date().toISOString(),
-      };
-
-      if (editingRevenue) {
-        await storageService.updateRevenue(revenue);
-      } else {
-        await storageService.addRevenue(revenue);
-      }
-
-      await updateRevenues();
-      setModalVisible(false);
-      resetForm();
-    } catch (error) {
-      console.error('Error saving revenue:', error);
-      Alert.alert('Error', 'Failed to save revenue');
-    }
-  };
-
-  const handleDeleteRevenue = (id: string) => {
-    Alert.alert(
-      'Delete Revenue',
-      'Are you sure you want to delete this revenue source?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await storageService.deleteRevenue(id);
-              await updateRevenues();
-            } catch (error) {
-              console.error('Error deleting revenue:', error);
-              Alert.alert('Error', 'Failed to delete revenue');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-
-  const resetForm = () => {
-    setFormData({ name: '', amount: '', type: 'salary' });
-    setEditingRevenue(null);
-  };
-
-  const openEditModal = (revenue: Revenue) => {
-    setEditingRevenue(revenue);
-    setFormData({
-      name: revenue.name,
-      amount: revenue.amount.toString(),
-      type: revenue.type,
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
+    const [formData, setFormData] = useState<RevenueForm>({
+        name: '',
+        amount: '',
+        type: 'salary',
     });
-    setModalVisible(true);
-  };
 
-  const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
-  const totalRemaining = revenues.reduce((sum, rev) => sum + rev.remainingAmount, 0);
+    const hasSalarySet = revenues.some(
+        (rev) => rev.type === 'salary' && rev.amount > 0
+    );
 
-  return (
-    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('revenues')}</Text>
-        <Text style={styles.headerSubtitle}>{t('manage_income_sources')}</Text>
-      </View>
+    const resetForm = () => {
+        setFormData({
+            name: '',
+            amount: '',
+            type: hasSalarySet ? 'freelance' : 'salary', // 👈 default changes
+        });
+        setEditingRevenue(null);
+    };
 
-      <View style={styles.summaryCards}>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>{t('total_income')}</Text>
-          <Text style={styles.summaryValue}>€{totalRevenues.toFixed(2)}</Text>
-        </View>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>{t('remaining')}</Text>
-          <Text style={styles.summaryValue}>€{totalRemaining.toFixed(2)}</Text>
-        </View>
-      </View>
+    const openModalForNew = () => {
+        resetForm();
+        setModalVisible(true);
+    };
 
-      <ScrollView style={styles.content}>
-        {revenues.map((revenue) => (
-          <View key={revenue.id} style={styles.revenueCard}>
-            <View style={styles.revenueHeader}>
-              <View>
-                <Text style={styles.revenueName}>{revenue.name}</Text>
-                <Text style={styles.revenueType}>{t(revenue.type)}</Text>
-              </View>
-              <View style={styles.revenueActions}>
-                <TouchableOpacity
-                  onPress={() => openEditModal(revenue)}
-                  style={styles.actionButton}
-                >
-                  <Edit3 size={20} color="#6B7280" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDeleteRevenue(revenue.id)}
-                  style={styles.actionButton}
-                >
-                  <Trash2 size={20} color="#EF4444" />
-                </TouchableOpacity>
-              </View>
+    const openModalForEdit = (revenue: Revenue) => {
+        setEditingRevenue(revenue);
+        setFormData({
+            name: revenue.name,
+            amount: revenue.amount.toString(),
+            type: revenue.type,
+        });
+        setModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalVisible(false);
+        resetForm();
+    };
+
+    const handleSaveRevenue = async () => {
+        if (!formData.name || !formData.amount) {
+            Alert.alert('Error', 'Please fill all fields');
+            return;
+        }
+
+        try {
+            const revenue: Revenue = {
+                id: editingRevenue?.id || Date.now().toString(),
+                name: formData.name,
+                amount: parseFloat(formData.amount),
+                type: formData.type,
+                remainingAmount:
+                    editingRevenue?.remainingAmount || parseFloat(formData.amount),
+                createdAt: editingRevenue?.createdAt || new Date().toISOString(),
+            };
+
+            editingRevenue
+                ? await storageService.updateRevenue(revenue)
+                : await storageService.addRevenue(revenue);
+
+            await updateRevenues();
+            handleCloseModal();
+        } catch (error) {
+            console.error('Error saving revenue:', error);
+            Alert.alert('Error', 'Failed to save revenue');
+        }
+    };
+
+    const handleDeleteRevenue = (id: string) => {
+        Alert.alert(t('delete_revenue'), t('delete_revenue_confirmation'), [
+            { text: t('cancel'), style: 'cancel' },
+            {
+                text: t('delete'),
+                style: 'destructive',
+                onPress: async () => {
+                    try {
+                        await storageService.deleteRevenue(id);
+                        await updateRevenues();
+                    } catch (error) {
+                        console.error('Error deleting revenue:', error);
+                        Alert.alert('Error', 'Failed to delete revenue');
+                    }
+                },
+            },
+        ]);
+    };
+
+    const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
+    const totalRemaining = revenues.reduce(
+        (sum, rev) => sum + rev.remainingAmount,
+        0
+    );
+
+    return (
+        <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>{t('revenues')}</Text>
+                <Text style={styles.headerSubtitle}>{t('manage_income_sources')}</Text>
             </View>
-            <View style={styles.revenueAmounts}>
-              <View style={styles.amountItem}>
-                <Text style={styles.amountLabel}>{t('total_amount')}</Text>
-                <Text style={styles.amountValue}>€{revenue.amount.toFixed(2)}</Text>
-              </View>
-              <View style={styles.amountItem}>
-                <Text style={styles.amountLabel}>{t('remaining')}</Text>
-                <Text style={[
-                  styles.amountValue,
-                  { color: revenue.remainingAmount > 0 ? '#10B981' : '#EF4444' }
-                ]}>
-                  €{revenue.remainingAmount.toFixed(2)}
-                </Text>
-              </View>
+
+            {/* Summary */}
+            <View style={styles.summaryCards}>
+                <SummaryCard
+                    label={t('total_income')}
+                    value={`€${totalRevenues.toFixed(2)}`}
+                />
+                <SummaryCard
+                    label={t('remaining')}
+                    value={`€${totalRemaining.toFixed(2)}`}
+                />
             </View>
-          </View>
-        ))}
-      </ScrollView>
 
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => {
-          resetForm();
-          setModalVisible(true);
-        }}
-      >
-        <Plus size={28} color="#0A2540" />
-      </TouchableOpacity>
+            {/* Revenues list */}
+            <ScrollView style={styles.content}>
+                {revenues.map((revenue) => (
+                    <RevenueCard
+                        key={revenue.id}
+                        revenue={revenue}
+                        onEdit={() => openModalForEdit(revenue)}
+                        onDelete={() => handleDeleteRevenue(revenue.id)}
+                        t={t}
+                    />
+                ))}
+            </ScrollView>
 
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => {
-          setModalVisible(false);
-          resetForm();
-        }}
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {editingRevenue ? t('edit_revenue') : t('add_revenue')}
-          </Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder={t('revenue_name')}
-            value={formData.name}
-            onChangeText={(text) => setFormData({ ...formData, name: text })}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder={t('amount')}
-            value={formData.amount}
-            onChangeText={(text) => setFormData({ ...formData, amount: text })}
-            keyboardType="numeric"
-          />
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setModalVisible(false);
-                resetForm();
-              }}
-            >
-              <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+            {/* Add button */}
+            <TouchableOpacity style={styles.fab} onPress={openModalForNew}>
+                <Plus size={28} color="#0A2540" />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveRevenue}
-            >
-              <Text style={styles.saveButtonText}>{t('save')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </LinearGradient>
-  );
+
+            {/* Modal */}
+            <RevenueModal
+                visible={isModalVisible}
+                onClose={() => {
+                    setModalVisible(false);
+                    setEditingRevenue(null);
+                }}
+                onSave={handleSaveRevenue}
+                formData={formData}
+                setFormData={setFormData}
+                editingRevenue={editingRevenue}
+                hasSalarySet={hasSalarySet}
+                t={t}
+            />
+        </LinearGradient>
+    );
 }
