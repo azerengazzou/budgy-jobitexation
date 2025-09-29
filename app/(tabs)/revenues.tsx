@@ -27,8 +27,6 @@ export default function RevenuesScreen() {
     type: 'salary' as Revenue['type'],
   });
 
-
-
   const handleSaveRevenue = async () => {
     if (!formData.name || !formData.amount) {
       Alert.alert('Error', 'Please fill all fields');

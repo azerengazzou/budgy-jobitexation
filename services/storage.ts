@@ -70,6 +70,9 @@ class StorageService {
   async deleteRevenue(id: string): Promise<void> {
     const revenues = await this.getRevenues();
     const filtered = revenues.filter(r => r.id !== id);
+    console.log(revenues);
+
+    console.log('Deleting revenue, new list:', filtered);
     await AsyncStorage.setItem(STORAGE_KEYS.REVENUES, JSON.stringify(filtered));
   }
 
