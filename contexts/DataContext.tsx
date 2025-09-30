@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { storageService } from '@/services/storage';
-import { Revenue } from '@/app/(tabs)/interfaces/revenues';
 import { Expense } from '@/app/(tabs)/interfaces/expenses';
 import { Goal } from '@/app/(tabs)/interfaces/goals';
+import { Revenue } from '@/app/(tabs)/revenues/components/interfaces/revenues';
 
 /**
  * Define the shape of the data and actions that will be stored in the context.
@@ -73,18 +73,31 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         storageService.getSavings(),
       ]);
 
-      // Normalize the `type` field in revenues to ensure it is one of the allowed values.
-      setRevenues(
-        revenuesData.map((rev: any) => ({
-          ...rev,
-          type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(rev.type)
-            ? rev.type
-            : 'other',
-        }))
-      );
+      // Normalize revenues
+      let normalizedRevenues = revenuesData.map((rev: any) => ({
+        ...rev,
+        type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(rev.type)
+          ? rev.type
+          : 'other',
+      }));
 
-      // Store the other data directly
-      setExpenses(expensesData);
+      // 👉 Ensure only one salary revenue is kept (latest one wins)
+      const salaryRevenues = normalizedRevenues.filter((rev) => rev.type === 'salary');
+      if (salaryRevenues.length > 1) {
+        // Keep the last salary entry (or you can decide first one)
+        const latestSalary = salaryRevenues[salaryRevenues.length - 1];
+        normalizedRevenues = [
+          ...normalizedRevenues.filter((rev) => rev.type !== 'salary'),
+          latestSalary,
+        ];
+      }
+
+      // 👉 Remove salary from expenses if it exists there by mistake
+      const filteredExpenses = expensesData.filter((exp: any) => exp.type !== 'salary');
+
+      // Update state
+      setRevenues(normalizedRevenues);
+      setExpenses(filteredExpenses);
       setGoals(goalsData);
       setSavings(savingsData);
     } catch (error) {
@@ -98,24 +111,33 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
    */
   const updateRevenues = async () => {
     const data = await storageService.getRevenues();
-    setRevenues(
-      data.map((rev: any) => ({
-        ...rev,
-        type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(rev.type)
-          ? rev.type
-          : 'other',
-      }))
-    );
-  };
 
-  const updateExpenses = async () => {
-    const data = await storageService.getExpenses();
-    setExpenses(data);
+    let normalized = data.map((rev: any) => ({
+      ...rev,
+      type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(rev.type)
+        ? rev.type
+        : 'other',
+    }));
+
+    // 👉 Ensure only one salary revenue
+    const salaryRevenues = normalized.filter((rev) => rev.type === 'salary');
+    if (salaryRevenues.length > 1) {
+      const latestSalary = salaryRevenues[salaryRevenues.length - 1];
+      normalized = [...normalized.filter((rev) => rev.type !== 'salary'), latestSalary];
+    }
+
+    setRevenues(normalized);
   };
 
   const updateGoals = async () => {
     const data = await storageService.getGoals();
     setGoals(data);
+  };
+
+  const updateExpenses = async () => {
+    const data = await storageService.getExpenses();
+    const filtered = data.filter((exp: any) => exp.type !== 'salary'); // ensure no salary leaks
+    setExpenses(filtered);
   };
 
   /**

@@ -15,7 +15,6 @@ import { storageService } from '@/services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '@/contexts/DataContext';
 import { styles } from './styles/expenses.styles';
-import { Revenue } from './interfaces/revenues';
 import { Expense } from './interfaces/expenses';
 
 export default function ExpensesScreen() {

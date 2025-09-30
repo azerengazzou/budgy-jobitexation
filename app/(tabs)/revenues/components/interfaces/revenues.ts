@@ -6,3 +6,9 @@ export interface Revenue {
     remainingAmount: number;
     createdAt: string;
 }
+
+export type RevenueForm = {
+    name: string;
+    amount: string;
+    type: Revenue['type'];
+};

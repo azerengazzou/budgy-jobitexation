@@ -172,4 +172,11 @@ export const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#FFFFFF',
     },
+    inputDisabled: {
+        padding: 12,
+        borderRadius: 8,
+        backgroundColor: '#E5E7EB',
+        color: '#6B7280',
+        marginBottom: 12,
+    },
 });
