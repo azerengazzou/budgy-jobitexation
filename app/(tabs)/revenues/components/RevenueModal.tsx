@@ -66,7 +66,7 @@ export const RevenueModal = ({
                             setFormData((prev) => ({ ...prev, type: value as Revenue['type'] }))
                         }
                     >
-                        {/* salary omitted when already set */}
+                        {!hasSalarySet && <Picker.Item label={t('salary')} value="salary" />}
                         <Picker.Item label={t('freelance')} value="freelance" />
                         <Picker.Item label={t('business')} value="business" />
                         <Picker.Item label={t('investment')} value="investment" />
