@@ -13,6 +13,7 @@ import { storageService } from '@/services/storage';
 import { User, Briefcase, DollarSign } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { styles } from './(tabs)/styles/onboarding.styles';
+import { Revenue } from './(tabs)/revenues/components/interfaces/revenues';
 
 export default function OnboardingScreen() {
   const { t } = useTranslation();
@@ -30,18 +31,44 @@ export default function OnboardingScreen() {
     }
 
     try {
+      const salaryAmount = parseFloat(formData.salary) || 0;
+
       const userProfile = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         profession: formData.profession,
-        salary: parseFloat(formData.salary) || 0,
+        salary: salaryAmount,
       };
 
+      // Save user profile
       await storageService.saveUserProfile(userProfile);
+
+      // If salary is provided, also save it as a revenue (only once)
+      if (salaryAmount > 0) {
+        const existingRevenues = await storageService.getRevenues();
+        const hasSalary = existingRevenues.some(r => r.type === 'salary');
+
+        if (!hasSalary) {
+          const salaryRevenue: Revenue = {
+            id: Date.now().toString(),
+            name: `${formData.firstName} ${formData.lastName}`.trim() || 'Salary',
+            amount: salaryAmount,
+            type: 'salary',
+            remainingAmount: salaryAmount,
+            createdAt: new Date().toISOString(),
+          };
+
+          await storageService.addRevenue(salaryRevenue);
+        }
+      }
+
+      // Mark onboarding as complete
       await storageService.setOnboardingComplete();
 
+      // Go to main app
       router.replace('/(tabs)');
     } catch (error) {
+      console.error('Onboarding error:', error);
       Alert.alert(t('error'), t('failed_to_save_profile'));
     }
   };
