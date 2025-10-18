@@ -302,15 +302,32 @@ export default function SettingsScreen() {
         {/* Export */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('export')}</Text>
-          <TouchableOpacity style={styles.settingCard} onPress={handleExportReport}>
+          <View style={[styles.settingCard, { opacity: 0.5, position: 'relative' }]}>
             <View style={styles.settingLeft}>
               <FileText size={24} color="#6366F1" />
               <View style={styles.settingText}>
-                <Text style={styles.settingTitle}>{t('export_report')}</Text>
-                <Text style={styles.settingSubtitle}>{t('generate_monthly_pdf')}</Text>
+                <Text style={[styles.settingTitle, { color: '#6366F1' }]}>{t('export_report')}</Text>
+                <Text style={[styles.settingSubtitle, { color: '#6366F1' }]}>{t('generate_monthly_pdf')}</Text>
               </View>
             </View>
-          </TouchableOpacity>
+            <View style={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              backgroundColor: '#F59E0B',
+              borderRadius: 6,
+              paddingHorizontal: 4,
+              paddingVertical: 1,
+              minWidth: 24,
+            }}>
+              <Text style={{
+                color: '#FFFFFF',
+                fontSize: 12,
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>Soon</Text>
+            </View>
+          </View>
         </View>
 
         {/* Data Management */}
