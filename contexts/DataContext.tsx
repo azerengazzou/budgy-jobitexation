@@ -1,15 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { storageService } from '@/services/storage';
 import { Expense } from '@/app/(tabs)/interfaces/expenses';
 import { Goal } from '@/app/(tabs)/interfaces/goals';
 import { Revenue } from '@/app/(tabs)/revenues/components/interfaces/revenues';
 
-/**
- * Define the shape of the data and actions that will be stored in the context.
- * - `revenues`, `expenses`, `goals`, `savings`: arrays holding respective data.
- * - `refreshData`: reloads all data at once.
- * - `updateRevenues`, `updateExpenses`, `updateGoals`: reload individual parts.
- */
 interface DataContextType {
   revenues: Revenue[];
   expenses: Expense[];
@@ -19,19 +13,11 @@ interface DataContextType {
   updateRevenues: () => Promise<void>;
   updateExpenses: () => Promise<void>;
   updateGoals: () => Promise<void>;
+  updateSavings: () => Promise<void>;
 }
 
-/**
- * Create the context object with the defined type.
- * Initially set to `undefined` so we can throw an error
- * if someone uses it outside a provider.
- */
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-/**
- * Custom hook for easier access to the context.
- * Ensures that `useData()` is only used inside the `DataProvider`.
- */
 export const useData = () => {
   const context = useContext(DataContext);
   if (!context) {
@@ -40,31 +26,41 @@ export const useData = () => {
   return context;
 };
 
-/**
- * Props for the provider: it just expects React children.
- */
 interface DataProviderProps {
   children: ReactNode;
 }
 
-/**
- * DataProvider component
- * ----------------------
- * This wraps your app (or part of it) and provides global data
- * such as revenues, expenses, goals, and savings to its children.
- */
+const VALID_REVENUE_TYPES = ['salary', 'freelance', 'business', 'investment', 'other'];
+
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
-  // Local state for the data
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [savings, setSavings] = useState<any[]>([]);
 
-  /**
-   * Helper function to load all pieces of data at once.
-   * Uses Promise.all to fetch everything in parallel.
-   */
-  const loadAllData = async () => {
+  const normalizeRevenues = useCallback((revenuesData: any[]) => {
+    let normalized = revenuesData.map((rev: any) => ({
+      ...rev,
+      type: VALID_REVENUE_TYPES.includes(rev.type) ? rev.type : 'other',
+    }));
+
+    const salaryRevenues = normalized.filter((rev) => rev.type === 'salary');
+    if (salaryRevenues.length > 1) {
+      const latestSalary = salaryRevenues[salaryRevenues.length - 1];
+      normalized = [
+        ...normalized.filter((rev) => rev.type !== 'salary'),
+        latestSalary,
+      ];
+    }
+
+    return normalized;
+  }, []);
+
+  const filterExpenses = useCallback((expensesData: any[]) => {
+    return expensesData.filter((exp: any) => exp.type !== 'salary');
+  }, []);
+
+  const loadAllData = useCallback(async () => {
     try {
       const [revenuesData, expensesData, goalsData, savingsData] = await Promise.all([
         storageService.getRevenues(),
@@ -73,93 +69,43 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         storageService.getSavings(),
       ]);
 
-      // Normalize revenues
-      let normalizedRevenues = revenuesData.map((rev: any) => ({
-        ...rev,
-        type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(rev.type)
-          ? rev.type
-          : 'other',
-      }));
-
-      // 👉 Ensure only one salary revenue is kept (latest one wins)
-      const salaryRevenues = normalizedRevenues.filter((rev) => rev.type === 'salary');
-      if (salaryRevenues.length > 1) {
-        // Keep the last salary entry (or you can decide first one)
-        const latestSalary = salaryRevenues[salaryRevenues.length - 1];
-        normalizedRevenues = [
-          ...normalizedRevenues.filter((rev) => rev.type !== 'salary'),
-          latestSalary,
-        ];
-      }
-
-      // 👉 Remove salary from expenses if it exists there by mistake
-      const filteredExpenses = expensesData.filter((exp: any) => exp.type !== 'salary');
-
-      // Update state
-      setRevenues(normalizedRevenues);
-      setExpenses(filteredExpenses);
+      setRevenues(normalizeRevenues(revenuesData));
+      setExpenses(filterExpenses(expensesData));
       setGoals(goalsData);
       setSavings(savingsData);
     } catch (error) {
       console.error('Error loading data:', error);
     }
-  };
+  }, [normalizeRevenues, filterExpenses]);
 
-  /**
-   * Functions to update a specific slice of data without
-   * reloading everything.
-   */
-  const updateRevenues = async () => {
+  const updateRevenues = useCallback(async () => {
     const data = await storageService.getRevenues();
+    setRevenues(normalizeRevenues(data));
+  }, [normalizeRevenues]);
 
-    let normalized = data.map((rev: any) => ({
-      ...rev,
-      type: ['salary', 'freelance', 'business', 'investment', 'other'].includes(rev.type)
-        ? rev.type
-        : 'other',
-    }));
+  const updateExpenses = useCallback(async () => {
+    const data = await storageService.getExpenses();
+    setExpenses(filterExpenses(data));
+  }, [filterExpenses]);
 
-    // 👉 Ensure only one salary revenue
-    const salaryRevenues = normalized.filter((rev) => rev.type === 'salary');
-    if (salaryRevenues.length > 1) {
-      const latestSalary = salaryRevenues[salaryRevenues.length - 1];
-      normalized = [...normalized.filter((rev) => rev.type !== 'salary'), latestSalary];
-    }
-
-    setRevenues(normalized);
-  };
-
-  const updateGoals = async () => {
+  const updateGoals = useCallback(async () => {
     const data = await storageService.getGoals();
     setGoals(data);
-  };
-
-  const updateExpenses = async () => {
-    const data = await storageService.getExpenses();
-    const filtered = data.filter((exp: any) => exp.type !== 'salary'); // ensure no salary leaks
-    setExpenses(filtered);
-  };
-
-  /**
-   * Public method to refresh everything at once.
-   * Just calls `loadAllData`.
-   */
-  const refreshData = async () => {
-    await loadAllData();
-  };
-
-  /**
-   * Load all data as soon as the provider mounts.
-   * (Equivalent to componentDidMount)
-   */
-  useEffect(() => {
-    loadAllData();
   }, []);
 
-  /**
-   * Return the provider component.
-   * Pass down the data and the functions to children via context.
-   */
+  const updateSavings = useCallback(async () => {
+    const data = await storageService.getSavings();
+    setSavings(data);
+  }, []);
+
+  const refreshData = useCallback(async () => {
+    await loadAllData();
+  }, [loadAllData]);
+
+  useEffect(() => {
+    loadAllData();
+  }, [loadAllData]);
+
   return (
     <DataContext.Provider
       value={{
@@ -171,6 +117,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         updateRevenues,
         updateExpenses,
         updateGoals,
+        updateSavings,
       }}
     >
       {children}
