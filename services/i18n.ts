@@ -92,11 +92,13 @@ const resources = {
 
       // Onboarding
       welcome_to_budgy: 'Budgy',
+      take_control_of_your_budget: 'Take control of your budget',
       lets_set_up_your_profile: 'Let\'s set up your profile to get started',
       first_name: 'First Name',
       last_name: 'Last Name',
       profession: 'Profession',
       salary_optional: 'Monthly Salary (Optional)',
+      start_budgeting: 'Start Budgeting',
       get_started: 'Get Started',
       your_data_stays_private: 'Your data stays private and secure on your device',
 
@@ -107,7 +109,7 @@ const resources = {
 
       // Validation
       please_fill_all_fields: 'Please fill all required fields',
-      name_required: 'First and last name are required',
+      name_required: 'First name is required',
       category_name_required: 'Category name is required',
       invalid_amount: 'Please enter a valid amount',
 
@@ -170,12 +172,14 @@ const resources = {
       expenses_by_category: 'Dépenses par catégorie',
 
       // Other translations...
-      welcome_to_budgy: 'Budget',
+      welcome_to_budgy: 'Budgy',
+      take_control_of_your_budget: 'Prenez le contrôle de votre budget',
       lets_set_up_your_profile: 'Configurons votre profil pour commencer',
       first_name: 'Prénom',
       last_name: 'Nom de famille',
       profession: 'Profession',
       salary_optional: 'Salaire mensuel (Optionnel)',
+      start_budgeting: 'Commencer le budget',
       get_started: 'Commencer',
 
       // Coming Soon
@@ -223,11 +227,13 @@ const resources = {
 
       // Other translations...
       welcome_to_budgy: 'بدجي',
+      take_control_of_your_budget: 'تحكم في ميزانيتك',
       lets_set_up_your_profile: 'دعنا نقوم بإعداد ملفك الشخصي للبدء',
       first_name: 'الاسم الأول',
       last_name: 'اسم العائلة',
       profession: 'المهنة',
       salary_optional: 'الراتب الشهري (اختياري)',
+      start_budgeting: 'ابدأ الميزانية',
       get_started: 'ابدأ',
 
       // Coming Soon
