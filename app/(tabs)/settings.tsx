@@ -8,19 +8,22 @@ import {
   Alert,
   Switch,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
-import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3 } from 'lucide-react-native';
+import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
 import { storageService } from '@/services/storage';
 import { exportService } from '@/services/export';
 import { notificationService } from '@/services/notifications';
 import { useTranslation } from 'react-i18next';
+import { useData } from '@/contexts/DataContext';
 import { UserProfile } from './interfaces/settings';
 import { styles } from './styles/settings.styles';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
+  const { refreshData } = useData();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currency, setCurrency] = useState('EUR');
   const [language, setLanguage] = useState('en');
@@ -78,6 +81,7 @@ export default function SettingsScreen() {
     await storageService.saveUserProfile(profile);
     setUserProfile(profile);
     setProfileModalVisible(false);
+    await refreshData();
   };
 
   const handleSaveSavings = async () => {
@@ -95,7 +99,7 @@ export default function SettingsScreen() {
       type: 'manual',
     });
 
-    await loadSettings();
+    await Promise.all([loadSettings(), refreshData()]);
     setSavingsModalVisible(false);
     setSavingsAmount('');
   };
@@ -141,6 +145,36 @@ export default function SettingsScreen() {
     } catch (error) {
       Alert.alert(t('error'), t('failed_to_export_report'));
     }
+  };
+
+  const handleDeleteAllData = () => {
+    Alert.alert(
+      t('delete_all_data'),
+      t('delete_all_data_confirmation'),
+      [
+        { text: t('cancel'), style: 'cancel' },
+        {
+          text: t('delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              Alert.alert(t('success'), t('all_data_deleted'), [
+                {
+                  text: t('ok'),
+                  onPress: () => {
+                    // Restart app by navigating to index
+                    require('expo-router').router.replace('/');
+                  }
+                }
+              ]);
+            } catch (error) {
+              Alert.alert(t('error'), t('failed_to_delete_data'));
+            }
+          }
+        }
+      ]
+    );
   };
 
   const openProfileModal = () => {
@@ -274,6 +308,20 @@ export default function SettingsScreen() {
               <View style={styles.settingText}>
                 <Text style={styles.settingTitle}>{t('export_report')}</Text>
                 <Text style={styles.settingSubtitle}>{t('generate_monthly_pdf')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Data Management */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('data_management')}</Text>
+          <TouchableOpacity style={[styles.settingCard, { backgroundColor: '#FEF2F2' }]} onPress={handleDeleteAllData}>
+            <View style={styles.settingLeft}>
+              <Trash2 size={24} color="#EF4444" />
+              <View style={styles.settingText}>
+                <Text style={[styles.settingTitle, { color: '#EF4444' }]}>{t('delete_all_data')}</Text>
+                <Text style={styles.settingSubtitle}>{t('permanently_delete_all_data')}</Text>
               </View>
             </View>
           </TouchableOpacity>

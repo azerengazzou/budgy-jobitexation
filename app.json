@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A2540"
+    },
     "scheme": "budgy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -34,6 +39,11 @@
     },
     "updates": {
       "enabled": false
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0a096794-84eb-4887-8251-0a7ca3682df7"
+      }
     }
   }
 }
