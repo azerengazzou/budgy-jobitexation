@@ -125,6 +125,20 @@ const resources = {
       failed_to_save_goal: 'Failed to save goal',
       failed_to_save_profile: 'Failed to save profile',
       failed_to_export_report: 'Failed to export report',
+
+      // Coming Soon
+      coming_soon: 'Coming Soon',
+      financial_goals_coming_soon: 'Financial goals and planning features will be available in a future update.',
+
+      // Data Management
+      data_management: 'Data Management',
+      delete_all_data: 'Delete All Data',
+      delete_all_data_confirmation: 'This will permanently delete all your data including revenues, expenses, and settings. This action cannot be undone.',
+      permanently_delete_all_data: 'Permanently delete all app data',
+      all_data_deleted: 'All data has been deleted successfully',
+      failed_to_delete_data: 'Failed to delete data',
+      ok: 'OK',
+      manual_savings_adjustment: 'Manual savings adjustment',
     },
   },
   fr: {
@@ -163,6 +177,20 @@ const resources = {
       profession: 'Profession',
       salary_optional: 'Salaire mensuel (Optionnel)',
       get_started: 'Commencer',
+
+      // Coming Soon
+      coming_soon: 'Bientôt disponible',
+      financial_goals_coming_soon: 'Les fonctionnalités d\'objectifs financiers et de planification seront disponibles dans une future mise à jour.',
+
+      // Data Management
+      data_management: 'Gestion des données',
+      delete_all_data: 'Supprimer toutes les données',
+      delete_all_data_confirmation: 'Cela supprimera définitivement toutes vos données y compris les revenus, dépenses et paramètres. Cette action ne peut pas être annulée.',
+      permanently_delete_all_data: 'Supprimer définitivement toutes les données de l\'application',
+      all_data_deleted: 'Toutes les données ont été supprimées avec succès',
+      failed_to_delete_data: 'Échec de la suppression des données',
+      ok: 'OK',
+      manual_savings_adjustment: 'Ajustement manuel de l\'épargne',
     },
   },
   ar: {
@@ -201,6 +229,20 @@ const resources = {
       profession: 'المهنة',
       salary_optional: 'الراتب الشهري (اختياري)',
       get_started: 'ابدأ',
+
+      // Coming Soon
+      coming_soon: 'قريباً',
+      financial_goals_coming_soon: 'ستكون ميزات الأهداف المالية والتخطيط متاحة في تحديث مستقبلي.',
+
+      // Data Management
+      data_management: 'إدارة البيانات',
+      delete_all_data: 'حذف جميع البيانات',
+      delete_all_data_confirmation: 'سيؤدي هذا إلى حذف جميع بياناتك نهائياً بما في ذلك الإيرادات والمصروفات والإعدادات. لا يمكن التراجع عن هذا الإجراء.',
+      permanently_delete_all_data: 'حذف جميع بيانات التطبيق نهائياً',
+      all_data_deleted: 'تم حذف جميع البيانات بنجاح',
+      failed_to_delete_data: 'فشل في حذف البيانات',
+      ok: 'موافق',
+      manual_savings_adjustment: 'تعديل يدوي للمدخرات',
     },
   },
 };

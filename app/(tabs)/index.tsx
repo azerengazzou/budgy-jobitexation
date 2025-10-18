@@ -10,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { storageService } from '@/services/storage';
 import { useData } from '@/contexts/DataContext';
-import { DollarSign, TrendingUp, Target, PiggyBank } from 'lucide-react-native';
+import { DollarSign, TrendingUp, PiggyBank, Target } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { styles } from './styles/dashboard.styles';
 
@@ -18,19 +18,17 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function Dashboard() {
   const { t } = useTranslation();
-  const { revenues, expenses, goals, savings, refreshData } = useData();
+  const { revenues, expenses, savings, refreshData } = useData();
   const [data, setData] = useState<{
     totalRevenues: number;
     totalExpenses: number;
     totalSavings: number;
-    activeGoals: number;
     expensesByCategory: { name: string; amount: number }[];
     monthlyData: any[];
   }>({
     totalRevenues: 0,
     totalExpenses: 0,
     totalSavings: 0,
-    activeGoals: 0,
     expensesByCategory: [],
     monthlyData: [],
   });
@@ -40,7 +38,6 @@ export default function Dashboard() {
     const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
     const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
     const totalSavings = savings.reduce((sum, sav) => sum + sav.amount, 0);
-    const activeGoals = goals.filter(goal => !goal.completed).length;
 
     const expensesByCategory = expenses.reduce<{ name: string; amount: number; }[]>((acc, expense) => {
       const existing = acc.find(item => item.name === expense.category);
@@ -56,7 +53,6 @@ export default function Dashboard() {
       totalRevenues,
       totalExpenses,
       totalSavings,
-      activeGoals,
       expensesByCategory,
       monthlyData: [],
     });
@@ -70,7 +66,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     calculateData();
-  }, [revenues, expenses, goals, savings]);
+  }, [revenues, expenses, savings]);
 
   const pieChartData = data.expensesByCategory.map((item, index) => ({
     name: item.name,
@@ -123,12 +119,29 @@ export default function Dashboard() {
             <Text style={styles.metricValue}>€{data.totalSavings.toFixed(2)}</Text>
           </View>
 
-          <View style={styles.metricCard}>
+          <View style={[styles.metricCard, { opacity: 0.5, position: 'relative' }]}>
             <View style={styles.metricHeader}>
-              <Target size={24} color="#8B5CF6" />
-              <Text style={styles.metricTitle}>{t('active_goals')}</Text>
+              <Target size={24} color="#012e7bff" />
+              <Text style={[styles.metricTitle, { color: '#012e7bff' }]}>{t('goals')}</Text>
             </View>
-            <Text style={styles.metricValue}>{data.activeGoals}</Text>
+            <Text style={[styles.metricValue, { color: '#012e7bff' }]}>--</Text>
+            <View style={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              backgroundColor: '#F59E0B',
+              borderRadius: 6,
+              paddingHorizontal: 4,
+              paddingVertical: 1,
+              minWidth: 24,
+            }}>
+              <Text style={{
+                color: '#FFFFFF',
+                fontSize: 10,
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}>Soon</Text>
+            </View>
           </View>
         </View>
 

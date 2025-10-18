@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+import { View, Text } from 'react-native';
 import { Home, TrendingUp, Target, Settings, ChartPie as PieChart } from 'lucide-react-native';
 
 export default function TabLayout() {
@@ -52,8 +53,37 @@ export default function TabLayout() {
         name="goals"
         options={{
           title: 'Goals',
-          tabBarIcon: ({ size, color }) => (
-            <Target size={size} color={color} />
+          tabBarIcon: ({ size }) => (
+            <View style={{ position: 'relative' }}>
+              <Target size={size} color="#9CA3AF" />
+              <View style={{
+                position: 'absolute',
+                top: -6,
+                right: -8,
+                backgroundColor: '#F59E0B',
+                borderRadius: 6,
+                paddingHorizontal: 4,
+                paddingVertical: 1,
+                minWidth: 24,
+              }}>
+                <Text style={{
+                  color: '#FFFFFF',
+                  fontSize: 8,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>Soon</Text>
+              </View>
+            </View>
+          ),
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '600',
+            color: '#9CA3AF',
+          },
+          tabBarButton: (props) => (
+            <View style={props.style}>
+              {props.children}
+            </View>
           ),
         }}
       />
