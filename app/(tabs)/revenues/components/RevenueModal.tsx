@@ -1,5 +1,6 @@
-
+import React, { useState } from 'react';
 import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Revenue, RevenueForm } from "./interfaces/revenues";
 import { styles } from "./style/revenues.styles";
 import {
@@ -9,6 +10,7 @@ import {
     TextInput
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { Calendar } from 'lucide-react-native';
 
 export const RevenueModal = ({
     visible,
@@ -29,6 +31,21 @@ export const RevenueModal = ({
     t: (key: string) => string;
     hasSalarySet: boolean;
 }) => {
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const formatDate = (date: Date) => {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    const onDateChange = (event: any, selectedDate?: Date) => {
+        setShowDatePicker(false);
+        if (selectedDate) {
+            setFormData(prev => ({ ...prev, date: selectedDate }));
+        }
+    };
     return (
         <Modal isVisible={visible} onBackdropPress={onClose} style={styles.modal}>
             <View style={styles.modalContent}>
@@ -56,6 +73,24 @@ export const RevenueModal = ({
                     }
                     keyboardType="numeric"
                 />
+
+                {/* Date */}
+                <TouchableOpacity
+                    style={styles.dateInput}
+                    onPress={() => setShowDatePicker(true)}
+                >
+                    <Calendar size={20} color="#6B7280" style={styles.dateIcon} />
+                    <Text style={styles.dateText}>{formatDate(formData.date)}</Text>
+                </TouchableOpacity>
+
+                {showDatePicker && (
+                    <DateTimePicker
+                        value={formData.date}
+                        mode="date"
+                        display="default"
+                        onChange={onDateChange}
+                    />
+                )}
 
                 {/* Category (type) */}
                 {hasSalarySet ? (

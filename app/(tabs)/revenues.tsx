@@ -29,6 +29,7 @@ export default function RevenuesScreen() {
         name: '',
         amount: '',
         type: 'salary',
+        date: new Date(),
     });
 
     const hasSalarySet = revenues.some(
@@ -40,6 +41,7 @@ export default function RevenuesScreen() {
             name: '',
             amount: '',
             type: hasSalarySet ? 'freelance' : 'salary', // 👈 default changes
+            date: new Date(),
         });
         setEditingRevenue(null);
     };
@@ -55,6 +57,7 @@ export default function RevenuesScreen() {
             name: revenue.name,
             amount: revenue.amount.toString(),
             type: revenue.type,
+            date: new Date(revenue.createdAt),
         });
         setModalVisible(true);
     };
@@ -78,7 +81,7 @@ export default function RevenuesScreen() {
                 type: formData.type,
                 remainingAmount:
                     editingRevenue?.remainingAmount || parseFloat(formData.amount),
-                createdAt: editingRevenue?.createdAt || new Date().toISOString(),
+                createdAt: editingRevenue?.createdAt || formData.date.toISOString(),
             };
 
             editingRevenue

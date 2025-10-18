@@ -11,4 +11,5 @@ export type RevenueForm = {
     name: string;
     amount: string;
     type: Revenue['type'];
+    date: Date;
 };

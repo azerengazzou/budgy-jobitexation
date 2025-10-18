@@ -10,7 +10,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
-import { Plus, CreditCard as Edit3, Trash2, ShoppingCart } from 'lucide-react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Plus, CreditCard as Edit3, Trash2, ShoppingCart, Calendar } from 'lucide-react-native';
 import { storageService } from '@/services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '@/contexts/DataContext';
@@ -32,7 +33,9 @@ export default function ExpensesScreen() {
     category: 'Food',
     description: '',
     revenueSourceId: '',
+    date: new Date(),
   });
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadCategories = async () => {
     try {
@@ -70,7 +73,7 @@ export default function ExpensesScreen() {
         category: formData.category,
         description: formData.description,
         revenueSourceId: formData.revenueSourceId,
-        date: new Date().toISOString(),
+        date: formData.date.toISOString(),
         createdAt: editingExpense?.createdAt || new Date().toISOString(),
       };
 
@@ -145,6 +148,7 @@ export default function ExpensesScreen() {
       category: categories[0] || 'Food',
       description: '',
       revenueSourceId: '',
+      date: new Date(),
     });
     setEditingExpense(null);
   };
@@ -156,8 +160,23 @@ export default function ExpensesScreen() {
       category: expense.category,
       description: expense.description,
       revenueSourceId: expense.revenueSourceId,
+      date: new Date(expense.date),
     });
     setModalVisible(true);
+  };
+
+  const formatDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setFormData({ ...formData, date: selectedDate });
+    }
   };
 
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
@@ -282,6 +301,23 @@ export default function ExpensesScreen() {
               ))}
             </Picker>
           </View>
+
+          <TouchableOpacity
+            style={styles.dateInput}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Calendar size={20} color="#6B7280" style={styles.dateIcon} />
+            <Text style={styles.dateText}>{formatDate(formData.date)}</Text>
+          </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={formData.date}
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )}
 
           <TextInput
             style={styles.input}

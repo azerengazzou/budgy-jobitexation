@@ -192,4 +192,20 @@ export const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#FFFFFF',
     },
+    dateInput: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 12,
+        padding: 15,
+        marginBottom: 15,
+    },
+    dateIcon: {
+        marginRight: 10,
+    },
+    dateText: {
+        fontSize: 16,
+        color: '#1F2937',
+    },
 });
