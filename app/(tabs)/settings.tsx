@@ -34,8 +34,6 @@ export default function SettingsScreen() {
   const [profileForm, setProfileForm] = useState({
     firstName: '',
     lastName: '',
-    profession: '',
-    salary: '',
   });
   const [savingsAmount, setSavingsAmount] = useState('');
 
@@ -66,7 +64,7 @@ export default function SettingsScreen() {
   }, []);
 
   const handleSaveProfile = async () => {
-    if (!profileForm.firstName || !profileForm.lastName) {
+    if (!profileForm.firstName) {
       Alert.alert(t('error'), t('name_required'));
       return;
     }
@@ -74,8 +72,6 @@ export default function SettingsScreen() {
     const profile: UserProfile = {
       firstName: profileForm.firstName,
       lastName: profileForm.lastName,
-      profession: profileForm.profession,
-      salary: parseFloat(profileForm.salary) || 0,
     };
 
     await storageService.saveUserProfile(profile);
@@ -182,8 +178,6 @@ export default function SettingsScreen() {
       setProfileForm({
         firstName: userProfile.firstName,
         lastName: userProfile.lastName,
-        profession: userProfile.profession,
-        salary: userProfile.salary.toString(),
       });
     }
     setProfileModalVisible(true);
@@ -208,7 +202,7 @@ export default function SettingsScreen() {
                   {userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : t('setup_profile')}
                 </Text>
                 <Text style={styles.settingSubtitle}>
-                  {userProfile?.profession || t('tap_to_configure')}
+                  {t('tap_to_configure')}
                 </Text>
               </View>
             </View>
@@ -366,21 +360,6 @@ export default function SettingsScreen() {
             placeholder={t('last_name')}
             value={profileForm.lastName}
             onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder={t('profession')}
-            value={profileForm.profession}
-            onChangeText={(text) => setProfileForm({ ...profileForm, profession: text })}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder={t('salary_optional')}
-            value={profileForm.salary}
-            onChangeText={(text) => setProfileForm({ ...profileForm, salary: text })}
-            keyboardType="numeric"
           />
 
           <View style={styles.buttonContainer}>

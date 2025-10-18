@@ -171,7 +171,68 @@ const resources = {
       remaining_balance: 'Solde restant',
       expenses_by_category: 'Dépenses par catégorie',
 
-      // Other translations...
+      // Revenues
+      manage_income_sources: 'Gérez vos sources de revenus',
+      total_income: 'Revenu total',
+      remaining: 'Restant',
+      add_revenue: 'Ajouter un revenu',
+      edit_revenue: 'Modifier le revenu',
+      revenue_name: 'Nom du revenu',
+      amount: 'Montant',
+      salary: 'Salaire',
+      freelance: 'Freelance',
+      business: 'Entreprise',
+      investment: 'Investissement',
+      other: 'Autre',
+
+      // Expenses
+      track_your_spending: 'Suivez vos dépenses',
+      add_expense: 'Ajouter une dépense',
+      edit_expense: 'Modifier la dépense',
+      manage_categories: 'Gérer les catégories',
+      category_name: 'Nom de la catégorie',
+      description: 'Description',
+      select_income_source: 'Sélectionner la source de revenus',
+      insufficient_funds: 'Fonds insuffisants dans la source de revenus sélectionnée',
+
+      // Goals
+      financial_goals: 'Objectifs financiers',
+      achieve_your_dreams: 'Réalisez vos rêves',
+      available_savings: 'Épargne disponible',
+      add_goal: 'Ajouter un objectif',
+      edit_goal: 'Modifier l\'objectif',
+      goal_name: 'Nom de l\'objectif',
+      target_amount: 'Montant cible',
+      deadline_yyyy_mm_dd: 'Date limite (AAAA-MM-JJ)',
+      days_left: 'jours restants',
+      overdue: 'En retard',
+      completed: 'terminé',
+      contribute: 'Contribuer',
+      contribute_to_goal: 'Contribuer à l\'objectif',
+      enter_contribution_amount: 'Entrez le montant de la contribution',
+      invalid_contribution_amount: 'Montant de contribution invalide',
+
+      // Settings
+      customize_your_experience: 'Personnalisez votre expérience',
+      profile: 'Profil',
+      setup_profile: 'Configurer le profil',
+      tap_to_configure: 'Appuyez pour configurer',
+      preferences: 'Préférences',
+      language: 'Langue',
+      currency: 'Devise',
+      notifications: 'Notifications',
+      enable_notifications: 'Activer les notifications',
+      daily_reminders: 'Rappels quotidiens et alertes',
+      export: 'Exporter',
+      export_report: 'Exporter le rapport mensuel',
+      generate_monthly_pdf: 'Générer un rapport PDF mensuel',
+      adjust_savings: 'Ajuster l\'épargne',
+      current_savings: 'Épargne actuelle',
+      amount_to_add_or_subtract: 'Montant à ajouter (+) ou soustraire (-)',
+      adjust: 'Ajuster',
+      edit_profile: 'Modifier le profil',
+
+      // Onboarding
       welcome_to_budgy: 'Budgy',
       take_control_of_your_budget: 'Prenez le contrôle de votre budget',
       lets_set_up_your_profile: 'Configurons votre profil pour commencer',
@@ -181,6 +242,33 @@ const resources = {
       salary_optional: 'Salaire mensuel (Optionnel)',
       start_budgeting: 'Commencer le budget',
       get_started: 'Commencer',
+      your_data_stays_private: 'Vos données restent privées et sécurisées sur votre appareil',
+
+      // Languages
+      language_en: 'Anglais',
+      language_fr: 'Français',
+      language_ar: 'Arabe',
+
+      // Validation
+      please_fill_all_fields: 'Veuillez remplir tous les champs requis',
+      name_required: 'Le prénom est requis',
+      category_name_required: 'Le nom de la catégorie est requis',
+      invalid_amount: 'Veuillez entrer un montant valide',
+
+      // Confirmations
+      delete_revenue_confirmation: 'Êtes-vous sûr de vouloir supprimer cette source de revenus?',
+      delete_expense_confirmation: 'Êtes-vous sûr de vouloir supprimer cette dépense?',
+      delete_goal_confirmation: 'Êtes-vous sûr de vouloir supprimer cet objectif?',
+
+      // Success messages
+      report_exported_successfully: 'Rapport exporté avec succès',
+
+      // Error messages
+      failed_to_save_revenue: 'Échec de l\'enregistrement du revenu',
+      failed_to_save_expense: 'Échec de l\'enregistrement de la dépense',
+      failed_to_save_goal: 'Échec de l\'enregistrement de l\'objectif',
+      failed_to_save_profile: 'Échec de l\'enregistrement du profil',
+      failed_to_export_report: 'Échec de l\'exportation du rapport',
 
       // Coming Soon
       coming_soon: 'Bientôt disponible',
@@ -225,7 +313,68 @@ const resources = {
       remaining_balance: 'الرصيد المتبقي',
       expenses_by_category: 'المصروفات حسب الفئة',
 
-      // Other translations...
+      // Revenues
+      manage_income_sources: 'إدارة مصادر الدخل',
+      total_income: 'إجمالي الدخل',
+      remaining: 'المتبقي',
+      add_revenue: 'إضافة إيراد',
+      edit_revenue: 'تحرير الإيراد',
+      revenue_name: 'اسم الإيراد',
+      amount: 'المبلغ',
+      salary: 'راتب',
+      freelance: 'عمل حر',
+      business: 'أعمال',
+      investment: 'استثمار',
+      other: 'أخرى',
+
+      // Expenses
+      track_your_spending: 'تتبع إنفاقك',
+      add_expense: 'إضافة مصروف',
+      edit_expense: 'تحرير المصروف',
+      manage_categories: 'إدارة الفئات',
+      category_name: 'اسم الفئة',
+      description: 'الوصف',
+      select_income_source: 'اختر مصدر الدخل',
+      insufficient_funds: 'أموال غير كافية في مصدر الدخل المحدد',
+
+      // Goals
+      financial_goals: 'الأهداف المالية',
+      achieve_your_dreams: 'حقق أحلامك',
+      available_savings: 'المدخرات المتاحة',
+      add_goal: 'إضافة هدف',
+      edit_goal: 'تحرير الهدف',
+      goal_name: 'اسم الهدف',
+      target_amount: 'المبلغ المستهدف',
+      deadline_yyyy_mm_dd: 'الموعد النهائي (سنة-شهر-يوم)',
+      days_left: 'أيام متبقية',
+      overdue: 'متأخر',
+      completed: 'مكتمل',
+      contribute: 'المساهمة',
+      contribute_to_goal: 'المساهمة في الهدف',
+      enter_contribution_amount: 'أدخل مبلغ المساهمة',
+      invalid_contribution_amount: 'مبلغ مساهمة غير صالح',
+
+      // Settings
+      customize_your_experience: 'خصص تجربتك',
+      profile: 'الملف الشخصي',
+      setup_profile: 'إعداد الملف الشخصي',
+      tap_to_configure: 'اضغط للتكوين',
+      preferences: 'التفضيلات',
+      language: 'اللغة',
+      currency: 'العملة',
+      notifications: 'الإشعارات',
+      enable_notifications: 'تفعيل الإشعارات',
+      daily_reminders: 'تذكيرات يومية وتنبيهات',
+      export: 'تصدير',
+      export_report: 'تصدير التقرير الشهري',
+      generate_monthly_pdf: 'إنشاء تقرير PDF شهري',
+      adjust_savings: 'تعديل المدخرات',
+      current_savings: 'المدخرات الحالية',
+      amount_to_add_or_subtract: 'المبلغ المراد إضافته (+) أو طرحه (-)',
+      adjust: 'تعديل',
+      edit_profile: 'تحرير الملف الشخصي',
+
+      // Onboarding
       welcome_to_budgy: 'بدجي',
       take_control_of_your_budget: 'تحكم في ميزانيتك',
       lets_set_up_your_profile: 'دعنا نقوم بإعداد ملفك الشخصي للبدء',
@@ -235,6 +384,33 @@ const resources = {
       salary_optional: 'الراتب الشهري (اختياري)',
       start_budgeting: 'ابدأ الميزانية',
       get_started: 'ابدأ',
+      your_data_stays_private: 'تبقى بياناتك خاصة وآمنة على جهازك',
+
+      // Languages
+      language_en: 'الإنجليزية',
+      language_fr: 'الفرنسية',
+      language_ar: 'العربية',
+
+      // Validation
+      please_fill_all_fields: 'يرجى ملء جميع الحقول المطلوبة',
+      name_required: 'الاسم الأول مطلوب',
+      category_name_required: 'اسم الفئة مطلوب',
+      invalid_amount: 'يرجى إدخال مبلغ صالح',
+
+      // Confirmations
+      delete_revenue_confirmation: 'هل أنت متأكد من حذف مصدر الإيراد هذا؟',
+      delete_expense_confirmation: 'هل أنت متأكد من حذف هذا المصروف؟',
+      delete_goal_confirmation: 'هل أنت متأكد من حذف هذا الهدف؟',
+
+      // Success messages
+      report_exported_successfully: 'تم تصدير التقرير بنجاح',
+
+      // Error messages
+      failed_to_save_revenue: 'فشل في حفظ الإيراد',
+      failed_to_save_expense: 'فشل في حفظ المصروف',
+      failed_to_save_goal: 'فشل في حفظ الهدف',
+      failed_to_save_profile: 'فشل في حفظ الملف الشخصي',
+      failed_to_export_report: 'فشل في تصدير التقرير',
 
       // Coming Soon
       coming_soon: 'قريباً',
