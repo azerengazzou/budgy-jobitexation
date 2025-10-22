@@ -10,7 +10,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Bell, FileText } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { storageService } from '@/services/storage';
-import { exportService } from '@/services/export';
 import { notificationService } from '@/services/notifications';
 import { useTranslation } from 'react-i18next';
 import { styles } from './(tabs)/styles/settings.styles';
@@ -50,14 +49,6 @@ export default function GeneralScreen() {
     }
   };
 
-  const handleExportReport = async () => {
-    try {
-      await exportService.generateMonthlyReport();
-      Alert.alert(t('success'), t('report_exported_successfully'));
-    } catch (error) {
-      Alert.alert(t('error'), t('failed_to_export_report'));
-    }
-  };
 
   return (
     <LinearGradient colors={['#6B7280', '#4B5563']} style={styles.container}>

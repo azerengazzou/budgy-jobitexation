@@ -14,7 +14,6 @@ import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
 import { storageService } from '@/services/storage';
-import { exportService } from '@/services/export';
 import { notificationService } from '@/services/notifications';
 import { useTranslation } from 'react-i18next';
 import { useData } from '@/contexts/DataContext';
@@ -131,15 +130,6 @@ export default function SettingsScreen() {
       await notificationService.scheduleNotifications();
     } else {
       await notificationService.cancelNotifications();
-    }
-  };
-
-  const handleExportReport = async () => {
-    try {
-      await exportService.generateMonthlyReport();
-      Alert.alert(t('success'), t('report_exported_successfully'));
-    } catch (error) {
-      Alert.alert(t('error'), t('failed_to_export_report'));
     }
   };
 
@@ -301,7 +291,7 @@ export default function SettingsScreen() {
         </View>
       </ScrollView>
 
-      
+
       {/* Savings Adjustment Modal */}
       <Modal
         isVisible={isSavingsModalVisible}
