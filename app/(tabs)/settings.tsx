@@ -191,44 +191,6 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* User Profile Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile')}</Text>
-          <TouchableOpacity style={styles.settingCard} onPress={openProfileModal}>
-            <View style={styles.settingLeft}>
-              <User size={24} color="#3B82F6" />
-              <View style={styles.settingText}>
-                <Text style={styles.settingTitle}>
-                  {userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : t('setup_profile')}
-                </Text>
-                <Text style={styles.settingSubtitle}>
-                  {t('tap_to_configure')}
-                </Text>
-              </View>
-            </View>
-            <Edit3 size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Savings Management */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('savings')}</Text>
-          <View style={styles.settingCard}>
-            <View style={styles.settingLeft}>
-              <PiggyBank size={24} color="#10B981" />
-              <View style={styles.settingText}>
-                <Text style={styles.settingTitle}>{t('total_savings')}</Text>
-                <Text style={styles.settingSubtitle}>€{totalSavings.toFixed(2)}</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.adjustButton}
-              onPress={() => setSavingsModalVisible(true)}
-            >
-              <Text style={styles.adjustButtonText}>{t('adjust')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
         {/* Language & Currency */}
         <View style={styles.section}>
@@ -339,46 +301,7 @@ export default function SettingsScreen() {
         </View>
       </ScrollView>
 
-      {/* Profile Modal */}
-      <Modal
-        isVisible={isProfileModalVisible}
-        onBackdropPress={() => setProfileModalVisible(false)}
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{t('edit_profile')}</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder={t('first_name')}
-            value={profileForm.firstName}
-            onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder={t('last_name')}
-            value={profileForm.lastName}
-            onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
-          />
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setProfileModalVisible(false)}
-            >
-              <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveProfile}
-            >
-              <Text style={styles.saveButtonText}>{t('save')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
+      
       {/* Savings Adjustment Modal */}
       <Modal
         isVisible={isSavingsModalVisible}

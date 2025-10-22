@@ -99,4 +99,19 @@ export const styles = StyleSheet.create({
         marginBottom: 15,
         textAlign: 'center',
     },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    settingsIcon: {
+        marginLeft: 10,
+    },
+    iconsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    userIcon: {
+        marginRight: 10,
+    },
 });

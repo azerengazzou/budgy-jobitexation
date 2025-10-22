@@ -5,14 +5,21 @@ import {
   ScrollView,
   Dimensions,
   RefreshControl,
+  TouchableOpacity,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart, BarChart } from 'react-native-chart-kit';
-import { storageService } from '@/services/storage';
 import { useData } from '@/contexts/DataContext';
-import { DollarSign, TrendingUp, PiggyBank, Target } from 'lucide-react-native';
+import { DollarSign, TrendingUp, PiggyBank, Target, Settings, User } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { router } from 'expo-router';
+import Modal from 'react-native-modal';
+import { storageService } from '@/services/storage';
+import { UserProfile } from './interfaces/settings';
 import { styles } from './styles/dashboard.styles';
+import { styles as settingsStyles } from './styles/settings.styles';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -33,6 +40,11 @@ export default function Dashboard() {
     monthlyData: [],
   });
   const [refreshing, setRefreshing] = useState(false);
+  const [isProfileModalVisible, setProfileModalVisible] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    firstName: '',
+    lastName: '',
+  });
 
   const calculateData = () => {
     const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
@@ -67,6 +79,38 @@ export default function Dashboard() {
   useEffect(() => {
     calculateData();
   }, [revenues, expenses, savings]);
+
+  const openProfileModal = async () => {
+    try {
+      const profile = await storageService.getUserProfile();
+      if (profile) {
+        setProfileForm({
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+    setProfileModalVisible(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profileForm.firstName) {
+      Alert.alert(t('error'), t('name_required'));
+      return;
+    }
+
+    const profile: UserProfile = {
+      firstName: profileForm.firstName,
+      lastName: profileForm.lastName,
+    };
+
+    await storageService.saveUserProfile(profile);
+    await refreshData();
+    setProfileModalVisible(false);
+    Alert.alert(t('success'), t('profile_updated'));
+  };
 
   const pieChartData = data.expensesByCategory.map((item, index) => ({
     name: item.name,
@@ -103,7 +147,15 @@ export default function Dashboard() {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>{formatDate()}</Text>
+          <View style={styles.headerRow}>
+            <Text style={styles.headerTitle}>{formatDate()}</Text>
+            <View style={styles.iconsContainer}>
+              <TouchableOpacity onPress={openProfileModal}>
+                <User size={20} color="#FFFFFF" style={styles.userIcon} />
+              </TouchableOpacity>
+              <Settings size={20} color="#FFFFFF" style={styles.settingsIcon} />
+            </View>
+          </View>
           {/*<Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>*/}
         </View>
 
@@ -189,6 +241,46 @@ export default function Dashboard() {
           </View>
         )}
       </ScrollView>
+
+      {/* Profile Modal */}
+      <Modal
+        isVisible={isProfileModalVisible}
+        onBackdropPress={() => setProfileModalVisible(false)}
+        style={settingsStyles.modal}
+      >
+        <View style={settingsStyles.modalContent}>
+          <Text style={settingsStyles.modalTitle}>{t('edit_profile')}</Text>
+
+          <TextInput
+            style={settingsStyles.input}
+            placeholder={t('first_name')}
+            value={profileForm.firstName}
+            onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
+          />
+
+          <TextInput
+            style={settingsStyles.input}
+            placeholder={t('last_name')}
+            value={profileForm.lastName}
+            onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
+          />
+
+          <View style={settingsStyles.buttonContainer}>
+            <TouchableOpacity
+              style={settingsStyles.cancelButton}
+              onPress={() => setProfileModalVisible(false)}
+            >
+              <Text style={settingsStyles.cancelButtonText}>{t('cancel')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={settingsStyles.saveButton}
+              onPress={handleSaveProfile}
+            >
+              <Text style={settingsStyles.saveButtonText}>{t('save')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 }
