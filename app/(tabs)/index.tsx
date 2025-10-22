@@ -200,7 +200,23 @@ export default function Dashboard() {
           </View>
         </View>
 
-
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={[styles.actionButton, styles.manageCategoriesButton]}>
+            <Text style={styles.actionButtonText}>{t('manage_categories')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.actionButton, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
+            <Text style={styles.actionButtonText}>{t('goals')}</Text>
+            <View style={styles.soonBadge}>
+              <Text style={styles.soonBadgeText}>Soon</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.actionButton, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
+            <Text style={styles.actionButtonText}>{t('export')}</Text>
+            <View style={styles.soonBadge}>
+              <Text style={styles.soonBadgeText}>Soon</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
 
         {pieChartData.length > 0 && (
           <View style={styles.chartCard}>

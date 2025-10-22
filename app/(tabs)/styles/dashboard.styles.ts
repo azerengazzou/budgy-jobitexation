@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         width: '48%',
-        marginBottom: 10,
+        marginBottom: 8,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
@@ -115,4 +115,51 @@ export const styles = StyleSheet.create({
     userIcon: {
         marginRight: 10,
     },
+    buttonsContainer: {
+        flexDirection: 'row',
+        marginBottom: 20,
+    },
+    actionButton: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 8,
+        paddingTop: 10,
+        paddingBottom: 10,
+        flex: 1,
+        marginHorizontal: 5,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    actionButtonText: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#1F2937',
+    },
+    soonBadge: {
+        position: 'absolute',
+        top: -6,
+        right: -8,
+        backgroundColor: '#F59E0B',
+        borderRadius: 6,
+        paddingHorizontal: 4,
+        paddingVertical: 1,
+        minWidth: 24,
+    },
+    soonBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    goalsButton: {
+        width: 80,
+        flex: 0,
+    },
+    manageCategoriesButton: {
+        width: 130,
+        flex: 0,
+    }
 });
