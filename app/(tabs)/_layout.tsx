@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View, Text } from 'react-native';
-import { Home, TrendingUp, Target, Settings, ChartPie as PieChart } from 'lucide-react-native';
+import { Home, TrendingUp, Target, ChartPie as PieChart } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -90,12 +90,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
-          tabBarIcon: ({ size, color }) => (
-            <Settings size={size} color={color} />
-          ),
+          href: null,
         }}
       />
+      
     </Tabs>
   );
 }

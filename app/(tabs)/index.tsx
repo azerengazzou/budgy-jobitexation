@@ -153,7 +153,9 @@ export default function Dashboard() {
               <TouchableOpacity onPress={openProfileModal}>
                 <User size={20} color="#FFFFFF" style={styles.userIcon} />
               </TouchableOpacity>
-              <Settings size={20} color="#FFFFFF" style={styles.settingsIcon} />
+              <TouchableOpacity onPress={() => router.push('/settings')}>
+                <Settings size={20} color="#FFFFFF" style={styles.settingsIcon} />
+              </TouchableOpacity>
             </View>
           </View>
           {/*<Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>*/}
