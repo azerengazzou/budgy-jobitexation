@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   Image,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -22,6 +23,24 @@ export default function OnboardingScreen() {
     firstName: '',
     lastName: '',
   });
+  const bounceAnim = useRef(new Animated.Value(0.8)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(bounceAnim, {
+          toValue: 0.9,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(bounceAnim, {
+          toValue: 0.8,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   const handleComplete = async () => {
     if (!formData.firstName) {
@@ -54,9 +73,9 @@ export default function OnboardingScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <View style={styles.logo}>
+            <Animated.View style={[styles.logo, { transform: [{ scale: bounceAnim }] }]}>
               <Image source={require('../assets/images/icon.png')} style={styles.logoImage} />
-            </View>
+            </Animated.View>
             <Text style={styles.brandName}>{t('welcome_to_budgy')}</Text>
             <Text style={styles.tagline}>{t('take_control_of_your_budget')}</Text>
           </View>

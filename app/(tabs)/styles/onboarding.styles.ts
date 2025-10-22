@@ -19,15 +19,14 @@ export const styles = StyleSheet.create({
     logo: {
         width: 80,
         height: 80,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        borderRadius: 40,
+        borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 15,
     },
     logoImage: {
-        width: 60,
-        height: 60,
+        width: 110,
+        height: 110,
         borderRadius: 30,
     },
     brandName: {
