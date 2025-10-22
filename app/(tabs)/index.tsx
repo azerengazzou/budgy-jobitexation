@@ -17,7 +17,7 @@ import { styles } from './styles/dashboard.styles';
 const screenWidth = Dimensions.get('window').width;
 
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { revenues, expenses, savings, refreshData } = useData();
   const [data, setData] = useState<{
     totalRevenues: number;
@@ -78,6 +78,19 @@ export default function Dashboard() {
 
   const remainingBalance = data.totalRevenues - data.totalExpenses;
 
+  const formatDate = () => {
+    const now = new Date();
+    const dayOptions: Intl.DateTimeFormatOptions = { weekday: 'long' };
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
+    const dayName = now.toLocaleDateString(i18n.language, dayOptions);
+    const dateString = now.toLocaleDateString(i18n.language, dateOptions);
+    return `${dayName}\n${dateString}`;
+  };
+
   return (
     <LinearGradient
       colors={['#0A2540', '#4A90E2']}
@@ -90,8 +103,8 @@ export default function Dashboard() {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('dashboard')}</Text>
-          <Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>
+          <Text style={styles.headerTitle}>{formatDate()}</Text>
+          {/*<Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>*/}
         </View>
 
         <View style={styles.metricsContainer}>

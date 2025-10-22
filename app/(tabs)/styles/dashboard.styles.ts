@@ -10,13 +10,16 @@ export const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     header: {
-        marginBottom: 30,
+        marginBottom: 20,
     },
     headerTitle: {
-        fontSize: 32,
-        fontWeight: 'bold',
+        fontSize: 18,
         color: '#FFFFFF',
         marginBottom: 5,
+    },
+    headerSubDate: {
+        fontSize: 15,
+        color: '#FFFFFF',
     },
     headerSubtitle: {
         fontSize: 16,
@@ -26,7 +29,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 15,
     },
     metricCard: {
         backgroundColor: '#FFFFFF',
