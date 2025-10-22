@@ -186,41 +186,21 @@ export default function Dashboard() {
             <Text style={styles.metricValue}>€{data.totalSavings.toFixed(2)}</Text>
           </View>
 
-          <View style={[styles.metricCard, { opacity: 0.5, position: 'relative' }]}>
+          <View style={styles.metricCard}>
             <View style={styles.metricHeader}>
-              <Target size={24} color="#012e7bff" />
-              <Text style={[styles.metricTitle, { color: '#012e7bff' }]}>{t('goals')}</Text>
+              <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
+              <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
             </View>
-            <Text style={[styles.metricValue, { color: '#012e7bff' }]}>--</Text>
-            <View style={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              backgroundColor: '#F59E0B',
-              borderRadius: 6,
-              paddingHorizontal: 4,
-              paddingVertical: 1,
-              minWidth: 24,
-            }}>
-              <Text style={{
-                color: '#FFFFFF',
-                fontSize: 10,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>Soon</Text>
-            </View>
+            <Text style={[
+              styles.metricValue,
+              { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
+            ]}>
+              €{remainingBalance.toFixed(2)}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.balanceCard}>
-          <Text style={styles.balanceTitle}>{t('remaining_balance')}</Text>
-          <Text style={[
-            styles.balanceAmount,
-            { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
-          ]}>
-            €{remainingBalance.toFixed(2)}
-          </Text>
-        </View>
+
 
         {pieChartData.length > 0 && (
           <View style={styles.chartCard}>
