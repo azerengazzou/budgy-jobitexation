@@ -273,7 +273,7 @@ export default function SettingsScreen() {
                 fontSize: 12,
                 fontWeight: 'bold',
                 textAlign: 'center',
-              }}>Soon</Text>
+              }}>{t('soon')}</Text>
             </View>
           </View>
         </View>

@@ -10,6 +10,10 @@ const resources = {
       expenses: 'Expenses',
       goals: 'Goals',
       settings: 'Settings',
+      categories: 'Categories',
+      
+      // Menu/UI
+      soon: 'Soon',
 
       // Common
       save: 'Save',
@@ -141,6 +145,58 @@ const resources = {
       failed_to_delete_data: 'Failed to delete data',
       ok: 'OK',
       manual_savings_adjustment: 'Manual savings adjustment',
+      
+      // Category Names
+      rent: 'Rent',
+      food: 'Food',
+      transport: 'Transport',
+      savings: 'Savings',
+      
+      // Categories Screen
+      search_categories: 'Search categories',
+      no_expense_categories: 'No expense categories found',
+      no_revenue_categories: 'No revenue categories found',
+      tap_plus_to_add: 'Tap the + button to add new categories',
+      delete_category_confirm: 'Are you sure you want to delete this category?',
+      enter_category_name: 'Enter category name',
+      add_category: 'Add Category',
+      edit_category: 'Edit Category',
+      expense_category: 'Expense Category',
+      revenue_type: 'Revenue Type',
+      fixed: 'FIXED',
+      
+      // Revenue Components
+      total_amount: 'Total Amount',
+      
+      // Notifications
+      mybudget_reminder: 'MyBudget Reminder',
+      daily_expense_reminder: "Don't forget to log your expenses today!",
+      savings_goal: 'Savings Goal',
+      weekly_savings_reminder: 'How about adding some money to your savings this week?',
+      test_notification: 'Test Notification',
+      test_notification_body: 'hello , thank you for testing our application, wiouuuu',
+      budget_alert: 'Budget Alert!',
+      budget_alert_body: "You've spent €{amount} in {category}, exceeding your limit of €{limit}",
+      
+      // Simulation Modal
+      budget_simulation: 'Budget Simulation',
+      select_category: 'Select Category',
+      percentage_change: 'Percentage Change',
+      percentage_change_placeholder: 'e.g., 10 for +10% or -10 for -10%',
+      run_simulation: 'Run Simulation',
+      simulation_results: 'Simulation Results',
+      current_spending: 'Current Spending',
+      simulated_spending: 'Simulated Spending',
+      difference: 'Difference',
+      close: 'Close',
+      
+      // Expense Deletion
+      delete_expense: 'Delete Expense',
+      delete_expense_confirm: 'Are you sure you want to delete this expense?',
+      failed_to_delete_expense: 'Failed to delete expense',
+      
+      // Profile
+      profile_updated: 'Profile updated successfully',
     },
   },
   fr: {
@@ -151,6 +207,10 @@ const resources = {
       expenses: 'Dépenses',
       goals: 'Objectifs',
       settings: 'Paramètres',
+      categories: 'Catégories',
+      
+      // Menu/UI
+      soon: 'Bientôt',
 
       // Common
       save: 'Enregistrer',
@@ -283,6 +343,58 @@ const resources = {
       failed_to_delete_data: 'Échec de la suppression des données',
       ok: 'OK',
       manual_savings_adjustment: 'Ajustement manuel de l\'épargne',
+      
+      // Category Names
+      rent: 'Loyer',
+      food: 'Nourriture',
+      transport: 'Transport',
+      savings: 'Épargne',
+      
+      // Categories Screen
+      search_categories: 'Rechercher des catégories',
+      no_expense_categories: 'Aucune catégorie de dépenses trouvée',
+      no_revenue_categories: 'Aucune catégorie de revenus trouvée',
+      tap_plus_to_add: 'Appuyez sur le bouton + pour ajouter de nouvelles catégories',
+      delete_category_confirm: 'Êtes-vous sûr de vouloir supprimer cette catégorie?',
+      enter_category_name: 'Entrez le nom de la catégorie',
+      add_category: 'Ajouter une catégorie',
+      edit_category: 'Modifier la catégorie',
+      expense_category: 'Catégorie de dépenses',
+      revenue_type: 'Type de revenus',
+      fixed: 'FIXE',
+      
+      // Revenue Components
+      total_amount: 'Montant total',
+      
+      // Notifications
+      mybudget_reminder: 'Rappel MonBudget',
+      daily_expense_reminder: "N'oubliez pas d'enregistrer vos dépenses aujourd'hui!",
+      savings_goal: 'Objectif d\'épargne',
+      weekly_savings_reminder: 'Que diriez-vous d\'ajouter de l\'argent à votre épargne cette semaine?',
+      test_notification: 'Notification de test',
+      test_notification_body: 'bonjour , merci de tester notre application, wiouuuu',
+      budget_alert: 'Alerte budget!',
+      budget_alert_body: 'Vous avez dépensé €{amount} dans {category}, dépassant votre limite de €{limit}',
+      
+      // Simulation Modal
+      budget_simulation: 'Simulation de budget',
+      select_category: 'Sélectionner une catégorie',
+      percentage_change: 'Changement en pourcentage',
+      percentage_change_placeholder: 'ex: 10 pour +10% ou -10 pour -10%',
+      run_simulation: 'Exécuter la simulation',
+      simulation_results: 'Résultats de la simulation',
+      current_spending: 'Dépenses actuelles',
+      simulated_spending: 'Dépenses simulées',
+      difference: 'Différence',
+      close: 'Fermer',
+      
+      // Expense Deletion
+      delete_expense: 'Supprimer la dépense',
+      delete_expense_confirm: 'Êtes-vous sûr de vouloir supprimer cette dépense?',
+      failed_to_delete_expense: 'Échec de la suppression de la dépense',
+      
+      // Profile
+      profile_updated: 'Profil mis à jour avec succès',
     },
   },
   ar: {
@@ -290,9 +402,13 @@ const resources = {
       // Navigation
       dashboard: 'لوحة التحكم',
       revenues: 'الإيرادات',
-      expenses: 'المصروفات',
+      expenses: 'المصاريف',
       goals: 'الأهداف',
       settings: 'الإعدادات',
+      categories: 'الفئات',
+      
+      // Menu/UI
+      soon: 'قريباً',
 
       // Common
       save: 'حفظ',
@@ -307,11 +423,11 @@ const resources = {
       // Dashboard
       financial_overview: 'نظرة عامة مالية',
       total_revenues: 'إجمالي الإيرادات',
-      total_expenses: 'إجمالي المصروفات',
+      total_expenses: 'إجمالي المصاريف',
       savings: 'المدخرات',
       active_goals: 'الأهداف النشطة',
       remaining_balance: 'الرصيد المتبقي',
-      expenses_by_category: 'المصروفات حسب الفئة',
+      expenses_by_category: 'المصاريف حسب الفئة',
 
       // Revenues
       manage_income_sources: 'إدارة مصادر الدخل',
@@ -425,6 +541,58 @@ const resources = {
       failed_to_delete_data: 'فشل في حذف البيانات',
       ok: 'موافق',
       manual_savings_adjustment: 'تعديل يدوي للمدخرات',
+      
+      // Category Names
+      rent: 'إيجار',
+      food: 'طعام',
+      transport: 'مواصلات',
+      savings: 'مدخرات',
+      
+      // Categories Screen
+      search_categories: 'البحث في الفئات',
+      no_expense_categories: 'لم يتم العثور على فئات مصاريف',
+      no_revenue_categories: 'لم يتم العثور على فئات إيرادات',
+      tap_plus_to_add: 'اضغط على زر + لإضافة فئات جديدة',
+      delete_category_confirm: 'هل أنت متأكد من حذف هذه الفئة؟',
+      enter_category_name: 'أدخل اسم الفئة',
+      add_category: 'إضافة فئة',
+      edit_category: 'تحرير الفئة',
+      expense_category: 'فئة المصاريف',
+      revenue_type: 'نوع الإيرادات',
+      fixed: 'ثابت',
+      
+      // Revenue Components
+      total_amount: 'المبلغ الإجمالي',
+      
+      // Notifications
+      mybudget_reminder: 'تذكير ميزانيتي',
+      daily_expense_reminder: 'لا تنس تسجيل مصاريفك اليوم!',
+      savings_goal: 'هدف الادخار',
+      weekly_savings_reminder: 'ما رأيك في إضافة بعض المال إلى مدخراتك هذا الأسبوع؟',
+      test_notification: 'إشعار تجريبي',
+      test_notification_body: 'مرحبا ، شكرا لك لاختبار تطبيقنا ، ويووو',
+      budget_alert: 'تنبيه الميزانية!',
+      budget_alert_body: 'لقد أنفقت €{amount} في {category}، متجاوزاً حدك البالغ €{limit}',
+      
+      // Simulation Modal
+      budget_simulation: 'محاكاة الميزانية',
+      select_category: 'اختر الفئة',
+      percentage_change: 'التغيير بالنسبة المئوية',
+      percentage_change_placeholder: 'مثال: 10 لـ +10% أو -10 لـ -10%',
+      run_simulation: 'تشغيل المحاكاة',
+      simulation_results: 'نتائج المحاكاة',
+      current_spending: 'الإنفاق الحالي',
+      simulated_spending: 'الإنفاق المحاكى',
+      difference: 'الفرق',
+      close: 'إغلاق',
+      
+      // Expense Deletion
+      delete_expense: 'حذف المصروف',
+      delete_expense_confirm: 'هل أنت متأكد من حذف هذا المصروف؟',
+      failed_to_delete_expense: 'فشل في حذف المصروف',
+      
+      // Profile
+      profile_updated: 'تم تحديث الملف الشخصي بنجاح',
     },
   },
 };

@@ -231,7 +231,7 @@ export default function Categories() {
                     </View>
                     {isFixed ? (
                       <View style={styles.fixedBadge}>
-                        <Text style={styles.fixedText}>FIXED</Text>
+                        <Text style={styles.fixedText}>{t('fixed')}</Text>
                       </View>
                     ) : (
                       <View style={styles.cardActions}>
@@ -279,7 +279,7 @@ export default function Categories() {
                     </View>
                     {isFixed ? (
                       <View style={styles.fixedBadge}>
-                        <Text style={styles.fixedText}>FIXED</Text>
+                        <Text style={styles.fixedText}>{t('fixed')}</Text>
                       </View>
                     ) : (
                       <View style={styles.cardActions}>

@@ -48,7 +48,7 @@ class NotificationService {
     // ✅ Daily expense reminder (calendar trigger)
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'MyBudget Reminder',
+        title: 'MyBudget Reminder', // Note: Notifications don't support i18n directly
         body: "Don't forget to log your expenses today!",
       },
       trigger: {
@@ -62,7 +62,7 @@ class NotificationService {
     // ✅ Weekly savings reminder (time interval trigger)
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Savings Goal',
+        title: 'Savings Goal', // Note: Notifications don't support i18n directly
         body: 'How about adding some money to your savings this week?',
       },
       trigger: {
@@ -75,7 +75,7 @@ class NotificationService {
     // ✅ 15-minute test notification
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Test Notification',
+        title: 'Test Notification', // Note: Notifications don't support i18n directly
         body: 'hello , thank you for testing our application, wiouuuu',
       },
       trigger: {
@@ -96,7 +96,7 @@ class NotificationService {
 
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Budget Alert!',
+        title: 'Budget Alert!', // Note: Notifications don't support i18n directly
         body: `You've spent €${amount.toFixed(2)} in ${category}, exceeding your limit of €${limit.toFixed(2)}`,
       },
       trigger: null, // send immediately

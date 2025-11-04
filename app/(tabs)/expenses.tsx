@@ -105,12 +105,12 @@ export default function ExpensesScreen() {
   const handleDeleteExpense = (expense: Expense) => {
     console.log('handleDeleteExpense called for:', expense.id);
     Alert.alert(
-      'Delete Expense',
-      'Are you sure you want to delete this expense?',
+      t('delete_expense'),
+      t('delete_expense_confirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('delete'),
           style: 'destructive',
           onPress: async () => {
             console.log('Delete confirmed, starting deletion process');
@@ -129,7 +129,7 @@ export default function ExpensesScreen() {
               console.log('Data reloaded successfully');
             } catch (error) {
               console.error('Delete error:', error);
-              Alert.alert('Error', 'Failed to delete expense');
+              Alert.alert(t('error'), t('failed_to_delete_expense'));
             }
           },
         },

@@ -211,13 +211,13 @@ export default function Dashboard() {
           <TouchableOpacity style={[styles.actionButton, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
             <Text style={styles.actionButtonText}>{t('goals')}</Text>
             <View style={styles.soonBadge}>
-              <Text style={styles.soonBadgeText}>Soon</Text>
+              <Text style={styles.soonBadgeText}>{t('soon')}</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.actionButton, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
             <Text style={styles.actionButtonText}>{t('export')}</Text>
             <View style={styles.soonBadge}>
-              <Text style={styles.soonBadgeText}>Soon</Text>
+              <Text style={styles.soonBadgeText}>{t('soon')}</Text>
             </View>
           </TouchableOpacity>
         </View>

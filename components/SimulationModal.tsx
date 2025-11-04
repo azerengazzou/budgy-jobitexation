@@ -108,7 +108,7 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
             <Text style={styles.label}>{t('percentage_change')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g., 10 for +10% or -10 for -10%"
+              placeholder={t('percentage_change_placeholder')}
               value={changePercentage}
               onChangeText={setChangePercentage}
               keyboardType="numeric"
