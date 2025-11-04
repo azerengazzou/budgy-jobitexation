@@ -21,6 +21,7 @@ import {
   Home,
   Coffee,
   Gamepad2,
+  PiggyBank,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-native-modal';
@@ -41,12 +42,13 @@ export default function Categories() {
   const [fadeAnim] = useState(new Animated.Value(1));
 
   const fixedRevenueTypes = ['salary', 'freelance'];
-  const fixedExpenseCategories = ['Rent', 'Food', 'Transport'];
+  const fixedExpenseCategories = ['Rent', 'Food', 'Transport', 'Savings'];
 
   const categoryIcons = {
     Food: Coffee,
     Transport: Car,
     Rent: Home,
+    Savings: PiggyBank,
     Shopping: ShoppingBag,
     Entertainment: Gamepad2,
     default: DollarSign,

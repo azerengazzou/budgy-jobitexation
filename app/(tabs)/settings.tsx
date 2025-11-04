@@ -145,6 +145,8 @@ export default function SettingsScreen() {
           onPress: async () => {
             try {
               await AsyncStorage.clear();
+              await refreshData();
+              await loadSettings();
               Alert.alert(t('success'), t('all_data_deleted'), [
                 {
                   text: t('ok'),

@@ -71,6 +71,19 @@ class NotificationService {
         repeats: true,
       },
     });
+
+    // ✅ 15-minute test notification
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Test Notification',
+        body: 'hello , thank you for testing our application, wiouuuu',
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 60 * 15, // 15 minutes
+        repeats: true,
+      },
+    });
   }
 
   async cancelNotifications(): Promise<void> {

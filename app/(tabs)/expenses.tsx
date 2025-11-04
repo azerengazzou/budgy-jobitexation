@@ -42,7 +42,7 @@ export default function ExpensesScreen() {
       const customCategories = Array.isArray(expenseData) && expenseData.length > 0 
         ? expenseData.map((item: any) => typeof item === 'string' ? item : (item?.name || String(item)))
         : [];
-      const fixedCategories = ['Rent', 'Food', 'Transport'];
+      const fixedCategories = ['Rent', 'Food', 'Transport', 'Savings'];
       setCategories([...fixedCategories, ...customCategories]);
     } catch (error) {
       console.error('Error loading categories:', error);
