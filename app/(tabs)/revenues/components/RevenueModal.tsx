@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Revenue, RevenueForm } from "./interfaces/revenues";
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { Calendar } from 'lucide-react-native';
+import { storageService } from '@/services/storage';
 
 export const RevenueModal = ({
     visible,
@@ -32,6 +33,31 @@ export const RevenueModal = ({
     hasSalarySet: boolean;
 }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [revenueTypes, setRevenueTypes] = useState<string[]>(['salary', 'freelance']);
+
+    useEffect(() => {
+        loadRevenueTypes();
+    }, [visible]);
+
+    useEffect(() => {
+        if (visible) {
+            loadRevenueTypes();
+        }
+    }, [visible]);
+
+    const loadRevenueTypes = async () => {
+        try {
+            const revenueData = await storageService.getItem('revenue_categories');
+            const customTypes = Array.isArray(revenueData) && revenueData.length > 0
+                ? revenueData.map((item: any) => typeof item === 'string' ? item : item.name || String(item))
+                : [];
+            const fixedTypes = ['salary', 'freelance'];
+            setRevenueTypes([...fixedTypes, ...customTypes]);
+        } catch (error) {
+            console.error('Error loading revenue types:', error);
+            setRevenueTypes(['salary', 'freelance']);
+        }
+    };
 
     const formatDate = (date: Date) => {
         const day = date.getDate().toString().padStart(2, '0');
@@ -93,35 +119,17 @@ export const RevenueModal = ({
                 )}
 
                 {/* Category (type) */}
-                {hasSalarySet ? (
-                    <Picker
-                        selectedValue={formData.type}
-                        style={styles.input}
-                        onValueChange={(value) =>
-                            setFormData((prev) => ({ ...prev, type: value as Revenue['type'] }))
-                        }
-                    >
-                        {!hasSalarySet && <Picker.Item label={t('salary')} value="salary" />}
-                        <Picker.Item label={t('freelance')} value="freelance" />
-                        <Picker.Item label={t('business')} value="business" />
-                        <Picker.Item label={t('investment')} value="investment" />
-                        <Picker.Item label={t('other')} value="other" />
-                    </Picker>
-                ) : (
-                    <Picker
-                        selectedValue={formData.type}
-                        style={styles.input}
-                        onValueChange={(value) =>
-                            setFormData((prev) => ({ ...prev, type: value as Revenue['type'] }))
-                        }
-                    >
-                        <Picker.Item label={t('salary')} value="salary" />
-                        <Picker.Item label={t('freelance')} value="freelance" />
-                        <Picker.Item label={t('business')} value="business" />
-                        <Picker.Item label={t('investment')} value="investment" />
-                        <Picker.Item label={t('other')} value="other" />
-                    </Picker>
-                )}
+                <Picker
+                    selectedValue={formData.type}
+                    style={styles.input}
+                    onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, type: value as Revenue['type'] }))
+                    }
+                >
+                    {revenueTypes.map((type) => (
+                        <Picker.Item key={type} label={t(type)} value={type} />
+                    ))}
+                </Picker>
 
                 {/* Buttons */}
                 <View style={styles.buttonContainer}>

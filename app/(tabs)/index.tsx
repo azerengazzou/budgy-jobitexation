@@ -201,7 +201,10 @@ export default function Dashboard() {
         </View>
 
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={[styles.actionButton, styles.manageCategoriesButton]}>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.manageCategoriesButton]}
+            onPress={() => router.push('/(tabs)/categories')}
+          >
             <Text style={styles.actionButtonText}>{t('manage_categories')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.actionButton, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>

@@ -17,6 +17,8 @@ class StorageService extends RevenueStorageService {
   async saveSettings(settings: any) { return this.userStorage.saveSettings(settings); }
   async getCategories() { return this.userStorage.getCategories(); }
   async saveCategories(categories: string[]) { return this.userStorage.saveCategories(categories); }
+  async getItem(key: string) { return this.userStorage.getItem(key); }
+  async setItem(key: string, value: any) { return this.userStorage.setItem(key, value); }
 
   // Expense methods
   async getExpenses() { return this.expenseStorage.getExpenses(); }
@@ -34,6 +36,8 @@ class StorageService extends RevenueStorageService {
   async addGoal(goal: any) { return this.expenseStorage.addGoal(goal); }
   async updateGoal(goal: any) { return this.expenseStorage.updateGoal(goal); }
   async deleteGoal(id: string) { return this.expenseStorage.deleteGoal(id); }
+
+
 
   // Monthly carry-over logic
   async processMonthlyCarryOver(): Promise<void> {

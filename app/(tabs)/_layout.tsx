@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View, Text } from 'react-native';
-import { Home, TrendingUp, Target, ChartPie as PieChart } from 'lucide-react-native';
+import { Home, TrendingUp, Target, ChartPie as PieChart, Tag } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -46,6 +46,15 @@ export default function TabLayout() {
           title: 'Expenses',
           tabBarIcon: ({ size, color }) => (
             <PieChart size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Categories',
+          tabBarIcon: ({ size, color }) => (
+            <Tag size={size} color={color} />
           ),
         }}
       />

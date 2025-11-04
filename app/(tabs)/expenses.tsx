@@ -15,6 +15,7 @@ import { Plus, CreditCard as Edit3, Trash2, ShoppingCart, Calendar } from 'lucid
 import { storageService } from '@/services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '@/contexts/DataContext';
+import { useFocusEffect } from '@react-navigation/native';
 import { styles } from './styles/expenses.styles';
 import { Expense } from './interfaces/expenses';
 
@@ -25,9 +26,7 @@ export default function ExpensesScreen() {
     'Rent', 'Food', 'Transport', 'Family', 'Children', 'Sports', 'Misc'
   ]);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [newCategory, setNewCategory] = useState('');
   const [formData, setFormData] = useState({
     amount: '',
     category: 'Food',
@@ -39,18 +38,27 @@ export default function ExpensesScreen() {
 
   const loadCategories = async () => {
     try {
-      const categoriesData = await storageService.getCategories();
-      if (categoriesData.length > 0) {
-        setCategories(categoriesData);
-      }
+      const expenseData = await storageService.getCategories();
+      const customCategories = Array.isArray(expenseData) && expenseData.length > 0 
+        ? expenseData.map((item: any) => typeof item === 'string' ? item : (item?.name || String(item)))
+        : [];
+      const fixedCategories = ['Rent', 'Food', 'Transport'];
+      setCategories([...fixedCategories, ...customCategories]);
     } catch (error) {
       console.error('Error loading categories:', error);
+      setCategories(['Rent', 'Food', 'Transport']);
     }
   };
 
   useEffect(() => {
     loadCategories();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadCategories();
+    }, [])
+  );
 
   const handleSaveExpense = async () => {
     if (!formData.amount || !formData.category || !formData.revenueSourceId) {
@@ -129,23 +137,12 @@ export default function ExpensesScreen() {
     );
   };
 
-  const handleAddCategory = async () => {
-    if (!newCategory.trim()) {
-      Alert.alert(t('error'), t('category_name_required'));
-      return;
-    }
 
-    const updatedCategories = [...categories, newCategory.trim()];
-    setCategories(updatedCategories);
-    await storageService.saveCategories(updatedCategories);
-    setNewCategory('');
-    setCategoryModalVisible(false);
-  };
 
   const resetForm = () => {
     setFormData({
       amount: '',
-      category: categories[0] || 'Food',
+      category: categories.length > 0 ? categories[0] : 'Food',
       description: '',
       revenueSourceId: '',
       date: new Date(),
@@ -193,14 +190,7 @@ export default function ExpensesScreen() {
         <Text style={styles.summaryValue}>€{totalExpenses.toFixed(2)}</Text>
       </View>
 
-      <View style={styles.categoryActions}>
-        <TouchableOpacity
-          style={styles.categoryButton}
-          onPress={() => setCategoryModalVisible(true)}
-        >
-          <Text style={styles.categoryButtonText}>{t('manage_categories')}</Text>
-        </TouchableOpacity>
-      </View>
+
 
       <ScrollView style={styles.content}>
         {expenses.map((expense) => (
@@ -347,41 +337,7 @@ export default function ExpensesScreen() {
         </View>
       </Modal>
 
-      {/* Category Management Modal */}
-      <Modal
-        isVisible={isCategoryModalVisible}
-        onBackdropPress={() => setCategoryModalVisible(false)}
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{t('add_category')}</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder={t('category_name')}
-            value={newCategory}
-            onChangeText={setNewCategory}
-          />
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setCategoryModalVisible(false);
-                setNewCategory('');
-              }}
-            >
-              <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleAddCategory}
-            >
-              <Text style={styles.saveButtonText}>{t('add')}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </LinearGradient>
   );
 }
