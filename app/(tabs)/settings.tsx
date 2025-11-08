@@ -13,10 +13,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
-import { storageService } from '@/services/storage';
-import { notificationService } from '@/services/notifications';
+import { storageService } from '../../services/storage';
+import { notificationService } from '../../services/notifications';
 import { useTranslation } from 'react-i18next';
-import { useData } from '@/contexts/DataContext';
+import { useData } from '../../contexts/DataContext';
 import { UserProfile } from './interfaces/settings';
 import { styles } from './styles/settings.styles';
 

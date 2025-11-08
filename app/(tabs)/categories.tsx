@@ -25,7 +25,7 @@ import {
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-native-modal';
-import { storageService } from '@/services/storage';
+import { storageService } from '../../services/storage';
 import { styles } from './styles/categories.styles';
 
 const { width } = Dimensions.get('window');

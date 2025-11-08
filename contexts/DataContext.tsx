@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { storageService } from '@/services/storage';
-import { Expense } from '@/app/(tabs)/interfaces/expenses';
+import { storageService } from '../services/storage';
+import { Expense } from '../app/(tabs)/interfaces/expenses';
 
-import { Revenue } from '@/app/(tabs)/revenues/components/interfaces/revenues';
+import { Revenue } from '../app/(tabs)/revenues/components/interfaces/revenues';
 
 interface DataContextType {
   revenues: Revenue[];

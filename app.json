@@ -13,11 +13,13 @@
     "scheme": "budgy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
+    "runtimeVersion": "1.0.0",
     "android": {
       "package": "com.budgy.app",
       "versionCode": 1,
-      "compileSdkVersion": 34,
-      "targetSdkVersion": 34,
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
+      "minSdkVersion": 23,
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.SYSTEM_ALERT_WINDOW",
@@ -45,7 +47,6 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-web-browser",
       "expo-notifications"
     ],
     "privacy": "public",

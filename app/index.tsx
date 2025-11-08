@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { storageService } from '@/services/storage';
+import { storageService } from '../services/storage';
 
 export default function IndexScreen() {
   const [isLoading, setIsLoading] = useState(true);

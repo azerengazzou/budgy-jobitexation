@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
-import { storageService } from '@/services/storage';
+import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
-import { useData } from '@/contexts/DataContext';
+import { useData } from '../../contexts/DataContext';
 import Modal from 'react-native-modal';
 import { Revenue, RevenueForm } from './revenues/components/interfaces/revenues';
 import { styles } from './revenues/components/style/revenues.styles';

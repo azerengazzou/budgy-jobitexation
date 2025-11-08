@@ -9,9 +9,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, User } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { storageService } from '@/services/storage';
+import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
-import { useData } from '@/contexts/DataContext';
+import { useData } from '../contexts/DataContext';
 import { UserProfile } from './(tabs)/interfaces/settings';
 import { styles } from './(tabs)/styles/settings.styles';
 

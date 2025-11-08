@@ -12,10 +12,10 @@ import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Plus, CreditCard as Edit3, Trash2, ShoppingCart, Calendar } from 'lucide-react-native';
-import { storageService } from '@/services/storage';
+import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
-import { useData } from '@/contexts/DataContext';
-import { useFocusEffect } from '@react-navigation/native';
+import { useData } from '../../contexts/DataContext';
+import { useFocusEffect } from 'expo-router';
 import { styles } from './styles/expenses.styles';
 import { Expense } from './interfaces/expenses';
 

@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart, BarChart } from 'react-native-chart-kit';
-import { useData } from '@/contexts/DataContext';
+import { useData } from '../../contexts/DataContext';
 import { DollarSign, TrendingUp, PiggyBank, Target, Settings, User } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
 import Modal from 'react-native-modal';
-import { storageService } from '@/services/storage';
+import { storageService } from '../../services/storage';
 import { UserProfile } from './interfaces/settings';
 import { styles } from './styles/dashboard.styles';
 import { styles as settingsStyles } from './styles/settings.styles';

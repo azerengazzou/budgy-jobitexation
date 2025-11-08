@@ -9,8 +9,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Bell, FileText } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { storageService } from '@/services/storage';
-import { notificationService } from '@/services/notifications';
+import { storageService } from '../services/storage';
+import { notificationService } from '../services/notifications';
 import { useTranslation } from 'react-i18next';
 import { styles } from './(tabs)/styles/settings.styles';
 

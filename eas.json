@@ -6,21 +6,28 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "node": "20.18.0"
+      "node": "22.11.0"
     },
     "preview": {
       "distribution": "internal",
-      "node": "20.18.0",
+      "node": "22.11.0",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease"
       }
     },
     "production": {
-      "node": "20.18.0",
+      "node": "22.11.0",
       "android": {
         "buildType": "app-bundle",
         "gradleCommand": ":app:bundleRelease"
+      }
+    },
+    "local": {
+      "node": "22.11.0",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
       }
     }
   },

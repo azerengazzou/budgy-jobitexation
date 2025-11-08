@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { storageService } from '@/services/storage';
+import { storageService } from '../services/storage';
 import { User, Wallet, TrendingUp, PiggyBank } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { styles } from './(tabs)/styles/onboarding.styles';

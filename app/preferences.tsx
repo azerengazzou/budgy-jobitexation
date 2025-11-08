@@ -8,7 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Globe, DollarSign } from 'lucide-react-native';
 import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
-import { storageService } from '@/services/storage';
+import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
 import { styles } from './(tabs)/styles/settings.styles';
 

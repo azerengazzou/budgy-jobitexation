@@ -10,7 +10,7 @@ import {
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import { TrendingUp, Calculator } from 'lucide-react-native';
-import { storageService } from '@/services/storage';
+import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
 
 interface SimulationModalProps {
