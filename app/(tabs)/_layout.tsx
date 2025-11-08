@@ -62,9 +62,9 @@ export default function TabLayout() {
         name="goals"
         options={{
           title: 'Goals',
-          tabBarIcon: ({ size }) => (
+          tabBarIcon: ({ size, color }) => (
             <View style={{ position: 'relative' }}>
-              <Target size={size} color="#9CA3AF" />
+              <Target size={size} color={color || "#9CA3AF"} />
               <View style={{
                 position: 'absolute',
                 top: -6,
