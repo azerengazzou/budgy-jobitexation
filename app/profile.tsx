@@ -12,8 +12,8 @@ import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../contexts/DataContext';
-import { UserProfile } from './(tabs)/interfaces/settings';
-import { styles } from './(tabs)/styles/settings.styles';
+import { UserProfile } from './interfaces/settings';
+import { styles } from './styles/settings.styles';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();

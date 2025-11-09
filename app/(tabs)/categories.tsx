@@ -26,7 +26,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-native-modal';
 import { storageService } from '../../services/storage';
-import { styles } from './styles/categories.styles';
+import { styles } from '../styles/categories.styles';
 
 const { width } = Dimensions.get('window');
 
@@ -65,7 +65,7 @@ export default function Categories() {
         ? expenseData.map((item: any) => typeof item === 'string' ? item : item?.name || String(item))
         : [];
       setExpenseCategories(expenseCategories);
-      
+
       const revenueData = await storageService.getItem('revenue_categories');
       const revenueCategories = Array.isArray(revenueData) && revenueData.length > 0
         ? revenueData.map((item: any) => typeof item === 'string' ? item : item?.name || String(item))
@@ -119,7 +119,7 @@ export default function Categories() {
   const handleDelete = (index: number, category: string) => {
     if (activeTab === 'expenses' && fixedExpenseCategories.includes(category)) return;
     if (activeTab === 'revenues' && fixedRevenueTypes.includes(category)) return;
-    
+
     Alert.alert(t('confirm_delete'), t('delete_category_confirm'), [
       { text: t('cancel'), style: 'cancel' },
       {

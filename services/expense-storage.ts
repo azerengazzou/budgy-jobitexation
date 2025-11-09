@@ -1,5 +1,5 @@
-import { Expense } from '@/app/(tabs)/interfaces/expenses';
-import { Goal } from '@/app/(tabs)/interfaces/goals';
+import { Expense } from '@/app/interfaces/expenses';
+import { Goal } from '@/app/interfaces/goals';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS, Saving } from './storage-types';
 

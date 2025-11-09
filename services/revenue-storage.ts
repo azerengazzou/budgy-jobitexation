@@ -1,4 +1,4 @@
-import { Revenue } from '@/app/(tabs)/revenues/components/interfaces/revenues';
+import { Revenue } from '@/app/components/interfaces/revenues';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS } from './storage-types';
 

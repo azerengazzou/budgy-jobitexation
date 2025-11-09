@@ -1,6 +1,6 @@
 import { Link, Stack } from 'expo-router';
 import { Text, View } from 'react-native';
-import { styles } from './(tabs)/styles/notFound.styles';
+import { styles } from './styles/notFound.styles';
 
 export default function NotFoundScreen() {
   return (

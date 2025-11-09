@@ -14,8 +14,8 @@ import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { User, Wallet, TrendingUp, PiggyBank } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { styles } from './(tabs)/styles/onboarding.styles';
-import { Revenue } from './(tabs)/revenues/components/interfaces/revenues';
+import { styles } from './styles/onboarding.styles';
+import { Revenue } from './components/interfaces/revenues';
 
 export default function OnboardingScreen() {
   const { t } = useTranslation();

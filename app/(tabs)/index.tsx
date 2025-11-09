@@ -17,9 +17,9 @@ import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
 import Modal from 'react-native-modal';
 import { storageService } from '../../services/storage';
-import { UserProfile } from './interfaces/settings';
-import { styles } from './styles/dashboard.styles';
-import { styles as settingsStyles } from './styles/settings.styles';
+import { styles } from '../styles/dashboard.styles';
+import { styles as settingsStyles } from '../styles/settings.styles';
+import { UserProfile } from '../interfaces/settings';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -202,7 +202,7 @@ export default function Dashboard() {
         </View>
 
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.actionButton, styles.manageCategoriesButton]}
             onPress={() => router.push('/(tabs)/categories')}
           >

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { Calendar } from 'lucide-react-native';
-import { storageService } from '../../../../services/storage';
+import { storageService } from '../../services/storage';
 
 export const RevenueModal = ({
     visible,

@@ -17,8 +17,8 @@ import { storageService } from '../../services/storage';
 import { notificationService } from '../../services/notifications';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
-import { UserProfile } from './interfaces/settings';
-import { styles } from './styles/settings.styles';
+import { UserProfile } from '../interfaces/settings';
+import { styles } from '../styles/settings.styles';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();

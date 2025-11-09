@@ -13,11 +13,11 @@ import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
 import Modal from 'react-native-modal';
-import { Revenue, RevenueForm } from './revenues/components/interfaces/revenues';
-import { styles } from './revenues/components/style/revenues.styles';
-import { SummaryCard } from './revenues/components/SummaryCard';
-import { RevenueCard } from './revenues/components/RevenueCard';
-import { RevenueModal } from './revenues/components/RevenueModal';
+import { Revenue, RevenueForm } from '../components/interfaces/revenues';
+import { styles } from '../components/style/revenues.styles';
+import { SummaryCard } from '../components/SummaryCard';
+import { RevenueCard } from '../components/RevenueCard';
+import { RevenueModal } from '../components/RevenueModal';
 
 export default function RevenuesScreen() {
     const { t } = useTranslation();

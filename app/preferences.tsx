@@ -10,7 +10,7 @@ import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
-import { styles } from './(tabs)/styles/settings.styles';
+import { styles } from './styles/settings.styles';
 
 export default function PreferencesScreen() {
   const { t, i18n } = useTranslation();

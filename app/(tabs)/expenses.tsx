@@ -16,8 +16,8 @@ import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
 import { useFocusEffect } from 'expo-router';
-import { styles } from './styles/expenses.styles';
-import { Expense } from './interfaces/expenses';
+import { styles } from '../styles/expenses.styles';
+import { Expense } from '../interfaces/expenses';
 
 export default function ExpensesScreen() {
   const { t } = useTranslation();
@@ -39,7 +39,7 @@ export default function ExpensesScreen() {
   const loadCategories = async () => {
     try {
       const expenseData = await storageService.getCategories();
-      const customCategories = Array.isArray(expenseData) && expenseData.length > 0 
+      const customCategories = Array.isArray(expenseData) && expenseData.length > 0
         ? expenseData.map((item: any) => typeof item === 'string' ? item : (item?.name || String(item)))
         : [];
       const fixedCategories = ['Rent', 'Food', 'Transport', 'Savings'];

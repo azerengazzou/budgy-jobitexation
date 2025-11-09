@@ -26,36 +26,28 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ size, color }) => (
-            <Home size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="revenues"
         options={{
           title: 'Revenues',
-          tabBarIcon: ({ size, color }) => (
-            <TrendingUp size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <TrendingUp size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="expenses"
         options={{
           title: 'Expenses',
-          tabBarIcon: ({ size, color }) => (
-            <PieChart size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <PieChart size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="categories"
         options={{
           title: 'Categories',
-          tabBarIcon: ({ size, color }) => (
-            <Tag size={size} color={color} />
-          ),
+          tabBarIcon: ({ size, color }) => <Tag size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -63,35 +55,31 @@ export default function TabLayout() {
         options={{
           title: 'Goals',
           tabBarIcon: ({ size, color }) => (
-            <View style={{ position: 'relative' }}>
-              <Target size={size} color={color || "#9CA3AF"} />
+            <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+              <Target size={size} color={color} />
               <View style={{
                 position: 'absolute',
-                top: -6,
-                right: -8,
+                top: -8,
+                right: -10,
                 backgroundColor: '#F59E0B',
-                borderRadius: 6,
-                paddingHorizontal: 4,
-                paddingVertical: 1,
-                minWidth: 24,
+                borderRadius: 8,
+                paddingHorizontal: 6,
+                paddingVertical: 2,
+                minWidth: 28,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.2,
+                shadowRadius: 2,
+                elevation: 2,
               }}>
                 <Text style={{
                   color: '#FFFFFF',
-                  fontSize: 8,
+                  fontSize: 9,
                   fontWeight: 'bold',
                   textAlign: 'center',
+                  lineHeight: 12,
                 }}>Soon</Text>
               </View>
-            </View>
-          ),
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '600',
-            color: '#9CA3AF',
-          },
-          tabBarButton: (props) => (
-            <View style={props.style}>
-              {props.children}
             </View>
           ),
         }}
@@ -102,7 +90,6 @@ export default function TabLayout() {
           href: null,
         }}
       />
-      
     </Tabs>
   );
 }
