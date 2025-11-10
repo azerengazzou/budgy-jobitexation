@@ -9,7 +9,18 @@ export class RevenueStorageService extends BaseStorageService {
 
   async addRevenue(revenue: Revenue): Promise<void> {
     const revenues = await this.getRevenues();
-    await this.setItem(STORAGE_KEYS.REVENUES, [...revenues, revenue]);
+    const existingRevenueIndex = revenues.findIndex(r => r.type === revenue.type);
+    
+    if (existingRevenueIndex !== -1) {
+      // Sum with existing revenue of same category
+      revenues[existingRevenueIndex].amount += revenue.amount;
+      revenues[existingRevenueIndex].remainingAmount += revenue.amount;
+    } else {
+      // Add new revenue
+      revenues.push(revenue);
+    }
+    
+    await this.setItem(STORAGE_KEYS.REVENUES, revenues);
   }
 
   async updateRevenue(updatedRevenue: Revenue): Promise<void> {

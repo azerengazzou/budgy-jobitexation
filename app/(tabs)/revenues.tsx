@@ -74,13 +74,22 @@ export default function RevenuesScreen() {
         }
 
         try {
+            let remainingAmount = parseFloat(formData.amount);
+            
+            // If editing, recalculate remaining amount based on related expenses
+            if (editingRevenue) {
+                const expenses = await storageService.getExpenses();
+                const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === editingRevenue.id);
+                const totalExpenses = relatedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+                remainingAmount = parseFloat(formData.amount) - totalExpenses;
+            }
+
             const revenue: Revenue = {
                 id: editingRevenue?.id || Date.now().toString(),
                 name: formData.name,
                 amount: parseFloat(formData.amount),
                 type: formData.type,
-                remainingAmount:
-                    editingRevenue?.remainingAmount || parseFloat(formData.amount),
+                remainingAmount,
                 createdAt: editingRevenue?.createdAt || formData.date.toISOString(),
             };
 
