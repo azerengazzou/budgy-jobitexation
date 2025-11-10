@@ -51,7 +51,7 @@ export default function Dashboard() {
   const calculateData = () => {
     const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
     const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const savingsFromExpenses = expenses.filter(exp => exp.category === 'Savings').reduce((sum, exp) => sum + exp.amount, 0);
+    const savingsFromExpenses = expenses.filter(exp => exp.category === 'savings').reduce((sum, exp) => sum + exp.amount, 0);
     const totalSavings = savings.reduce((sum, sav) => sum + sav.amount, 0) + savingsFromExpenses;
 
     const expensesByCategory = expenses.reduce<{ name: string; amount: number; }[]>((acc, expense) => {

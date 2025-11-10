@@ -31,7 +31,7 @@ export default function ExpensesScreen() {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [formData, setFormData] = useState({
     amount: '',
-    category: 'Food',
+    category: 'food',
     description: '',
     revenueSourceId: '',
     date: new Date(),
@@ -44,11 +44,11 @@ export default function ExpensesScreen() {
       const customCategories = Array.isArray(expenseData) && expenseData.length > 0
         ? expenseData.map((item: any) => typeof item === 'string' ? item : (item?.name || String(item)))
         : [];
-      const fixedCategories = ['Rent', 'Food', 'Transport', 'Savings'];
+      const fixedCategories = ['rent', 'food', 'transport', 'savings'];
       setCategories([...fixedCategories, ...customCategories]);
     } catch (error) {
       console.error('Error loading categories:', error);
-      setCategories(['Rent', 'Food', 'Transport']);
+      setCategories(['rent', 'food', 'transport']);
     }
   };
 
@@ -144,7 +144,7 @@ export default function ExpensesScreen() {
   const resetForm = () => {
     setFormData({
       amount: '',
-      category: categories.length > 0 ? categories[0] : 'Food',
+      category: categories.length > 0 ? categories[0] : 'food',
       description: '',
       revenueSourceId: '',
       date: new Date(),
@@ -202,7 +202,9 @@ export default function ExpensesScreen() {
                 <ShoppingCart size={24} color="#F97316" />
               </View>
               <View style={styles.expenseDetails}>
-                <Text style={styles.expenseCategory}>{expense.category}</Text>
+                <Text style={styles.expenseCategory}>
+                  {['rent', 'food', 'transport', 'savings'].includes(expense.category) ? t(expense.category) : expense.category}
+                </Text>
                 <Text style={styles.expenseDescription}>{expense.description}</Text>
                 <Text style={styles.expenseDate}>
                   {new Date(expense.date).toLocaleDateString()}
@@ -271,9 +273,11 @@ export default function ExpensesScreen() {
               onValueChange={(value) => setFormData({ ...formData, category: value })}
               style={styles.picker}
             >
-              {categories.map((category) => (
-                <Picker.Item key={category} label={category} value={category} />
-              ))}
+              {categories.map((category) => {
+                const fixedCategories = ['rent', 'food', 'transport', 'savings'];
+                const label = fixedCategories.includes(category) ? t(category) : category;
+                return <Picker.Item key={category} label={label} value={category} />;
+              })}
             </Picker>
           </View>
 

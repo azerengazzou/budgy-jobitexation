@@ -42,7 +42,11 @@ export default function Categories() {
   const [fadeAnim] = useState(new Animated.Value(1));
 
   const fixedRevenueTypes = ['salary', 'freelance'];
-  const fixedExpenseCategories = ['Rent', 'Food', 'Transport', 'Savings'];
+  const fixedExpenseCategories = ['rent', 'food', 'transport', 'savings'];
+
+  const getTranslatedCategoryName = (category: string, isFixed: boolean) => {
+    return isFixed ? t(category) : category;
+  };
 
   const categoryIcons = {
     Food: Coffee,
@@ -57,6 +61,11 @@ export default function Categories() {
   useEffect(() => {
     loadCategories();
   }, []);
+
+  // Refresh when language changes
+  useEffect(() => {
+    // Force re-render when language changes
+  }, [t]);
 
   const loadCategories = async () => {
     try {
@@ -225,7 +234,7 @@ export default function Categories() {
                         <IconComponent size={18} color="#DC2626" />
                       </View>
                       <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>{item}</Text>
+                        <Text style={styles.cardTitle}>{getTranslatedCategoryName(item, fixedExpenseCategories.includes(item))}</Text>
                         <Text style={styles.cardSubtitle}>{t('expense_category')}</Text>
                       </View>
                     </View>
@@ -273,7 +282,7 @@ export default function Categories() {
                         <DollarSign size={18} color="#059669" />
                       </View>
                       <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>{item}</Text>
+                        <Text style={styles.cardTitle}>{getTranslatedCategoryName(item, fixedRevenueTypes.includes(item))}</Text>
                         <Text style={styles.cardSubtitle}>{t('revenue_type')}</Text>
                       </View>
                     </View>
