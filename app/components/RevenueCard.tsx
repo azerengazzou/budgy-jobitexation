@@ -22,7 +22,7 @@ export const RevenueCard = ({
         <View style={styles.revenueHeader}>
             <View>
                 <Text style={styles.revenueName}>{revenue.name}</Text>
-                <Text style={styles.revenueType}>{t(revenue.type)}</Text>
+                <Text style={styles.revenueType}>{revenue.type}</Text>
             </View>
             <View style={styles.revenueActions}>
                 <TouchableOpacity onPress={onEdit} style={styles.actionButton}>

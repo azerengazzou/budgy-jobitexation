@@ -37,10 +37,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [savings, setSavings] = useState<any[]>([]);
 
   const normalizeRevenues = useCallback((revenuesData: any[]) => {
-    let normalized = revenuesData.map((rev: any) => ({
-      ...rev,
-      type: VALID_REVENUE_TYPES.includes(rev.type) ? rev.type : 'other',
-    }));
+    let normalized = [...revenuesData];
 
     const salaryRevenues = normalized.filter((rev) => rev.type === 'salary');
     if (salaryRevenues.length > 1) {

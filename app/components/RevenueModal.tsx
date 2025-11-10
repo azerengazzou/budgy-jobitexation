@@ -126,9 +126,11 @@ export const RevenueModal = ({
                         setFormData((prev) => ({ ...prev, type: value as Revenue['type'] }))
                     }
                 >
-                    {revenueTypes.map((type) => (
-                        <Picker.Item key={type} label={t(type)} value={type} />
-                    ))}
+                    {revenueTypes.map((type) => {
+                        // Only translate fixed types, show custom types as-is
+                        const label = ['salary', 'freelance'].includes(type) ? t(type) : type;
+                        return <Picker.Item key={type} label={label} value={type} />;
+                    })}
                 </Picker>
 
                 {/* Buttons */}
