@@ -17,12 +17,14 @@ import { storageService } from '../../services/storage';
 import { notificationService } from '../../services/notifications';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import { UserProfile } from '../interfaces/settings';
 import { styles } from '../styles/settings.styles';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const { refreshData } = useData();
+  const { formatAmount, updateCurrency } = useCurrency();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currency, setCurrency] = useState('EUR');
   const [language, setLanguage] = useState('en');
@@ -116,6 +118,7 @@ export default function SettingsScreen() {
       language,
       notificationsEnabled,
     });
+    await updateCurrency();
   };
 
   const handleNotificationToggle = async (value: boolean) => {
@@ -303,7 +306,7 @@ export default function SettingsScreen() {
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>{t('adjust_savings')}</Text>
           <Text style={styles.modalSubtitle}>
-            {t('current_savings')}: €{totalSavings.toFixed(2)}
+            {t('current_savings')}: {formatAmount(totalSavings)}
           </Text>
 
           <TextInput

@@ -12,6 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { useData } from '../../contexts/DataContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import { DollarSign, TrendingUp, PiggyBank, Target, Settings, User } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
@@ -26,6 +27,7 @@ const screenWidth = Dimensions.get('window').width;
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const { revenues, expenses, savings, refreshData } = useData();
+  const { formatAmount } = useCurrency();
   const [data, setData] = useState<{
     totalRevenues: number;
     totalExpenses: number;
@@ -168,7 +170,7 @@ export default function Dashboard() {
               <DollarSign size={24} color="#10B981" />
               <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
             </View>
-            <Text style={styles.metricValue}>€{data.totalRevenues.toFixed(2)}</Text>
+            <Text style={styles.metricValue}>{formatAmount(data.totalRevenues)}</Text>
           </View>
 
           <View style={styles.metricCard}>
@@ -176,7 +178,7 @@ export default function Dashboard() {
               <TrendingUp size={24} color="#EF4444" />
               <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
             </View>
-            <Text style={styles.metricValue}>€{data.totalExpenses.toFixed(2)}</Text>
+            <Text style={styles.metricValue}>{formatAmount(data.totalExpenses)}</Text>
           </View>
 
           <View style={styles.metricCard}>
@@ -184,7 +186,7 @@ export default function Dashboard() {
               <PiggyBank size={24} color="#F59E0B" />
               <Text style={styles.metricTitle}>{t('savings')}</Text>
             </View>
-            <Text style={styles.metricValue}>€{data.totalSavings.toFixed(2)}</Text>
+            <Text style={styles.metricValue}>{formatAmount(data.totalSavings)}</Text>
           </View>
 
           <View style={styles.metricCard}>
@@ -196,7 +198,7 @@ export default function Dashboard() {
               styles.metricValue,
               { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
             ]}>
-              €{remainingBalance.toFixed(2)}
+              {formatAmount(remainingBalance)}
             </Text>
           </View>
         </View>

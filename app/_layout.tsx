@@ -5,6 +5,7 @@ import { useFrameworkReady } from '../hooks/useFrameworkReady';
 import { storageService } from '../services/storage';
 import { notificationService } from '../services/notifications';
 import { DataProvider } from '../contexts/DataContext';
+import { CurrencyProvider } from '../contexts/CurrencyContext';
 import '../services/i18n';
 
 export default function RootLayout() {
@@ -24,13 +25,15 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <DataProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </DataProvider>
+    <CurrencyProvider>
+      <DataProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </DataProvider>
+    </CurrencyProvider>
   );
 }

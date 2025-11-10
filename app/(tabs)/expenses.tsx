@@ -15,6 +15,7 @@ import { Plus, CreditCard as Edit3, Trash2, ShoppingCart, Calendar } from 'lucid
 import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import { useFocusEffect } from 'expo-router';
 import { styles } from '../styles/expenses.styles';
 import { Expense } from '../interfaces/expenses';
@@ -22,6 +23,7 @@ import { Expense } from '../interfaces/expenses';
 export default function ExpensesScreen() {
   const { t } = useTranslation();
   const { expenses, revenues, updateExpenses, updateRevenues } = useData();
+  const { formatAmount } = useCurrency();
   const [categories, setCategories] = useState<string[]>([
     'Rent', 'Food', 'Transport', 'Family', 'Children', 'Sports', 'Misc'
   ]);
@@ -187,7 +189,7 @@ export default function ExpensesScreen() {
 
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>{t('total_expenses')}</Text>
-        <Text style={styles.summaryValue}>€{totalExpenses.toFixed(2)}</Text>
+        <Text style={styles.summaryValue}>{formatAmount(totalExpenses)}</Text>
       </View>
 
 
@@ -207,7 +209,7 @@ export default function ExpensesScreen() {
                 </Text>
               </View>
               <View style={styles.expenseActions}>
-                <Text style={styles.expenseAmount}>€{expense.amount.toFixed(2)}</Text>
+                <Text style={styles.expenseAmount}>{formatAmount(expense.amount)}</Text>
                 <View style={styles.actionButtons}>
                   <TouchableOpacity
                     onPress={() => openEditModal(expense)}
@@ -285,7 +287,7 @@ export default function ExpensesScreen() {
               {revenues.map((revenue) => (
                 <Picker.Item
                   key={revenue.id}
-                  label={`${revenue.name} (€${revenue.remainingAmount.toFixed(2)})`}
+                  label={`${revenue.name} (${formatAmount(revenue.remainingAmount)})`}
                   value={revenue.id}
                 />
               ))}

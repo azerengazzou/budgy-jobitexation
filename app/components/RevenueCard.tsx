@@ -6,6 +6,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 import { Plus, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 export const RevenueCard = ({
     revenue,
@@ -17,7 +18,10 @@ export const RevenueCard = ({
     onEdit: () => void;
     onDelete: () => void;
     t: (key: string) => string;
-}) => (
+}) => {
+    const { formatAmount } = useCurrency();
+    
+    return (
     <View style={styles.revenueCard}>
         <View style={styles.revenueHeader}>
             <View>
@@ -37,7 +41,7 @@ export const RevenueCard = ({
         <View style={styles.revenueAmounts}>
             <View style={styles.amountItem}>
                 <Text style={styles.amountLabel}>{t('total_amount')}</Text>
-                <Text style={styles.amountValue}>€{revenue.amount.toFixed(2)}</Text>
+                <Text style={styles.amountValue}>{formatAmount(revenue.amount)}</Text>
             </View>
             <View style={styles.amountItem}>
                 <Text style={styles.amountLabel}>{t('remaining')}</Text>
@@ -47,9 +51,10 @@ export const RevenueCard = ({
                         { color: revenue.remainingAmount > 0 ? '#10B981' : '#EF4444' },
                     ]}
                 >
-                    €{revenue.remainingAmount.toFixed(2)}
+                    {formatAmount(revenue.remainingAmount)}
                 </Text>
             </View>
         </View>
     </View>
-);
+    );
+};

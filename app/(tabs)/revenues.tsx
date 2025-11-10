@@ -12,6 +12,7 @@ import { Plus, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
 import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import Modal from 'react-native-modal';
 import { Revenue, RevenueForm } from '../components/interfaces/revenues';
 import { styles } from '../components/style/revenues.styles';
@@ -22,6 +23,7 @@ import { RevenueModal } from '../components/RevenueModal';
 export default function RevenuesScreen() {
     const { t } = useTranslation();
     const { revenues, updateRevenues, updateExpenses } = useData();
+    const { formatAmount } = useCurrency();
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
@@ -160,11 +162,11 @@ export default function RevenuesScreen() {
             <View style={styles.summaryCards}>
                 <SummaryCard
                     label={t('total_income')}
-                    value={`€${totalRevenues.toFixed(2)}`}
+                    value={formatAmount(totalRevenues)}
                 />
                 <SummaryCard
                     label={t('remaining')}
-                    value={`€${totalRemaining.toFixed(2)}`}
+                    value={formatAmount(totalRemaining)}
                 />
             </View>
 
