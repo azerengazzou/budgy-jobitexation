@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { storageService } from '../services/storage';
+import { backupService } from '../services/backup-service';
 import { Expense } from '../app/interfaces/expenses';
 
 import { Revenue } from '../app/components/interfaces/revenues';
@@ -74,11 +75,13 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const updateRevenues = useCallback(async () => {
     const data = await storageService.getRevenues();
     setRevenues(normalizeRevenues(data));
+    await backupService.autoBackup();
   }, [normalizeRevenues]);
 
   const updateExpenses = useCallback(async () => {
     const data = await storageService.getExpenses();
     setExpenses(filterExpenses(data));
+    await backupService.autoBackup();
   }, [filterExpenses]);
 
 

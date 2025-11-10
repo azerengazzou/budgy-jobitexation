@@ -18,6 +18,7 @@ import { notificationService } from '../../services/notifications';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import { backupService } from '../../services/backup-service';
 import { UserProfile } from '../interfaces/settings';
 import { styles } from '../styles/settings.styles';
 
@@ -37,13 +38,15 @@ export default function SettingsScreen() {
     lastName: '',
   });
   const [savingsAmount, setSavingsAmount] = useState('');
+  const [lastBackupTime, setLastBackupTime] = useState<string | null>(null);
 
   const loadSettings = async () => {
     try {
-      const [profile, settings, savings] = await Promise.all([
+      const [profile, settings, savings, backupTime] = await Promise.all([
         storageService.getUserProfile(),
         storageService.getSettings(),
         storageService.getSavings(),
+        backupService.getLastBackupTime(),
       ]);
 
       setUserProfile(profile);
@@ -55,6 +58,7 @@ export default function SettingsScreen() {
 
       const totalSavingsAmount = savings.reduce((sum, saving) => sum + saving.amount, 0);
       setTotalSavings(totalSavingsAmount);
+      setLastBackupTime(backupTime);
     } catch (error) {
       console.error('Error loading settings:', error);
     }
@@ -248,6 +252,37 @@ export default function SettingsScreen() {
               thumbColor="#FFFFFF"
             />
           </View>
+        </View>
+
+        {/* Backup */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Backup</Text>
+          <TouchableOpacity style={styles.settingCard} onPress={async () => {
+            try {
+              const filePath = await backupService.createBackup();
+              if (filePath) {
+                Alert.alert('Success', 'Backup created successfully!');
+                await loadSettings();
+              } else {
+                Alert.alert('Error', 'Failed to create backup');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'Failed to create backup');
+            }
+          }}>
+            <View style={styles.settingLeft}>
+              <FileText size={24} color="#10B981" />
+              <View style={styles.settingText}>
+                <Text style={styles.settingTitle}>Manual Backup</Text>
+                <Text style={styles.settingSubtitle}>
+                  {lastBackupTime 
+                    ? `Last backup: ${new Date(lastBackupTime).toLocaleString()}`
+                    : 'No backup created yet'
+                  }
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* Export */}
