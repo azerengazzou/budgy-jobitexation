@@ -50,7 +50,12 @@ class BackupService {
       };
 
       const fileName = this.getBackupFileName();
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      // Save to budgy_backup folder to persist after app deletion
+      const backupDir = `${FileSystem.documentDirectory}../budgy_backup/`;
+      const fileUri = `${backupDir}${fileName}`;
+      
+      // Ensure budgy_backup directory exists
+      await FileSystem.makeDirectoryAsync(backupDir, { intermediates: true });
       
       await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(backupData, null, 2));
       
@@ -82,14 +87,15 @@ class BackupService {
 
   async scanForBackups(): Promise<string | null> {
     try {
-      const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory!);
+      const backupDir = `${FileSystem.documentDirectory}../budgy_backup/`;
+      const files = await FileSystem.readDirectoryAsync(backupDir);
       const backupFiles = files.filter(file => file.startsWith('finance_backup_') && file.endsWith('.json'));
       
       if (backupFiles.length === 0) return null;
       
       // Return the most recent backup file
       const latestBackup = backupFiles.sort().reverse()[0];
-      return `${FileSystem.documentDirectory}${latestBackup}`;
+      return `${backupDir}${latestBackup}`;
     } catch (error) {
       console.error('Backup scan failed:', error);
       return null;

@@ -75,13 +75,11 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const updateRevenues = useCallback(async () => {
     const data = await storageService.getRevenues();
     setRevenues(normalizeRevenues(data));
-    await backupService.autoBackup();
   }, [normalizeRevenues]);
 
   const updateExpenses = useCallback(async () => {
     const data = await storageService.getExpenses();
     setExpenses(filterExpenses(data));
-    await backupService.autoBackup();
   }, [filterExpenses]);
 
 
@@ -93,6 +91,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   const refreshData = useCallback(async () => {
     await loadAllData();
+    await backupService.autoBackup();
   }, [loadAllData]);
 
   useEffect(() => {
