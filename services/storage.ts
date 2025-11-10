@@ -3,6 +3,7 @@ import { RevenueStorageService } from './revenue-storage';
 import { UserStorageService } from './user-storage';
 import { ExpenseStorageService } from './expense-storage';
 import { STORAGE_KEYS } from './storage-types';
+import { backupService } from './backup-service';
 
 class StorageService extends RevenueStorageService {
   private userStorage = new UserStorageService();
@@ -14,9 +15,17 @@ class StorageService extends RevenueStorageService {
   async setOnboardingComplete() { return this.userStorage.setOnboardingComplete(); }
   async isOnboardingComplete() { return this.userStorage.isOnboardingComplete(); }
   async getSettings() { return this.userStorage.getSettings(); }
-  async saveSettings(settings: any) { return this.userStorage.saveSettings(settings); }
+  async saveSettings(settings: any) { 
+    const result = await this.userStorage.saveSettings(settings);
+    await backupService.autoBackup();
+    return result;
+  }
   async getCategories() { return this.userStorage.getCategories(); }
-  async saveCategories(categories: string[]) { return this.userStorage.saveCategories(categories); }
+  async saveCategories(categories: string[]) { 
+    const result = await this.userStorage.saveCategories(categories);
+    await backupService.autoBackup();
+    return result;
+  }
   async getItem(key: string): Promise<any> { 
     return await this.userStorage.getItem(key); 
   }
@@ -26,9 +35,21 @@ class StorageService extends RevenueStorageService {
 
   // Expense methods
   async getExpenses() { return this.expenseStorage.getExpenses(); }
-  async addExpense(expense: any) { return this.expenseStorage.addExpense(expense); }
-  async updateExpense(expense: any) { return this.expenseStorage.updateExpense(expense); }
-  async deleteExpense(id: string) { return this.expenseStorage.deleteExpense(id); }
+  async addExpense(expense: any) { 
+    const result = await this.expenseStorage.addExpense(expense);
+    await backupService.autoBackup();
+    return result;
+  }
+  async updateExpense(expense: any) { 
+    const result = await this.expenseStorage.updateExpense(expense);
+    await backupService.autoBackup();
+    return result;
+  }
+  async deleteExpense(id: string) { 
+    const result = await this.expenseStorage.deleteExpense(id);
+    await backupService.autoBackup();
+    return result;
+  }
   async deleteExpensesByRevenueId(revenueId: string) { return this.expenseStorage.deleteExpensesByRevenueId(revenueId); }
 
   // Savings methods
@@ -45,6 +66,25 @@ class StorageService extends RevenueStorageService {
 
 
 
+
+  // Override revenue methods to add backup triggers
+  async addRevenue(revenue: any) {
+    const result = await super.addRevenue(revenue);
+    await backupService.autoBackup();
+    return result;
+  }
+
+  async updateRevenue(revenue: any) {
+    const result = await super.updateRevenue(revenue);
+    await backupService.autoBackup();
+    return result;
+  }
+
+  async deleteRevenue(id: string) {
+    const result = await super.deleteRevenue(id);
+    await backupService.autoBackup();
+    return result;
+  }
 
   // Monthly carry-over logic
   async processMonthlyCarryOver(): Promise<void> {

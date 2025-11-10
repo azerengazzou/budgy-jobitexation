@@ -37,21 +37,21 @@ class BackupService {
       ]);
 
       const backupData: BackupData = {
-        revenues: revenues ? JSON.parse(revenues) : [],
-        expenses: expenses ? JSON.parse(expenses) : [],
-        categories: categories ? JSON.parse(categories) : [],
-        revenueCategories: revenueCategories ? JSON.parse(revenueCategories) : [],
-        settings: settings ? JSON.parse(settings) : {},
-        userProfile: userProfile ? JSON.parse(userProfile) : {},
-        savings: savings ? JSON.parse(savings) : [],
-        goals: goals ? JSON.parse(goals) : [],
+        revenues: this.safeJsonParse(revenues, []),
+        expenses: this.safeJsonParse(expenses, []),
+        categories: this.safeJsonParse(categories, []),
+        revenueCategories: this.safeJsonParse(revenueCategories, []),
+        settings: this.safeJsonParse(settings, {}),
+        userProfile: this.safeJsonParse(userProfile, {}),
+        savings: this.safeJsonParse(savings, []),
+        goals: this.safeJsonParse(goals, []),
         timestamp: new Date().toISOString(),
         version: '1.0.0',
       };
 
       const fileName = this.getBackupFileName();
-      // Save to budgy_backup folder to persist after app deletion
-      const backupDir = `${FileSystem.documentDirectory}../budgy_backup/`;
+      // Save to budgy_backup folder in document directory
+      const backupDir = `${FileSystem.documentDirectory}budgy_backup/`;
       const fileUri = `${backupDir}${fileName}`;
       
       // Ensure budgy_backup directory exists
@@ -77,6 +77,15 @@ class BackupService {
     }
   }
 
+  private safeJsonParse(jsonString: string | null, defaultValue: any): any {
+    if (!jsonString || jsonString === 'undefined') return defaultValue;
+    try {
+      return JSON.parse(jsonString);
+    } catch (error) {
+      return defaultValue;
+    }
+  }
+
   async autoBackup(): Promise<void> {
     try {
       await this.createBackup();
@@ -87,7 +96,7 @@ class BackupService {
 
   async scanForBackups(): Promise<string | null> {
     try {
-      const backupDir = `${FileSystem.documentDirectory}../budgy_backup/`;
+      const backupDir = `${FileSystem.documentDirectory}budgy_backup/`;
       const files = await FileSystem.readDirectoryAsync(backupDir);
       const backupFiles = files.filter(file => file.startsWith('finance_backup_') && file.endsWith('.json'));
       

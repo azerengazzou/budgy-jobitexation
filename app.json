@@ -16,7 +16,7 @@
     "runtimeVersion": "1.1.7",
     "android": {
       "package": "com.budgy.app",
-      "versionCode": 1,
+      "versionCode": 117,
       "compileSdkVersion": 35,
       "targetSdkVersion": 35,
       "minSdkVersion": 23,
