@@ -52,9 +52,8 @@ class NotificationService {
         body: "Don't forget to log your expenses today!",
       },
       trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.CALENDAR, // ✅ TS-safe
         hour: 20,
-        minute: 0,
+        minute: 41,
         repeats: true,
       },
     });
@@ -66,21 +65,19 @@ class NotificationService {
         body: 'How about adding some money to your savings this week?',
       },
       trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, // ✅ TS-safe
         seconds: 60 * 60 * 24 * 7, // one week
         repeats: true,
       },
     });
 
-    // ✅ 15-minute test notification
+    // Hourly expense reminder
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Test Notification', // Note: Notifications don't support i18n directly
-        body: 'hello , thank you for testing our application, wiouuuu',
+        title: 'Budgeting Reminder',
+        body: 'Did you stop tracking your expenses? Don\'t forget to log your expenses for today.',
       },
       trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 60 * 15, // 15 minutes
+        seconds: 60 * 60, // 1 hour
         repeats: true,
       },
     });
@@ -99,7 +96,7 @@ class NotificationService {
         title: 'Budget Alert!', // Note: Notifications don't support i18n directly
         body: `You've spent €${amount.toFixed(2)} in ${category}, exceeding your limit of €${limit.toFixed(2)}`,
       },
-      trigger: null, // send immediately
+      trigger: null,
     });
   }
 }

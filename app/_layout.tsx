@@ -19,6 +19,7 @@ export default function RootLayout() {
 
       // Setup notifications
       await notificationService.requestPermissions();
+      await notificationService.scheduleNotifications();
     };
 
     initializeApp();
