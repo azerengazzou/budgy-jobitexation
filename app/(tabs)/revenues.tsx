@@ -21,7 +21,7 @@ import { RevenueModal } from '../components/RevenueModal';
 
 export default function RevenuesScreen() {
     const { t } = useTranslation();
-    const { revenues, updateRevenues } = useData();
+    const { revenues, updateRevenues, updateExpenses } = useData();
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
@@ -105,23 +105,41 @@ export default function RevenuesScreen() {
         }
     };
 
-    const handleDeleteRevenue = (id: string) => {
-        Alert.alert(t('delete_revenue'), t('delete_revenue_confirmation'), [
-            { text: t('cancel'), style: 'cancel' },
-            {
-                text: t('delete'),
-                style: 'destructive',
-                onPress: async () => {
-                    try {
-                        await storageService.deleteRevenue(id);
-                        await updateRevenues();
-                    } catch (error) {
-                        console.error('Error deleting revenue:', error);
-                        Alert.alert('Error', 'Failed to delete revenue');
-                    }
+    const handleDeleteRevenue = async (id: string) => {
+        try {
+            // Check if there are related expenses
+            const expenses = await storageService.getExpenses();
+            const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
+            const hasRelatedExpenses = relatedExpenses.length > 0;
+            
+            const message = hasRelatedExpenses 
+                ? `${t('delete_revenue_confirmation')} All expenses related to this revenue will also be deleted.`
+                : t('delete_revenue_confirmation');
+
+            Alert.alert(t('delete_revenue'), message, [
+                { text: t('cancel'), style: 'cancel' },
+                {
+                    text: t('delete'),
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await storageService.deleteRevenue(id);
+                            if (hasRelatedExpenses) {
+                                await storageService.deleteExpensesByRevenueId(id);
+                            }
+                            await updateRevenues();
+                            await updateExpenses();
+                        } catch (error) {
+                            console.error('Error deleting revenue:', error);
+                            Alert.alert('Error', 'Failed to delete revenue');
+                        }
+                    },
                 },
-            },
-        ]);
+            ]);
+        } catch (error) {
+            console.error('Error checking related expenses:', error);
+            Alert.alert('Error', 'Failed to delete revenue');
+        }
     };
 
     const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);

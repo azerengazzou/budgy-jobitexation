@@ -27,6 +27,11 @@ export class ExpenseStorageService extends BaseStorageService {
     await this.setItem(STORAGE_KEYS.EXPENSES, expenses.filter(e => e.id !== id));
   }
 
+  async deleteExpensesByRevenueId(revenueId: string): Promise<void> {
+    const expenses = await this.getExpenses();
+    await this.setItem(STORAGE_KEYS.EXPENSES, expenses.filter(e => e.revenueSourceId !== revenueId));
+  }
+
   async getSavings(): Promise<Saving[]> {
     return (await this.getItem<Saving[]>(STORAGE_KEYS.SAVINGS)) || [];
   }

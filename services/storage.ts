@@ -25,6 +25,7 @@ class StorageService extends RevenueStorageService {
   async addExpense(expense: any) { return this.expenseStorage.addExpense(expense); }
   async updateExpense(expense: any) { return this.expenseStorage.updateExpense(expense); }
   async deleteExpense(id: string) { return this.expenseStorage.deleteExpense(id); }
+  async deleteExpensesByRevenueId(revenueId: string) { return this.expenseStorage.deleteExpensesByRevenueId(revenueId); }
 
   // Savings methods
   async getSavings() { return this.expenseStorage.getSavings(); }
