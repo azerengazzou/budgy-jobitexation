@@ -11,6 +11,7 @@ interface BackupData {
   userProfile: any;
   savings: any[];
   goals: any[];
+  savingsTransactions: any[];
   timestamp: string;
   version: string;
 }
@@ -25,7 +26,7 @@ class BackupService {
   async createBackup(): Promise<string | null> {
     try {
       // Use AsyncStorage directly to avoid circular dependency
-      const [revenues, expenses, categories, revenueCategories, settings, userProfile, savings, goals] = await Promise.all([
+      const [revenues, expenses, categories, revenueCategories, settings, userProfile, savings, goals, savingsTransactions] = await Promise.all([
         AsyncStorage.getItem(STORAGE_KEYS.REVENUES),
         AsyncStorage.getItem(STORAGE_KEYS.EXPENSES),
         AsyncStorage.getItem(STORAGE_KEYS.CATEGORIES),
@@ -34,6 +35,7 @@ class BackupService {
         AsyncStorage.getItem(STORAGE_KEYS.USER_PROFILE),
         AsyncStorage.getItem(STORAGE_KEYS.SAVINGS),
         AsyncStorage.getItem(STORAGE_KEYS.GOALS),
+        AsyncStorage.getItem('savings_transactions'),
       ]);
 
       const backupData: BackupData = {
@@ -45,8 +47,9 @@ class BackupService {
         userProfile: this.safeJsonParse(userProfile, {}),
         savings: this.safeJsonParse(savings, []),
         goals: this.safeJsonParse(goals, []),
+        savingsTransactions: this.safeJsonParse(savingsTransactions, []),
         timestamp: new Date().toISOString(),
-        version: '1.0.0',
+        version: '1.1.0',
       };
 
       const fileName = this.getBackupFileName();
@@ -126,6 +129,7 @@ class BackupService {
         AsyncStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(backupData.userProfile)),
         AsyncStorage.setItem(STORAGE_KEYS.SAVINGS, JSON.stringify(backupData.savings)),
         AsyncStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(backupData.goals)),
+        AsyncStorage.setItem('savings_transactions', JSON.stringify(backupData.savingsTransactions || [])),
       ]);
       
       return true;

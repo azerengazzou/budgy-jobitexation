@@ -2,17 +2,21 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { storageService } from '../services/storage';
 import { backupService } from '../services/backup-service';
 import { Expense } from '../app/interfaces/expenses';
-
 import { Revenue } from '../app/components/interfaces/revenues';
+import { Goal, SavingsTransaction } from '../app/interfaces/savings';
 
 interface DataContextType {
   revenues: Revenue[];
   expenses: Expense[];
   savings: any[];
+  goals: Goal[];
+  savingsTransactions: SavingsTransaction[];
   refreshData: () => Promise<void>;
   updateRevenues: () => Promise<void>;
   updateExpenses: () => Promise<void>;
   updateSavings: () => Promise<void>;
+  updateGoals: () => Promise<void>;
+  updateSavingsTransactions: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -34,8 +38,9 @@ const VALID_REVENUE_TYPES = ['salary', 'freelance', 'business', 'investment', 'o
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-
   const [savings, setSavings] = useState<any[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [savingsTransactions, setSavingsTransactions] = useState<SavingsTransaction[]>([]);
 
   const normalizeRevenues = useCallback((revenuesData: any[]) => {
     let normalized = [...revenuesData];
@@ -58,15 +63,19 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   const loadAllData = useCallback(async () => {
     try {
-      const [revenuesData, expensesData, savingsData] = await Promise.all([
+      const [revenuesData, expensesData, savingsData, goalsData, savingsTransactionsData] = await Promise.all([
         storageService.getRevenues(),
         storageService.getExpenses(),
         storageService.getSavings(),
+        storageService.getGoals(),
+        storageService.getSavingsTransactions(),
       ]);
 
       setRevenues(normalizeRevenues(revenuesData));
       setExpenses(filterExpenses(expensesData));
       setSavings(savingsData);
+      setGoals(goalsData);
+      setSavingsTransactions(savingsTransactionsData);
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -89,6 +98,16 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     setSavings(data);
   }, []);
 
+  const updateGoals = useCallback(async () => {
+    const data = await storageService.getGoals();
+    setGoals(data);
+  }, []);
+
+  const updateSavingsTransactions = useCallback(async () => {
+    const data = await storageService.getSavingsTransactions();
+    setSavingsTransactions(data);
+  }, []);
+
   const refreshData = useCallback(async () => {
     await loadAllData();
     await backupService.autoBackup();
@@ -104,10 +123,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         revenues,
         expenses,
         savings,
+        goals,
+        savingsTransactions,
         refreshData,
         updateRevenues,
         updateExpenses,
         updateSavings,
+        updateGoals,
+        updateSavingsTransactions,
       }}
     >
       {children}

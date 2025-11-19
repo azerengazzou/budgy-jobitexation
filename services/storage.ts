@@ -2,12 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RevenueStorageService } from './revenue-storage';
 import { UserStorageService } from './user-storage';
 import { ExpenseStorageService } from './expense-storage';
+import { SavingsStorageService } from './savings-storage';
 import { STORAGE_KEYS } from './storage-types';
 import { backupService } from './backup-service';
+import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
 
 class StorageService extends RevenueStorageService {
   private userStorage = new UserStorageService();
   private expenseStorage = new ExpenseStorageService();
+  private savingsStorage = new SavingsStorageService();
 
   // User Profile methods
   async saveUserProfile(profile: any) { return this.userStorage.saveUserProfile(profile); }
@@ -57,11 +60,50 @@ class StorageService extends RevenueStorageService {
   async addSaving(saving: any) { return this.expenseStorage.addSaving(saving); }
   async deductFromSavings(amount: number) { return this.expenseStorage.deductFromSavings(amount); }
 
-  // Goals methods
-  async getGoals() { return this.expenseStorage.getGoals(); }
-  async addGoal(goal: any) { return this.expenseStorage.addGoal(goal); }
-  async updateGoal(goal: any) { return this.expenseStorage.updateGoal(goal); }
-  async deleteGoal(id: string) { return this.expenseStorage.deleteGoal(id); }
+  // Goals methods with savings integration
+  async getGoals(): Promise<Goal[]> { return this.expenseStorage.getGoals(); }
+  async addGoal(goal: Goal) { 
+    const result = await this.expenseStorage.addGoal(goal);
+    await backupService.autoBackup();
+    return result;
+  }
+  async updateGoal(goal: Goal) { 
+    const result = await this.expenseStorage.updateGoal(goal);
+    await backupService.autoBackup();
+    return result;
+  }
+  async deleteGoal(id: string) { 
+    // Delete related savings transactions
+    await this.savingsStorage.deleteTransactionsByGoalId(id);
+    const result = await this.expenseStorage.deleteGoal(id);
+    await backupService.autoBackup();
+    return result;
+  }
+
+  // Savings Transactions methods
+  async getSavingsTransactions(): Promise<SavingsTransaction[]> {
+    return this.savingsStorage.getSavingsTransactions();
+  }
+  async addSavingsTransaction(transaction: SavingsTransaction) {
+    await this.savingsStorage.addSavingsTransaction(transaction);
+    // Update goal's current amount
+    const currentAmount = await this.savingsStorage.calculateGoalCurrentAmount(transaction.goalId);
+    const goals = await this.getGoals();
+    const goalIndex = goals.findIndex(g => g.id === transaction.goalId);
+    if (goalIndex !== -1) {
+      goals[goalIndex].currentAmount = currentAmount;
+      goals[goalIndex].updatedAt = new Date().toISOString();
+      // Check if goal is completed
+      if (currentAmount >= goals[goalIndex].targetAmount && goals[goalIndex].status === 'active') {
+        goals[goalIndex].status = 'completed';
+      }
+      await this.expenseStorage.updateGoal(goals[goalIndex]);
+    }
+    await backupService.autoBackup();
+  }
+  async getTransactionsByGoalId(goalId: string): Promise<SavingsTransaction[]> {
+    return this.savingsStorage.getTransactionsByGoalId(goalId);
+  }
 
 
 
@@ -84,6 +126,11 @@ class StorageService extends RevenueStorageService {
     const result = await super.deleteRevenue(id);
     await backupService.autoBackup();
     return result;
+  }
+
+  // Deduct from revenue when saving
+  async deductFromRevenueForSaving(revenueId: string, amount: number): Promise<void> {
+    await this.deductFromRevenue(revenueId, amount);
   }
 
   // Monthly carry-over logic
