@@ -6,6 +6,9 @@ import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
 import { Revenue } from '@/app/components/interfaces/revenues';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useTranslation } from 'react-i18next';
+import { RequiredFieldIndicator } from './RequiredFieldIndicator';
+import { NumericInput } from './NumericInput';
+import { KeyboardDismissWrapper } from './KeyboardDismissWrapper';
 
 interface AddSavingsModalProps {
   visible: boolean;
@@ -56,7 +59,7 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
       type: 'deposit',
       description: description || `${t('savings_for')} ${goal.title}`,
       date: new Date().toISOString(),
-      revenueSourceId: selectedRevenueId || undefined,
+      ...(selectedRevenueId && { revenueSourceId: selectedRevenueId }),
     };
 
     onSave(transaction, selectedRevenueId || undefined);
@@ -68,7 +71,7 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
+      <KeyboardDismissWrapper style={{ backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
         <View style={{ 
           backgroundColor: 'white', 
           borderTopLeftRadius: 24, 
@@ -117,14 +120,11 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
           </View>
 
           {/* Amount input */}
-          <Text style={{ fontSize: 14, fontWeight: '600', color: '#1F2937', marginBottom: 8 }}>
-            {t('amount')}:
-          </Text>
-          <TextInput
+          <RequiredFieldIndicator label={t('amount')} required={true} />
+          <NumericInput
             value={amount}
             onChangeText={setAmount}
             placeholder={t('enter_amount')}
-            keyboardType="numeric"
             style={{
               borderWidth: 1,
               borderColor: '#D1D5DB',
@@ -137,9 +137,7 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
           />
 
           {/* Revenue source selection */}
-          <Text style={{ fontSize: 14, fontWeight: '600', color: '#1F2937', marginBottom: 8 }}>
-            {t('deduct_from')}:
-          </Text>
+          <RequiredFieldIndicator label={t('deduct_from')} required={true} />
           <View style={{ marginBottom: 16 }}>
             {revenues.map((revenue) => (
               <TouchableOpacity
@@ -169,6 +167,7 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
           </View>
 
           {/* Description */}
+          <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
           <TextInput
             value={description}
             onChangeText={setDescription}
@@ -199,7 +198,7 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
             </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
+      </KeyboardDismissWrapper>
     </Modal>
   );
 };

@@ -37,6 +37,8 @@ export const styles = StyleSheet.create({
         padding: 12,
         width: '48%',
         marginBottom: 8,
+    },
+    metricCardShadow: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
@@ -66,6 +68,8 @@ export const styles = StyleSheet.create({
         padding: 25,
         marginBottom: 20,
         alignItems: 'center',
+    },
+    balanceCardShadow: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -87,6 +91,8 @@ export const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 20,
         marginBottom: 20,
+    },
+    chartCardShadow: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -127,6 +133,8 @@ export const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: 5,
         alignItems: 'center',
+    },
+    actionButtonShadow: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,

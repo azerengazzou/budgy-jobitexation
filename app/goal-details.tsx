@@ -10,8 +10,11 @@ import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { ProgressRing } from '@/components/ProgressRing';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
+import { GoalCompletionAnimation } from '@/components/GoalCompletionAnimation';
+import { useGoalCompletionAnimation } from '@/hooks/useGoalCompletionAnimation';
 
 export default function GoalDetailsScreen() {
+  // ✅ ALL HOOKS AT THE TOP - ALWAYS CALLED IN SAME ORDER
   const { t } = useTranslation();
   const router = useRouter();
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
@@ -21,21 +24,48 @@ export default function GoalDetailsScreen() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [transactions, setTransactions] = useState<SavingsTransaction[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  
+  // ✅ ALWAYS call useGoalCompletionAnimation - handle null goal inside the hook
+  const {
+    isAnimating,
+    showAnimation,
+    isComplete,
+    currentProgress,
+    handleAnimationFinished,
+  } = useGoalCompletionAnimation({
+    goal: goal || {
+      id: '',
+      title: '',
+      targetAmount: 0,
+      currentAmount: 0,
+      currency: 'EUR',
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    },
+    onCompletionFinished: () => {
+      console.log('Goal completion animation finished!');
+    },
+  });
 
+  // ✅ SINGLE SOURCE OF TRUTH - Only update from goals array
   useEffect(() => {
-    loadGoalData();
-  }, [goalId, goals]);
+    if (goalId && goals.length > 0) {
+      const foundGoal = goals.find(g => g.id === goalId);
+      if (foundGoal) {
+        setGoal(foundGoal);
+      }
+    }
+  }, [goals, goalId]);
 
-  const loadGoalData = async () => {
-    if (!goalId) return;
-    
-    const foundGoal = goals.find(g => g.id === goalId);
-    if (foundGoal) {
-      setGoal(foundGoal);
+  // ✅ SEPARATE EFFECT FOR TRANSACTIONS ONLY
+  useEffect(() => {
+    const loadTransactions = async () => {
+      if (!goalId) return;
       const goalTransactions = await storageService.getTransactionsByGoalId(goalId);
       setTransactions(goalTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-    }
-  };
+    };
+    loadTransactions();
+  }, [goalId]);
 
   const handleAddSavings = async (transaction: SavingsTransaction, revenueSourceId?: string) => {
     try {
@@ -43,14 +73,18 @@ export default function GoalDetailsScreen() {
       if (revenueSourceId) {
         await storageService.deductFromRevenueForSaving(revenueSourceId, transaction.amount);
       }
+      // ✅ SINGLE REFRESH - Let useEffect handle the rest
       await refreshData();
-      await loadGoalData();
+      // ✅ RELOAD TRANSACTIONS SEPARATELY
+      const goalTransactions = await storageService.getTransactionsByGoalId(transaction.goalId);
+      setTransactions(goalTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
     } catch (error) {
       console.error('Error adding savings:', error);
     }
   };
 
-  if (!goal) {
+  // ✅ VALIDATION AFTER ALL HOOKS - Safe to return early now
+  if (!goal || !goal.id) {
     return (
       <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -60,12 +94,12 @@ export default function GoalDetailsScreen() {
     );
   }
 
-  const progressPercentage = goal.targetAmount > 0 
+  const progressPercentage = currentProgress || (goal.targetAmount > 0 
     ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100) 
-    : 0;
+    : 0);
 
   const remainingAmount = Math.max(goal.targetAmount - goal.currentAmount, 0);
-  const isCompleted = goal.currentAmount >= goal.targetAmount;
+  const isCompleted = isComplete || goal.currentAmount >= goal.targetAmount;
 
   const getProgressColor = (percentage: number) => {
     if (percentage >= 100) return '#10B981';
@@ -75,21 +109,25 @@ export default function GoalDetailsScreen() {
   };
 
   const renderTransaction = ({ item }: { item: SavingsTransaction }) => (
-    <View style={{
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      backgroundColor: 'white',
-      borderRadius: 12,
-      marginBottom: 8,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 1,
-    }}>
+    <View style={[
+      {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        backgroundColor: 'white',
+        borderRadius: 12,
+        marginBottom: 8,
+        elevation: 1,
+      },
+      {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      }
+    ]}>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 16, fontWeight: '500', color: '#1F2937', marginBottom: 2 }}>
           {item.description}
@@ -125,13 +163,15 @@ export default function GoalDetailsScreen() {
           </View>
         </View>
 
-        {/* Progress Ring */}
+        {/* Progress Ring with Completion Animation */}
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
-          <ProgressRing
+          <GoalCompletionAnimation
+            isComplete={isCompleted}
             size={160}
             strokeWidth={12}
             progress={progressPercentage}
             color={getProgressColor(progressPercentage)}
+            onFinished={handleAnimationFinished}
           >
             <View style={{ alignItems: 'center' }}>
               <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'white' }}>
@@ -141,7 +181,7 @@ export default function GoalDetailsScreen() {
                 {t('complete')}
               </Text>
             </View>
-          </ProgressRing>
+          </GoalCompletionAnimation>
         </View>
 
         {/* Amount Info */}
@@ -187,7 +227,9 @@ export default function GoalDetailsScreen() {
               justifyContent: 'center',
             }}
           >
-            <Plus size={20} color="white" style={{ marginRight: 8 }} />
+            <View style={{ marginRight: 8 }}>
+              <Plus size={20} color="white" />
+            </View>
             <Text style={{ color: 'white', fontWeight: '600' }}>{t('add_money')}</Text>
           </TouchableOpacity>
           

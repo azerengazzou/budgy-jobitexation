@@ -35,6 +35,7 @@ export default function GoalsScreen() {
   const handleAddGoal = () => {
     router.push('/add-goal');
   };
+  
 
   const handleAddSavings = async (transaction: SavingsTransaction, revenueSourceId?: string) => {
     try {

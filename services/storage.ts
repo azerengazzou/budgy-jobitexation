@@ -85,20 +85,32 @@ class StorageService extends RevenueStorageService {
     return this.savingsStorage.getSavingsTransactions();
   }
   async addSavingsTransaction(transaction: SavingsTransaction) {
+    console.log('Adding savings transaction:', transaction);
     await this.savingsStorage.addSavingsTransaction(transaction);
+    
     // Update goal's current amount
     const currentAmount = await this.savingsStorage.calculateGoalCurrentAmount(transaction.goalId);
+    console.log('Calculated current amount:', currentAmount);
+    
     const goals = await this.getGoals();
     const goalIndex = goals.findIndex(g => g.id === transaction.goalId);
+    
     if (goalIndex !== -1) {
+      console.log('Before update - Goal current amount:', goals[goalIndex].currentAmount);
       goals[goalIndex].currentAmount = currentAmount;
       goals[goalIndex].updatedAt = new Date().toISOString();
+      
       // Check if goal is completed
       if (currentAmount >= goals[goalIndex].targetAmount && goals[goalIndex].status === 'active') {
         goals[goalIndex].status = 'completed';
       }
+      
       await this.expenseStorage.updateGoal(goals[goalIndex]);
+      console.log('After update - Goal current amount:', goals[goalIndex].currentAmount);
+    } else {
+      console.log('Goal not found with ID:', transaction.goalId);
     }
+    
     await backupService.autoBackup();
   }
   async getTransactionsByGoalId(goalId: string): Promise<SavingsTransaction[]> {

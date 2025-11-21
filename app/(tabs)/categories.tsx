@@ -27,6 +27,8 @@ import { useTranslation } from 'react-i18next';
 import Modal from 'react-native-modal';
 import { storageService } from '../../services/storage';
 import { styles } from '../styles/categories.styles';
+import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
+import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
 const { width } = Dimensions.get('window');
 
@@ -178,7 +180,8 @@ export default function Categories() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardDismissWrapper>
+      <View style={styles.container}>
       <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.header}>
         <Text style={styles.headerTitle}>{t('manage_categories')}</Text>
 
@@ -329,7 +332,7 @@ export default function Categories() {
           <View style={styles.modalDivider} />
 
           <View style={styles.modalBody}>
-            <Text style={styles.inputLabel}>{t('category_name')}</Text>
+            <RequiredFieldIndicator label={t('category_name')} required={true} />
             <TextInput
               style={styles.modernInput}
               placeholder={t('enter_category_name')}
@@ -351,6 +354,7 @@ export default function Categories() {
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </KeyboardDismissWrapper>
   );
 }

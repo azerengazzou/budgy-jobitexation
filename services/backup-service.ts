@@ -81,10 +81,19 @@ class BackupService {
   }
 
   private safeJsonParse(jsonString: string | null, defaultValue: any): any {
-    if (!jsonString || jsonString === 'undefined') return defaultValue;
+    // ✅ COMPREHENSIVE NULL/UNDEFINED CHECKS
+    if (!jsonString || 
+        jsonString === 'undefined' || 
+        jsonString === 'null' || 
+        jsonString.trim() === '') {
+      return defaultValue;
+    }
+    
     try {
-      return JSON.parse(jsonString);
+      const parsed = JSON.parse(jsonString);
+      return parsed !== null && parsed !== undefined ? parsed : defaultValue;
     } catch (error) {
+      console.error('JSON parse error:', error);
       return defaultValue;
     }
   }
@@ -117,18 +126,31 @@ class BackupService {
   async restoreFromBackup(filePath: string): Promise<boolean> {
     try {
       const backupContent = await FileSystem.readAsStringAsync(filePath);
+      
+      // ✅ VALIDATE BEFORE JSON.parse
+      if (!backupContent || backupContent.trim() === '' || backupContent === 'undefined') {
+        console.error('Invalid backup content');
+        return false;
+      }
+      
       const backupData: BackupData = JSON.parse(backupContent);
+      
+      // ✅ VALIDATE BACKUP DATA STRUCTURE
+      if (!backupData || typeof backupData !== 'object') {
+        console.error('Invalid backup data structure');
+        return false;
+      }
       
       // Use AsyncStorage directly to avoid circular dependency
       await Promise.all([
-        AsyncStorage.setItem(STORAGE_KEYS.REVENUES, JSON.stringify(backupData.revenues)),
-        AsyncStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(backupData.expenses)),
-        AsyncStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(backupData.categories)),
-        AsyncStorage.setItem('revenue_categories', JSON.stringify(backupData.revenueCategories)),
-        AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(backupData.settings)),
-        AsyncStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(backupData.userProfile)),
-        AsyncStorage.setItem(STORAGE_KEYS.SAVINGS, JSON.stringify(backupData.savings)),
-        AsyncStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(backupData.goals)),
+        AsyncStorage.setItem(STORAGE_KEYS.REVENUES, JSON.stringify(backupData.revenues || [])),
+        AsyncStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(backupData.expenses || [])),
+        AsyncStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(backupData.categories || [])),
+        AsyncStorage.setItem('revenue_categories', JSON.stringify(backupData.revenueCategories || [])),
+        AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(backupData.settings || {})),
+        AsyncStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(backupData.userProfile || {})),
+        AsyncStorage.setItem(STORAGE_KEYS.SAVINGS, JSON.stringify(backupData.savings || [])),
+        AsyncStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(backupData.goals || [])),
         AsyncStorage.setItem('savings_transactions', JSON.stringify(backupData.savingsTransactions || [])),
       ]);
       

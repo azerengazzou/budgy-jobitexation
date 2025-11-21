@@ -25,12 +25,14 @@ export const styles = StyleSheet.create({
         padding: 20,
         marginHorizontal: 20,
         marginBottom: 20,
+        alignItems: 'center',
+    },
+    summaryCardShadow: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
         elevation: 3,
-        alignItems: 'center',
     },
     summaryLabel: {
         fontSize: 16,
@@ -66,6 +68,8 @@ export const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 20,
         marginBottom: 15,
+    },
+    expenseCardShadow: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -122,6 +126,8 @@ export const styles = StyleSheet.create({
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    fabShadow: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

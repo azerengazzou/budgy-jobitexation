@@ -12,6 +12,9 @@ import {
 import Modal from 'react-native-modal';
 import { Calendar } from 'lucide-react-native';
 import { storageService } from '../../services/storage';
+import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
+import { NumericInput } from '../../components/NumericInput';
+import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
 export const RevenueModal = ({
     visible,
@@ -74,12 +77,14 @@ export const RevenueModal = ({
     };
     return (
         <Modal isVisible={visible} onBackdropPress={onClose} style={styles.modal}>
-            <View style={styles.modalContent}>
+            <KeyboardDismissWrapper style={{ flex: 0 }}>
+                <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>
                     {editingRevenue ? t('edit_revenue') : t('add_revenue')}
                 </Text>
 
                 {/* Revenue Name */}
+                <RequiredFieldIndicator label={t('revenue_name')} required={true} />
                 <TextInput
                     style={styles.input}
                     placeholder={t('revenue_name')}
@@ -90,14 +95,14 @@ export const RevenueModal = ({
                 />
 
                 {/* Amount */}
-                <TextInput
+                <RequiredFieldIndicator label={t('amount')} required={true} />
+                <NumericInput
                     style={styles.input}
                     placeholder={t('amount')}
                     value={formData.amount}
                     onChangeText={(text) =>
                         setFormData((prev) => ({ ...prev, amount: text }))
                     }
-                    keyboardType="numeric"
                 />
 
                 {/* Date */}
@@ -142,7 +147,8 @@ export const RevenueModal = ({
                         <Text style={styles.saveButtonText}>{t('save')}</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+                </View>
+            </KeyboardDismissWrapper>
         </Modal>
     );
 };

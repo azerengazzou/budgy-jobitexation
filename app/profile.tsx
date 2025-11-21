@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { useData } from '../contexts/DataContext';
 import { UserProfile } from './interfaces/settings';
 import { styles } from './styles/settings.styles';
+import { RequiredFieldIndicator } from '../components/RequiredFieldIndicator';
+import { KeyboardDismissWrapper } from '../components/KeyboardDismissWrapper';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -60,7 +62,8 @@ export default function ProfileScreen() {
   };
 
   return (
-    <LinearGradient colors={['#6B7280', '#4B5563']} style={styles.container}>
+    <KeyboardDismissWrapper>
+      <LinearGradient colors={['#6B7280', '#4B5563']} style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color="#FFFFFF" />
@@ -76,16 +79,15 @@ export default function ProfileScreen() {
               <Text style={styles.settingTitle}>{t('personal_information')}</Text>
             </View>
           </View>
-          <Text style={styles.nameTitle}>{t('first_name')} :</Text>
-
+          <RequiredFieldIndicator label={t('first_name')} required={true} />
           <TextInput
             style={styles.input}
             placeholder={t('first_name')}
             value={profileForm.firstName}
             onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
           />
-          <Text style={styles.nameTitle}>{t('last_name')} :</Text>
-
+          
+          <RequiredFieldIndicator label={t('last_name')} required={false} />
           <TextInput
             style={styles.input}
             placeholder={t('last_name')}
@@ -98,6 +100,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </LinearGradient>
+      </LinearGradient>
+    </KeyboardDismissWrapper>
   );
 }

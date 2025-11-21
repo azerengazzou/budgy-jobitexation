@@ -19,8 +19,13 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         color: '#D1D5DB',
     },
-    content: {
+    scrollContainer: {
         flex: 1,
+    },
+    scrollContent: {
+        paddingBottom: 50,
+    },
+    content: {
         paddingHorizontal: 20,
     },
     section: {

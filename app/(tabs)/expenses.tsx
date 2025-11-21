@@ -19,6 +19,9 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import { useFocusEffect } from 'expo-router';
 import { styles } from '../styles/expenses.styles';
 import { Expense } from '../interfaces/expenses';
+import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
+import { NumericInput } from '../../components/NumericInput';
+import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
 export default function ExpensesScreen() {
   const { t } = useTranslation();
@@ -181,13 +184,14 @@ export default function ExpensesScreen() {
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
   return (
-    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
+    <KeyboardDismissWrapper>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('expenses')}</Text>
         <Text style={styles.headerSubtitle}>{t('track_your_spending')}</Text>
       </View>
 
-      <View style={styles.summaryCard}>
+      <View style={[styles.summaryCard, styles.summaryCardShadow]}>
         <Text style={styles.summaryLabel}>{t('total_expenses')}</Text>
         <Text style={styles.summaryValue}>{formatAmount(totalExpenses)}</Text>
       </View>
@@ -196,7 +200,7 @@ export default function ExpensesScreen() {
 
       <ScrollView style={styles.content}>
         {expenses.map((expense) => (
-          <View key={expense.id} style={styles.expenseCard}>
+          <View key={expense.id} style={[styles.expenseCard, styles.expenseCardShadow]}>
             <View style={styles.expenseHeader}>
               <View style={styles.expenseIcon}>
                 <ShoppingCart size={24} color="#F97316" />
@@ -236,7 +240,7 @@ export default function ExpensesScreen() {
       </ScrollView>
 
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, styles.fabShadow]}
         onPress={() => {
           resetForm();
           setModalVisible(true);
@@ -259,14 +263,15 @@ export default function ExpensesScreen() {
             {editingExpense ? t('edit_expense') : t('add_expense')}
           </Text>
 
-          <TextInput
+          <RequiredFieldIndicator label={t('amount')} required={true} />
+          <NumericInput
             style={styles.input}
             placeholder={t('amount')}
             value={formData.amount}
             onChangeText={(text) => setFormData({ ...formData, amount: text })}
-            keyboardType="numeric"
           />
 
+          <RequiredFieldIndicator label={t('category')} required={true} />
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={formData.category}
@@ -281,6 +286,7 @@ export default function ExpensesScreen() {
             </Picker>
           </View>
 
+          <RequiredFieldIndicator label={t('income_source')} required={true} />
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={formData.revenueSourceId}
@@ -315,6 +321,7 @@ export default function ExpensesScreen() {
             />
           )}
 
+          <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
           <TextInput
             style={styles.input}
             placeholder={t('description')}
@@ -342,8 +349,7 @@ export default function ExpensesScreen() {
           </View>
         </View>
       </Modal>
-
-
-    </LinearGradient>
+      </LinearGradient>
+    </KeyboardDismissWrapper>
   );
 }

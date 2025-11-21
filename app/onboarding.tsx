@@ -16,6 +16,8 @@ import { User, Wallet, TrendingUp, PiggyBank } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { styles } from './styles/onboarding.styles';
 import { Revenue } from './components/interfaces/revenues';
+import { RequiredFieldIndicator } from '../components/RequiredFieldIndicator';
+import { KeyboardDismissWrapper } from '../components/KeyboardDismissWrapper';
 
 export default function OnboardingScreen() {
   const { t } = useTranslation();
@@ -69,8 +71,9 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <KeyboardDismissWrapper>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <Animated.View style={[styles.logo, { transform: [{ scale: bounceAnim }] }]}>
@@ -94,6 +97,7 @@ export default function OnboardingScreen() {
          */}
         </View>
         <View style={styles.form}>
+          <RequiredFieldIndicator label={t('first_name')} required={true} />
           <View style={styles.inputGroup}>
             <View style={styles.inputIcon}>
               <User size={24} color="#0A2540" />
@@ -108,6 +112,7 @@ export default function OnboardingScreen() {
             />
           </View>
 
+          <RequiredFieldIndicator label={t('last_name')} required={false} />
           <View style={styles.inputGroup}>
             <View style={styles.inputIcon}>
               <User size={24} color="#0A2540" />
@@ -132,7 +137,8 @@ export default function OnboardingScreen() {
         <View style={styles.footer}>
           <Text style={styles.footerText}>{t('your_data_stays_private')}</Text>
         </View>
-      </ScrollView>
-    </LinearGradient>
+        </ScrollView>
+      </LinearGradient>
+    </KeyboardDismissWrapper>
   );
 }

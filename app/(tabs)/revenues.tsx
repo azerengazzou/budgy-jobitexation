@@ -19,6 +19,7 @@ import { styles } from '../components/style/revenues.styles';
 import { SummaryCard } from '../components/SummaryCard';
 import { RevenueCard } from '../components/RevenueCard';
 import { RevenueModal } from '../components/RevenueModal';
+import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
 export default function RevenuesScreen() {
     const { t } = useTranslation();
@@ -151,7 +152,8 @@ export default function RevenuesScreen() {
     );
 
     return (
-        <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
+        <KeyboardDismissWrapper>
+            <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>{t('revenues')}</Text>
@@ -171,7 +173,11 @@ export default function RevenuesScreen() {
             </View>
 
             {/* Revenues list */}
-            <ScrollView style={styles.content}>
+            <ScrollView 
+                style={styles.content}
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={false}
+            >
                 {revenues.map((revenue) => (
                     <RevenueCard
                         key={revenue.id}
@@ -202,6 +208,7 @@ export default function RevenuesScreen() {
                 hasSalarySet={hasSalarySet}
                 t={t}
             />
-        </LinearGradient>
+            </LinearGradient>
+        </KeyboardDismissWrapper>
     );
 }

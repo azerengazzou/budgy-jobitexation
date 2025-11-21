@@ -9,6 +9,9 @@ import { Goal, DEFAULT_GOAL_CATEGORIES } from '@/app/interfaces/savings';
 import { storageService } from '@/services/storage';
 import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { RequiredFieldIndicator } from '@/components/RequiredFieldIndicator';
+import { NumericInput } from '@/components/NumericInput';
+import { KeyboardDismissWrapper } from '@/components/KeyboardDismissWrapper';
 
 export default function AddGoalScreen() {
   const { t } = useTranslation();
@@ -66,7 +69,8 @@ export default function AddGoalScreen() {
   };
 
   return (
-    <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
+    <KeyboardDismissWrapper>
+      <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
       <View style={{ paddingTop: 60, paddingHorizontal: 20, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 16 }}>
@@ -86,9 +90,7 @@ export default function AddGoalScreen() {
         paddingTop: 20,
       }}>
         <ScrollView style={{ paddingHorizontal: 20 }} showsVerticalScrollIndicator={false}>
-          <Text style={{ fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 8 }}>
-            {t('goal_title')}
-          </Text>
+          <RequiredFieldIndicator label={t('goal_title')} required={true} />
           <TextInput
             value={title}
             onChangeText={setTitle}
@@ -139,14 +141,11 @@ export default function AddGoalScreen() {
             ))}
           </View>
 
-          <Text style={{ fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 8 }}>
-            {t('target_amount')}
-          </Text>
-          <TextInput
+          <RequiredFieldIndicator label={t('target_amount')} required={true} />
+          <NumericInput
             value={targetAmount}
             onChangeText={setTargetAmount}
             placeholder={t('enter_target_amount')}
-            keyboardType="numeric"
             style={{
               borderWidth: 1,
               borderColor: '#D1D5DB',
@@ -195,9 +194,7 @@ export default function AddGoalScreen() {
             />
           )}
 
-          <Text style={{ fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 8 }}>
-            {t('description')} ({t('optional')})
-          </Text>
+          <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
           <TextInput
             value={description}
             onChangeText={setDescription}
@@ -235,6 +232,7 @@ export default function AddGoalScreen() {
           <View style={{ height: 40 }} />
         </ScrollView>
       </View>
-    </LinearGradient>
+      </LinearGradient>
+    </KeyboardDismissWrapper>
   );
 }

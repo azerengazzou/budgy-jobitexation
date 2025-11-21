@@ -21,6 +21,7 @@ import { storageService } from '../../services/storage';
 import { styles } from '../styles/dashboard.styles';
 import { styles as settingsStyles } from '../styles/settings.styles';
 import { UserProfile } from '../interfaces/settings';
+import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -139,10 +140,11 @@ export default function Dashboard() {
   };
 
   return (
-    <LinearGradient
-      colors={['#0A2540', '#4A90E2']}
-      style={styles.container}
-    >
+    <KeyboardDismissWrapper>
+      <LinearGradient
+        colors={['#0A2540', '#4A90E2']}
+        style={styles.container}
+      >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -205,18 +207,18 @@ export default function Dashboard() {
 
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.manageCategoriesButton]}
+            style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
             onPress={() => router.push('/(tabs)/categories')}
           >
             <Text style={styles.actionButtonText}>{t('manage_categories')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
+          <TouchableOpacity style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
             <Text style={styles.actionButtonText}>{t('goals')}</Text>
             <View style={styles.soonBadge}>
               <Text style={styles.soonBadgeText}>{t('soon')}</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
+          <TouchableOpacity style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
             <Text style={styles.actionButtonText}>{t('export')}</Text>
             <View style={styles.soonBadge}>
               <Text style={styles.soonBadgeText}>{t('soon')}</Text>
@@ -252,7 +254,8 @@ export default function Dashboard() {
         onBackdropPress={() => setProfileModalVisible(false)}
         style={settingsStyles.modal}
       >
-        <View style={settingsStyles.modalContent}>
+        <KeyboardDismissWrapper style={{ flex: 0 }}>
+          <View style={settingsStyles.modalContent}>
           <Text style={settingsStyles.modalTitle}>{t('edit_profile')}</Text>
 
           <TextInput
@@ -283,8 +286,10 @@ export default function Dashboard() {
               <Text style={settingsStyles.saveButtonText}>{t('save')}</Text>
             </TouchableOpacity>
           </View>
-        </View>
+          </View>
+        </KeyboardDismissWrapper>
       </Modal>
-    </LinearGradient>
+      </LinearGradient>
+    </KeyboardDismissWrapper>
   );
 }

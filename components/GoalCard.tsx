@@ -31,6 +31,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
   return (
     <TouchableOpacity onPress={onPress} style={[
       savingsStyles.goalCard,
+      savingsStyles.goalCardShadow,
       isCompleted && { opacity: 0.8, borderColor: '#10B981', borderWidth: 2 }
     ]}>
       <View style={savingsStyles.goalHeader}>

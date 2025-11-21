@@ -12,6 +12,9 @@ import { Picker } from '@react-native-picker/picker';
 import { TrendingUp, Calculator } from 'lucide-react-native';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
+import { RequiredFieldIndicator } from './RequiredFieldIndicator';
+import { NumericInput } from './NumericInput';
+import { KeyboardDismissWrapper } from './KeyboardDismissWrapper';
 
 interface SimulationModalProps {
   isVisible: boolean;
@@ -84,7 +87,8 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
       onBackdropPress={onClose}
       style={styles.modal}
     >
-      <View style={styles.modalContent}>
+      <KeyboardDismissWrapper style={{ flex: 0 }}>
+        <View style={styles.modalContent}>
         <View style={styles.header}>
           <Calculator size={24} color="#3B82F6" />
           <Text style={styles.title}>{t('budget_simulation')}</Text>
@@ -92,7 +96,7 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
 
         <ScrollView>
           <View style={styles.inputSection}>
-            <Text style={styles.label}>{t('select_category')}</Text>
+            <RequiredFieldIndicator label={t('select_category')} required={true} />
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={selectedCategory}
@@ -105,13 +109,14 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
               </Picker>
             </View>
 
-            <Text style={styles.label}>{t('percentage_change')}</Text>
-            <TextInput
+            <RequiredFieldIndicator label={t('percentage_change')} required={true} />
+            <NumericInput
               style={styles.input}
               placeholder={t('percentage_change_placeholder')}
               value={changePercentage}
               onChangeText={setChangePercentage}
-              keyboardType="numeric"
+              allowDecimals={true}
+              maxDecimals={1}
             />
 
             <TouchableOpacity style={styles.simulateButton} onPress={runSimulation}>
@@ -152,7 +157,8 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Text style={styles.closeButtonText}>{t('close')}</Text>
         </TouchableOpacity>
-      </View>
+        </View>
+      </KeyboardDismissWrapper>
     </Modal>
   );
 }
