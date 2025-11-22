@@ -1,5 +1,6 @@
 import { BaseStorageService } from './storage-base';
 import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
+import { normalizeAmount } from '@/components/NumericInput';
 
 const SAVINGS_STORAGE_KEYS = {
   SAVINGS_TRANSACTIONS: 'savings_transactions',
@@ -13,7 +14,11 @@ export class SavingsStorageService extends BaseStorageService {
 
   async addSavingsTransaction(transaction: SavingsTransaction): Promise<void> {
     const transactions = await this.getSavingsTransactions();
-    await this.setItem(SAVINGS_STORAGE_KEYS.SAVINGS_TRANSACTIONS, [...transactions, transaction]);
+    const normalizedTransaction = {
+      ...transaction,
+      amount: normalizeAmount(transaction.amount)
+    };
+    await this.setItem(SAVINGS_STORAGE_KEYS.SAVINGS_TRANSACTIONS, [...transactions, normalizedTransaction]);
   }
 
   async getTransactionsByGoalId(goalId: string): Promise<SavingsTransaction[]> {
@@ -32,16 +37,17 @@ export class SavingsStorageService extends BaseStorageService {
   // Goal amount calculations
   async calculateGoalCurrentAmount(goalId: string): Promise<number> {
     const transactions = await this.getTransactionsByGoalId(goalId);
-    return transactions.reduce((total, transaction) => {
+    const total = transactions.reduce((total, transaction) => {
       return transaction.type === 'deposit' 
         ? total + transaction.amount 
         : total - transaction.amount;
     }, 0);
+    return normalizeAmount(total);
   }
 
   async updateGoalCurrentAmount(goalId: string): Promise<number> {
     const currentAmount = await this.calculateGoalCurrentAmount(goalId);
     // This will be called by the main storage service to update the goal
-    return currentAmount;
+    return normalizeAmount(currentAmount);
   }
 }

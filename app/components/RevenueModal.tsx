@@ -13,7 +13,7 @@ import Modal from 'react-native-modal';
 import { Calendar } from 'lucide-react-native';
 import { storageService } from '../../services/storage';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
-import { NumericInput } from '../../components/NumericInput';
+import { NumericInput, normalizeAmount } from '../../components/NumericInput';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
 export const RevenueModal = ({

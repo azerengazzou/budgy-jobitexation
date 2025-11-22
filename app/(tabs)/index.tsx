@@ -22,6 +22,7 @@ import { styles } from '../styles/dashboard.styles';
 import { styles as settingsStyles } from '../styles/settings.styles';
 import { UserProfile } from '../interfaces/settings';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
+import { normalizeAmount } from '../../components/NumericInput';
 
 const screenWidth = Dimensions.get('window').width;
 

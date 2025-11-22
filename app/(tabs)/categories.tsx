@@ -6,8 +6,6 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  Animated,
-  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -30,8 +28,6 @@ import { styles } from '../styles/categories.styles';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
-const { width } = Dimensions.get('window');
-
 export default function Categories() {
   const { t } = useTranslation();
   const [expenseCategories, setExpenseCategories] = useState<string[]>([]);
@@ -41,7 +37,6 @@ export default function Categories() {
   const [newCategory, setNewCategory] = useState('');
   const [activeTab, setActiveTab] = useState<'expenses' | 'revenues'>('expenses');
   const [searchQuery, setSearchQuery] = useState('');
-  const [fadeAnim] = useState(new Animated.Value(1));
 
   const fixedRevenueTypes = ['salary', 'freelance'];
   const fixedExpenseCategories = ['rent', 'food', 'transport', 'savings'];

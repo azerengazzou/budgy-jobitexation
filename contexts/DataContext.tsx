@@ -4,11 +4,12 @@ import { backupService } from '../services/backup-service';
 import { Expense } from '../app/interfaces/expenses';
 import { Revenue } from '../app/components/interfaces/revenues';
 import { Goal, SavingsTransaction } from '../app/interfaces/savings';
+import { Saving } from '../services/storage-types';
 
 interface DataContextType {
   revenues: Revenue[];
   expenses: Expense[];
-  savings: any[];
+  savings: Saving[];
   goals: Goal[];
   savingsTransactions: SavingsTransaction[];
   refreshData: () => Promise<void>;
@@ -33,12 +34,10 @@ interface DataProviderProps {
   children: ReactNode;
 }
 
-const VALID_REVENUE_TYPES = ['salary', 'freelance', 'business', 'investment', 'other'];
-
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [savings, setSavings] = useState<any[]>([]);
+  const [savings, setSavings] = useState<Saving[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [savingsTransactions, setSavingsTransactions] = useState<SavingsTransaction[]>([]);
 
@@ -57,8 +56,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     return normalized;
   }, []);
 
-  const filterExpenses = useCallback((expensesData: any[]) => {
-    return expensesData.filter((exp: any) => exp.type !== 'salary');
+  const filterExpenses = useCallback((expensesData: Expense[]) => {
+    return expensesData.filter((exp: Expense) => exp.category !== 'salary');
   }, []);
 
   const loadAllData = useCallback(async () => {

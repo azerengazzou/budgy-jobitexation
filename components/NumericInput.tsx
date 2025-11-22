@@ -8,11 +8,17 @@ interface NumericInputProps extends Omit<TextInputProps, 'keyboardType' | 'onCha
   maxDecimals?: number;
 }
 
+// Utility function to normalize amounts to 3 decimal places
+export const normalizeAmount = (value: string | number): number => {
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  return isNaN(num) ? 0 : parseFloat(num.toFixed(3));
+};
+
 export const NumericInput: React.FC<NumericInputProps> = ({
   value,
   onChangeText,
   allowDecimals = true,
-  maxDecimals = 2,
+  maxDecimals = 3,
   ...props
 }) => {
   const handleTextChange = (text: string) => {

@@ -1,6 +1,7 @@
 import { Revenue } from '@/app/components/interfaces/revenues';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS } from './storage-types';
+import { normalizeAmount } from '@/components/NumericInput';
 
 export class RevenueStorageService extends BaseStorageService {
   async getRevenues(): Promise<Revenue[]> {
@@ -13,11 +14,15 @@ export class RevenueStorageService extends BaseStorageService {
     
     if (existingRevenueIndex !== -1) {
       // Sum with existing revenue of same category
-      revenues[existingRevenueIndex].amount += revenue.amount;
-      revenues[existingRevenueIndex].remainingAmount += revenue.amount;
+      revenues[existingRevenueIndex].amount = normalizeAmount(revenues[existingRevenueIndex].amount + revenue.amount);
+      revenues[existingRevenueIndex].remainingAmount = normalizeAmount(revenues[existingRevenueIndex].remainingAmount + revenue.amount);
     } else {
       // Add new revenue
-      revenues.push(revenue);
+      revenues.push({
+        ...revenue,
+        amount: normalizeAmount(revenue.amount),
+        remainingAmount: normalizeAmount(revenue.remainingAmount)
+      });
     }
     
     await this.setItem(STORAGE_KEYS.REVENUES, revenues);
@@ -27,7 +32,11 @@ export class RevenueStorageService extends BaseStorageService {
     const revenues = await this.getRevenues();
     const index = revenues.findIndex(r => r.id === updatedRevenue.id);
     if (index !== -1) {
-      revenues[index] = updatedRevenue;
+      revenues[index] = {
+        ...updatedRevenue,
+        amount: normalizeAmount(updatedRevenue.amount),
+        remainingAmount: normalizeAmount(updatedRevenue.remainingAmount)
+      };
       await this.setItem(STORAGE_KEYS.REVENUES, revenues);
     }
   }
@@ -41,7 +50,7 @@ export class RevenueStorageService extends BaseStorageService {
     const revenues = await this.getRevenues();
     const revenue = revenues.find(r => r.id === revenueId);
     if (revenue) {
-      revenue.remainingAmount += amountChange;
+      revenue.remainingAmount = normalizeAmount(revenue.remainingAmount + amountChange);
       await this.setItem(STORAGE_KEYS.REVENUES, revenues);
     }
   }

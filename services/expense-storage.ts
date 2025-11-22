@@ -2,6 +2,7 @@ import { Expense } from '@/app/interfaces/expenses';
 import { Goal } from '@/app/interfaces/savings';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS, Saving } from './storage-types';
+import { normalizeAmount } from '@/components/NumericInput';
 
 export class ExpenseStorageService extends BaseStorageService {
   async getExpenses(): Promise<Expense[]> {
@@ -10,14 +11,21 @@ export class ExpenseStorageService extends BaseStorageService {
 
   async addExpense(expense: Expense): Promise<void> {
     const expenses = await this.getExpenses();
-    await this.setItem(STORAGE_KEYS.EXPENSES, [...expenses, expense]);
+    const normalizedExpense = {
+      ...expense,
+      amount: normalizeAmount(expense.amount)
+    };
+    await this.setItem(STORAGE_KEYS.EXPENSES, [...expenses, normalizedExpense]);
   }
 
   async updateExpense(updatedExpense: Expense): Promise<void> {
     const expenses = await this.getExpenses();
     const index = expenses.findIndex(e => e.id === updatedExpense.id);
     if (index !== -1) {
-      expenses[index] = updatedExpense;
+      expenses[index] = {
+        ...updatedExpense,
+        amount: normalizeAmount(updatedExpense.amount)
+      };
       await this.setItem(STORAGE_KEYS.EXPENSES, expenses);
     }
   }
@@ -38,13 +46,17 @@ export class ExpenseStorageService extends BaseStorageService {
 
   async addSaving(saving: Saving): Promise<void> {
     const savings = await this.getSavings();
-    await this.setItem(STORAGE_KEYS.SAVINGS, [...savings, saving]);
+    const normalizedSaving = {
+      ...saving,
+      amount: normalizeAmount(saving.amount)
+    };
+    await this.setItem(STORAGE_KEYS.SAVINGS, [...savings, normalizedSaving]);
   }
 
   async deductFromSavings(amount: number): Promise<void> {
     const deduction: Saving = {
       id: Date.now().toString(),
-      amount: -amount,
+      amount: normalizeAmount(-amount),
       description: 'Goal contribution',
       date: new Date().toISOString(),
       type: 'goal',
@@ -58,14 +70,23 @@ export class ExpenseStorageService extends BaseStorageService {
 
   async addGoal(goal: Goal): Promise<void> {
     const goals = await this.getGoals();
-    await this.setItem(STORAGE_KEYS.GOALS, [...goals, goal]);
+    const normalizedGoal = {
+      ...goal,
+      targetAmount: normalizeAmount(goal.targetAmount),
+      currentAmount: normalizeAmount(goal.currentAmount)
+    };
+    await this.setItem(STORAGE_KEYS.GOALS, [...goals, normalizedGoal]);
   }
 
   async updateGoal(updatedGoal: Goal): Promise<void> {
     const goals = await this.getGoals();
     const index = goals.findIndex(g => g.id === updatedGoal.id);
     if (index !== -1) {
-      goals[index] = updatedGoal;
+      goals[index] = {
+        ...updatedGoal,
+        targetAmount: normalizeAmount(updatedGoal.targetAmount),
+        currentAmount: normalizeAmount(updatedGoal.currentAmount)
+      };
       await this.setItem(STORAGE_KEYS.GOALS, goals);
     }
   }

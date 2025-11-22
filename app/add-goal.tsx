@@ -10,7 +10,7 @@ import { storageService } from '@/services/storage';
 import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { RequiredFieldIndicator } from '@/components/RequiredFieldIndicator';
-import { NumericInput } from '@/components/NumericInput';
+import { NumericInput, normalizeAmount } from '@/components/NumericInput';
 import { KeyboardDismissWrapper } from '@/components/KeyboardDismissWrapper';
 
 export default function AddGoalScreen() {
@@ -33,7 +33,7 @@ export default function AddGoalScreen() {
       return;
     }
 
-    const amount = parseFloat(targetAmount);
+    const amount = normalizeAmount(targetAmount);
     if (!amount || amount <= 0) {
       Alert.alert(t('error'), t('please_enter_valid_target_amount'));
       return;

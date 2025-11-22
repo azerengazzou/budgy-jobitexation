@@ -13,8 +13,9 @@ import { TrendingUp, Calculator } from 'lucide-react-native';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
 import { RequiredFieldIndicator } from './RequiredFieldIndicator';
-import { NumericInput } from './NumericInput';
+import { NumericInput, normalizeAmount } from './NumericInput';
 import { KeyboardDismissWrapper } from './KeyboardDismissWrapper';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 interface SimulationModalProps {
   isVisible: boolean;
@@ -31,6 +32,7 @@ interface SimulationResult {
 
 export default function SimulationModal({ isVisible, onClose }: SimulationModalProps) {
   const { t } = useTranslation();
+  const { formatAmount } = useCurrency();
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [changePercentage, setChangePercentage] = useState('');
@@ -64,12 +66,12 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
       const currentTotal = categoryExpenses.reduce((sum, exp) => sum + exp.amount, 0);
       
       const percentage = parseFloat(changePercentage) / 100;
-      const simulatedTotal = currentTotal * (1 + percentage);
-      const difference = simulatedTotal - currentTotal;
+      const simulatedTotal = normalizeAmount(currentTotal * (1 + percentage));
+      const difference = normalizeAmount(simulatedTotal - currentTotal);
 
       const result: SimulationResult = {
         category: selectedCategory,
-        currentAmount: currentTotal,
+        currentAmount: normalizeAmount(currentTotal),
         simulatedAmount: simulatedTotal,
         difference,
         percentageChange: parseFloat(changePercentage),
@@ -133,11 +135,11 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
                   <Text style={styles.resultCategory}>{result.category}</Text>
                   <View style={styles.resultRow}>
                     <Text style={styles.resultLabel}>{t('current_spending')}</Text>
-                    <Text style={styles.resultValue}>€{result.currentAmount.toFixed(2)}</Text>
+                    <Text style={styles.resultValue}>{formatAmount(result.currentAmount)}</Text>
                   </View>
                   <View style={styles.resultRow}>
                     <Text style={styles.resultLabel}>{t('simulated_spending')}</Text>
-                    <Text style={styles.resultValue}>€{result.simulatedAmount.toFixed(2)}</Text>
+                    <Text style={styles.resultValue}>{formatAmount(result.simulatedAmount)}</Text>
                   </View>
                   <View style={styles.resultRow}>
                     <Text style={styles.resultLabel}>{t('difference')}</Text>
@@ -145,7 +147,7 @@ export default function SimulationModal({ isVisible, onClose }: SimulationModalP
                       styles.resultValue,
                       { color: result.difference >= 0 ? '#EF4444' : '#10B981' }
                     ]}>
-                      {result.difference >= 0 ? '+' : ''}€{result.difference.toFixed(2)}
+                      {result.difference >= 0 ? '+' : ''}{formatAmount(result.difference)}
                     </Text>
                   </View>
                 </View>

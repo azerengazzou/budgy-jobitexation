@@ -167,6 +167,21 @@ const resources = {
       
       // Revenue Components
       total_amount: 'Total Amount',
+      delete_revenue: 'Delete Revenue',
+      failed_to_delete_revenue: 'Failed to delete revenue',
+      all_expenses_related_will_be_deleted: 'All expenses related to this revenue will also be deleted.',
+      no_revenues_yet: 'No Revenues Yet',
+      add_your_first_income_source_to_start_tracking: 'Add your first income source to start tracking your finances.',
+      income_sources: 'income sources',
+      available_funds: 'Available Funds',
+      your_revenues: 'Your Revenues',
+      
+      // Expenses
+      no_expenses_yet: 'No Expenses Yet',
+      start_tracking_your_expenses_to_better_manage_your_budget: 'Start tracking your expenses to better manage your budget and achieve your financial goals.',
+      expenses_recorded: 'expenses recorded',
+      your_expenses: 'Your Expenses',
+      in: 'in',
       
       // Notifications
       mybudget_reminder: 'MyBudget Reminder',
@@ -410,6 +425,21 @@ const resources = {
       
       // Revenue Components
       total_amount: 'Montant total',
+      delete_revenue: 'Supprimer le revenu',
+      failed_to_delete_revenue: 'Échec de la suppression du revenu',
+      all_expenses_related_will_be_deleted: 'Toutes les dépenses liées à ce revenu seront également supprimées.',
+      no_revenues_yet: 'Aucun revenu pour le moment',
+      add_your_first_income_source_to_start_tracking: 'Ajoutez votre première source de revenus pour commencer à suivre vos finances.',
+      income_sources: 'sources de revenus',
+      available_funds: 'Fonds disponibles',
+      your_revenues: 'Vos revenus',
+      
+      // Expenses
+      no_expenses_yet: 'Aucune dépense pour le moment',
+      start_tracking_your_expenses_to_better_manage_your_budget: 'Commencez à suivre vos dépenses pour mieux gérer votre budget et atteindre vos objectifs financiers.',
+      expenses_recorded: 'dépenses enregistrées',
+      your_expenses: 'Vos dépenses',
+      in: 'dans',
       
       // Notifications
       mybudget_reminder: 'Rappel MonBudget',
@@ -653,6 +683,21 @@ const resources = {
       
       // Revenue Components
       total_amount: 'المبلغ الإجمالي',
+      delete_revenue: 'حذف الإيراد',
+      failed_to_delete_revenue: 'فشل في حذف الإيراد',
+      all_expenses_related_will_be_deleted: 'سيتم حذف جميع المصاريف المرتبطة بهذا الإيراد أيضاً.',
+      no_revenues_yet: 'لا توجد إيرادات بعد',
+      add_your_first_income_source_to_start_tracking: 'أضف مصدر الدخل الأول لبدء تتبع أموالك.',
+      income_sources: 'مصادر الدخل',
+      available_funds: 'الأموال المتاحة',
+      your_revenues: 'إيراداتك',
+      
+      // Expenses
+      no_expenses_yet: 'لا توجد مصاريف بعد',
+      start_tracking_your_expenses_to_better_manage_your_budget: 'ابدأ في تتبع مصاريفك لإدارة ميزانيتك بشكل أفضل وتحقيق أهدافك المالية.',
+      expenses_recorded: 'مصاريف مسجلة',
+      your_expenses: 'مصاريفك',
+      in: 'في',
       
       // Notifications
       mybudget_reminder: 'تذكير ميزانيتي',

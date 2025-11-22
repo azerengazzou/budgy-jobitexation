@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -11,17 +11,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Plus, CreditCard as Edit3, Trash2, ShoppingCart, Calendar } from 'lucide-react-native';
+import { Plus, Edit3, Trash2, ShoppingCart, Calendar } from 'lucide-react-native';
 import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useFocusEffect } from 'expo-router';
-import { styles } from '../styles/expenses.styles';
 import { Expense } from '../interfaces/expenses';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
-import { NumericInput } from '../../components/NumericInput';
+import { NumericInput, normalizeAmount } from '../../components/NumericInput';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
+import { savingsStyles } from '../styles/savings.styles';
 
 export default function ExpensesScreen() {
   const { t } = useTranslation();
@@ -71,10 +71,15 @@ export default function ExpensesScreen() {
       return;
     }
 
-    const amount = parseFloat(formData.amount);
+    const amount = normalizeAmount(formData.amount);
     const revenue = revenues.find(r => r.id === formData.revenueSourceId);
 
-    if (!revenue || revenue.remainingAmount < amount) {
+    // For editing, check if we have enough funds considering the original expense amount
+    const availableAmount = editingExpense 
+      ? revenue?.remainingAmount + editingExpense.amount 
+      : revenue?.remainingAmount;
+
+    if (!revenue || (availableAmount || 0) < amount) {
       Alert.alert(t('error'), t('insufficient_funds'));
       return;
     }
@@ -91,7 +96,10 @@ export default function ExpensesScreen() {
       };
 
       if (editingExpense) {
+        // Return original amount to revenue, then deduct new amount
+        await storageService.addToRevenue(editingExpense.revenueSourceId, editingExpense.amount);
         await storageService.updateExpense(expense);
+        await storageService.deductFromRevenue(formData.revenueSourceId, amount);
       } else {
         await storageService.addExpense(expense);
         // Deduct from revenue source
@@ -107,40 +115,7 @@ export default function ExpensesScreen() {
     }
   };
 
-  const handleDeleteExpense = (expense: Expense) => {
-    console.log('handleDeleteExpense called for:', expense.id);
-    Alert.alert(
-      t('delete_expense'),
-      t('delete_expense_confirm'),
-      [
-        { text: t('cancel'), style: 'cancel' },
-        {
-          text: t('delete'),
-          style: 'destructive',
-          onPress: async () => {
-            console.log('Delete confirmed, starting deletion process');
-            try {
-              console.log('Calling deleteExpense for ID:', expense.id);
-              await storageService.deleteExpense(expense.id);
-              console.log('Expense deleted successfully');
 
-              console.log('Adding amount back to revenue:', expense.revenueSourceId, expense.amount);
-              await storageService.addToRevenue(expense.revenueSourceId, expense.amount);
-              console.log('Amount added back successfully');
-
-              console.log('Reloading data...');
-              await updateExpenses();
-              await updateRevenues();
-              console.log('Data reloaded successfully');
-            } catch (error) {
-              console.error('Delete error:', error);
-              Alert.alert(t('error'), t('failed_to_delete_expense'));
-            }
-          },
-        },
-      ]
-    );
-  };
 
 
 
@@ -155,17 +130,7 @@ export default function ExpensesScreen() {
     setEditingExpense(null);
   };
 
-  const openEditModal = (expense: Expense) => {
-    setEditingExpense(expense);
-    setFormData({
-      amount: expense.amount.toString(),
-      category: expense.category,
-      description: expense.description,
-      revenueSourceId: expense.revenueSourceId,
-      date: new Date(expense.date),
-    });
-    setModalVisible(true);
-  };
+
 
   const formatDate = (date: Date) => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -181,174 +146,428 @@ export default function ExpensesScreen() {
     }
   };
 
-  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const { totalExpenses, expensesByCategory } = useMemo(() => {
+    const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const byCategory = expenses.reduce((acc, expense) => {
+      acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+      return acc;
+    }, {} as Record<string, number>);
+    return { totalExpenses: total, expensesByCategory: byCategory };
+  }, [expenses]);
 
-  return (
-    <KeyboardDismissWrapper>
-      <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('expenses')}</Text>
-        <Text style={styles.headerSubtitle}>{t('track_your_spending')}</Text>
-      </View>
+  const renderExpenseCard = useCallback(({ item }: { item: Expense }) => {
+    const categoryTotal = expensesByCategory[item.category] || 0;
+    const categoryPercentage = totalExpenses > 0 ? (categoryTotal / totalExpenses) * 100 : 0;
+    
+    const getCategoryColor = (category: string) => {
+      const colors: Record<string, string> = {
+        rent: '#EF4444',
+        food: '#F59E0B',
+        transport: '#3B82F6',
+        savings: '#10B981',
+      };
+      return colors[category] || '#6B7280';
+    };
 
-      <View style={[styles.summaryCard, styles.summaryCardShadow]}>
-        <Text style={styles.summaryLabel}>{t('total_expenses')}</Text>
-        <Text style={styles.summaryValue}>{formatAmount(totalExpenses)}</Text>
-      </View>
-
-
-
-      <ScrollView style={styles.content}>
-        {expenses.map((expense) => (
-          <View key={expense.id} style={[styles.expenseCard, styles.expenseCardShadow]}>
-            <View style={styles.expenseHeader}>
-              <View style={styles.expenseIcon}>
-                <ShoppingCart size={24} color="#F97316" />
-              </View>
-              <View style={styles.expenseDetails}>
-                <Text style={styles.expenseCategory}>
-                  {['rent', 'food', 'transport', 'savings'].includes(expense.category) ? t(expense.category) : expense.category}
-                </Text>
-                <Text style={styles.expenseDescription}>{expense.description}</Text>
-                <Text style={styles.expenseDate}>
-                  {new Date(expense.date).toLocaleDateString()}
-                </Text>
-              </View>
-              <View style={styles.expenseActions}>
-                <Text style={styles.expenseAmount}>{formatAmount(expense.amount)}</Text>
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    onPress={() => openEditModal(expense)}
-                    style={styles.actionButton}
-                  >
-                    <Edit3 size={16} color="#6B7280" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      console.log('Trash button tapped');
-                      handleDeleteExpense(expense);
-                    }}
-                    style={styles.actionButton}
-                  >
-                    <Trash2 size={16} color="#EF4444" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
-
-      <TouchableOpacity
-        style={[styles.fab, styles.fabShadow]}
-        onPress={() => {
-          resetForm();
-          setModalVisible(true);
-        }}
-      >
-        <Plus size={28} color="#0A2540" />
-      </TouchableOpacity>
-
-      {/* Add/Edit Expense Modal */}
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => {
-          setModalVisible(false);
-          resetForm();
-        }}
-        style={styles.modal}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {editingExpense ? t('edit_expense') : t('add_expense')}
+    return (
+      <View style={[savingsStyles.goalCard, { marginBottom: 12 }]}>
+        <View style={savingsStyles.goalHeader}>
+          <Text style={savingsStyles.goalEmoji}>
+            {item.category === 'food' ? '🍽️' : 
+             item.category === 'transport' ? '🚗' :
+             item.category === 'rent' ? '🏠' :
+             item.category === 'savings' ? '💰' : '🛒'}
           </Text>
-
-          <RequiredFieldIndicator label={t('amount')} required={true} />
-          <NumericInput
-            style={styles.input}
-            placeholder={t('amount')}
-            value={formData.amount}
-            onChangeText={(text) => setFormData({ ...formData, amount: text })}
-          />
-
-          <RequiredFieldIndicator label={t('category')} required={true} />
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={formData.category}
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
-              style={styles.picker}
-            >
-              {categories.map((category) => {
-                const fixedCategories = ['rent', 'food', 'transport', 'savings'];
-                const label = fixedCategories.includes(category) ? t(category) : category;
-                return <Picker.Item key={category} label={label} value={category} />;
-              })}
-            </Picker>
+          <View style={savingsStyles.goalInfo}>
+            <Text style={savingsStyles.goalTitle}>
+              {['rent', 'food', 'transport', 'savings'].includes(item.category) ? t(item.category) : item.category}
+            </Text>
+            <Text style={savingsStyles.goalCategory}>
+              {item.description || new Date(item.date).toLocaleDateString()}
+            </Text>
           </View>
-
-          <RequiredFieldIndicator label={t('income_source')} required={true} />
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={formData.revenueSourceId}
-              onValueChange={(value) => setFormData({ ...formData, revenueSourceId: value })}
-              style={styles.picker}
-            >
-              <Picker.Item label={t('select_income_source')} value="" />
-              {revenues.map((revenue) => (
-                <Picker.Item
-                  key={revenue.id}
-                  label={`${revenue.name} (${formatAmount(revenue.remainingAmount)})`}
-                  value={revenue.id}
-                />
-              ))}
-            </Picker>
-          </View>
-
-          <TouchableOpacity
-            style={styles.dateInput}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Calendar size={20} color="#6B7280" style={styles.dateIcon} />
-            <Text style={styles.dateText}>{formatDate(formData.date)}</Text>
-          </TouchableOpacity>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={formData.date}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
-            />
-          )}
-
-          <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
-          <TextInput
-            style={styles.input}
-            placeholder={t('description')}
-            value={formData.description}
-            onChangeText={(text) => setFormData({ ...formData, description: text })}
-            multiline
-          />
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setModalVisible(false);
-                resetForm();
-              }}
-            >
-              <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={[savingsStyles.currentAmount, { marginRight: 12 }]}>
+              {formatAmount(item.amount)}
+            </Text>
+            <TouchableOpacity onPress={() => openEditModal(item)} style={{ padding: 8, marginRight: 4 }}>
+              <Edit3 size={16} color="#6B7280" />
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveExpense}
-            >
-              <Text style={styles.saveButtonText}>{t('save')}</Text>
+            <TouchableOpacity onPress={() => handleDeleteExpense(item)} style={{ padding: 8 }}>
+              <Trash2 size={16} color="#EF4444" />
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+
+        <View style={savingsStyles.goalProgress}>
+          <View style={savingsStyles.progressBar}>
+            <View 
+              style={[
+                savingsStyles.progressFill,
+                { 
+                  width: `${Math.min(categoryPercentage, 100)}%`,
+                  backgroundColor: getCategoryColor(item.category),
+                }
+              ]} 
+            />
+          </View>
+        </View>
+
+        <View style={savingsStyles.goalAmounts}>
+          <Text style={savingsStyles.targetAmount}>
+            {formatAmount(categoryTotal)} {t('in')} {['rent', 'food', 'transport', 'savings'].includes(item.category) ? t(item.category) : item.category}
+          </Text>
+          <Text style={savingsStyles.progressPercentage}>
+            {categoryPercentage.toFixed(1)}%
+          </Text>
+        </View>
+      </View>
+    );
+  }, [expenses, totalExpenses, expensesByCategory, t, formatAmount]);
+
+  const keyExtractor = useCallback((item: Expense) => item.id, []);
+
+  const openEditModal = useCallback((expense: Expense) => {
+    setEditingExpense(expense);
+    setFormData({
+      amount: expense.amount.toString(),
+      category: expense.category,
+      description: expense.description,
+      revenueSourceId: expense.revenueSourceId,
+      date: new Date(expense.date),
+    });
+    setModalVisible(true);
+  }, []);
+
+  const handleDeleteExpense = useCallback((expense: Expense) => {
+    Alert.alert(
+      t('delete_expense'),
+      t('delete_expense_confirm'),
+      [
+        { text: t('cancel'), style: 'cancel' },
+        {
+          text: t('delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await storageService.deleteExpense(expense.id);
+              await storageService.addToRevenue(expense.revenueSourceId, expense.amount);
+              await updateExpenses();
+              await updateRevenues();
+            } catch (error) {
+              console.error('Delete error:', error);
+              Alert.alert(t('error'), t('failed_to_delete_expense'));
+            }
+          },
+        },
+      ]
+    );
+  }, [t, updateExpenses, updateRevenues]);
+
+  if (expenses.length === 0) {
+    return (
+      <KeyboardDismissWrapper>
+        <LinearGradient colors={['#0A2540', '#4A90E2']} style={savingsStyles.container}>
+          <View style={savingsStyles.header}>
+            <Text style={savingsStyles.headerTitle}>{t('expenses')}</Text>
+            <Text style={savingsStyles.headerSubtitle}>{t('track_your_spending')}</Text>
+          </View>
+
+          <View style={savingsStyles.totalSavingsCard}>
+            <Text style={savingsStyles.totalAmount}>{formatAmount(totalExpenses)}</Text>
+            <Text style={savingsStyles.totalLabel}>{t('total_expenses')}</Text>
+          </View>
+
+          <View style={savingsStyles.goalsSection}>
+            <View style={savingsStyles.emptyState}>
+              <ShoppingCart size={64} color="#D1D5DB" style={savingsStyles.emptyStateIcon} />
+              <Text style={savingsStyles.emptyStateTitle}>{t('no_expenses_yet')}</Text>
+              <Text style={savingsStyles.emptyStateText}>
+                {t('start_tracking_your_expenses_to_better_manage_your_budget')}
+              </Text>
+              <TouchableOpacity onPress={() => {
+                resetForm();
+                setModalVisible(true);
+              }} style={[savingsStyles.addButton, { marginTop: 20 }]}>
+                <Text style={savingsStyles.addButtonText}>{t('add_expense')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          
+          {/* Modal for empty state */}
+          <Modal
+            isVisible={isModalVisible}
+            onBackdropPress={() => {
+              setModalVisible(false);
+              resetForm();
+            }}
+            style={{ justifyContent: 'center', margin: 20 }}
+          >
+            <KeyboardDismissWrapper style={{ flex: 0 }}>
+              <View style={{ backgroundColor: '#FFFFFF', borderRadius: 20, padding: 25 }}>
+                <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1F2937', marginBottom: 20, textAlign: 'center' }}>
+                  {editingExpense ? t('edit_expense') : t('add_expense')}
+                </Text>
+
+                <RequiredFieldIndicator label={t('amount')} required={true} />
+                <NumericInput
+                  style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16 }}
+                  placeholder={t('amount')}
+                  value={formData.amount}
+                  onChangeText={(text) => setFormData({ ...formData, amount: text })}
+                />
+
+                <RequiredFieldIndicator label={t('category')} required={true} />
+                <View style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, marginBottom: 15 }}>
+                  <Picker
+                    selectedValue={formData.category}
+                    onValueChange={(value) => setFormData({ ...formData, category: value })}
+                    style={{ height: 50 }}
+                  >
+                    {categories.map((category) => {
+                      const fixedCategories = ['rent', 'food', 'transport', 'savings'];
+                      const label = fixedCategories.includes(category) ? t(category) : category;
+                      return <Picker.Item key={category} label={label} value={category} />;
+                    })}
+                  </Picker>
+                </View>
+
+                <RequiredFieldIndicator label={t('income_source')} required={true} />
+                <View style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, marginBottom: 15 }}>
+                  <Picker
+                    selectedValue={formData.revenueSourceId}
+                    onValueChange={(value) => setFormData({ ...formData, revenueSourceId: value })}
+                    style={{ height: 50 }}
+                  >
+                    <Picker.Item label={t('select_income_source')} value="" />
+                    {revenues.map((revenue) => (
+                      <Picker.Item
+                        key={revenue.id}
+                        label={`${revenue.name} (${formatAmount(revenue.remainingAmount)})`}
+                        value={revenue.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+
+                <TouchableOpacity
+                  style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15 }}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Calendar size={20} color="#6B7280" style={{ marginRight: 10 }} />
+                  <Text style={{ fontSize: 16, color: '#1F2937' }}>{formatDate(formData.date)}</Text>
+                </TouchableOpacity>
+
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={formData.date}
+                    mode="date"
+                    display="default"
+                    onChange={onDateChange}
+                  />
+                )}
+
+                <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
+                <TextInput
+                  style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16, textAlignVertical: 'top' }}
+                  placeholder={t('description')}
+                  value={formData.description}
+                  onChangeText={(text) => setFormData({ ...formData, description: text })}
+                  multiline
+                />
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, backgroundColor: '#F3F4F6', borderRadius: 12, padding: 15, marginRight: 10 }}
+                    onPress={() => {
+                      setModalVisible(false);
+                      resetForm();
+                    }}
+                  >
+                    <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#6B7280' }}>{t('cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flex: 1, backgroundColor: '#3B82F6', borderRadius: 12, padding: 15, marginLeft: 10 }}
+                    onPress={handleSaveExpense}
+                  >
+                    <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>{t('save')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </KeyboardDismissWrapper>
+          </Modal>
+        </LinearGradient>
+      </KeyboardDismissWrapper>
+    );
+  }
+
+  return (
+    <KeyboardDismissWrapper>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={savingsStyles.container}>
+        <View style={savingsStyles.header}>
+          <Text style={savingsStyles.headerTitle}>{t('expenses')}</Text>
+          <Text style={savingsStyles.headerSubtitle}>
+            {expenses.length} {t('expenses_recorded')}
+          </Text>
+        </View>
+
+        <View style={savingsStyles.totalSavingsCard}>
+          <Text style={savingsStyles.totalAmount}>{formatAmount(totalExpenses)}</Text>
+          <Text style={savingsStyles.totalLabel}>{t('total_expenses')}</Text>
+        </View>
+
+        <View style={savingsStyles.goalsSection}>
+          <View style={savingsStyles.sectionHeader}>
+            <Text style={savingsStyles.sectionTitle}>{t('your_expenses')}</Text>
+            <TouchableOpacity onPress={() => {
+              resetForm();
+              setModalVisible(true);
+            }} style={savingsStyles.addButton}>
+              <Text style={savingsStyles.addButtonText}>{t('add_expense')}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={expenses}
+            renderItem={renderExpenseCard}
+            keyExtractor={keyExtractor}
+            style={savingsStyles.goalsList}
+            showsVerticalScrollIndicator={false}
+            initialNumToRender={5}
+            maxToRenderPerBatch={3}
+            windowSize={10}
+            removeClippedSubviews={true}
+          />
+        </View>
+        
+        {/* Floating Action Button */}
+        <TouchableOpacity 
+          style={{
+            position: 'absolute',
+            bottom: 30,
+            right: 20,
+            backgroundColor: '#F5F7FA',
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8,
+          }}
+          onPress={() => {
+            resetForm();
+            setModalVisible(true);
+          }}
+        >
+          <Plus size={28} color="#0A2540" />
+        </TouchableOpacity>
+
+        {/* Modal for populated state */}
+        <Modal
+          isVisible={isModalVisible}
+          onBackdropPress={() => {
+            setModalVisible(false);
+            resetForm();
+          }}
+          style={{ justifyContent: 'center', margin: 20 }}
+        >
+          <KeyboardDismissWrapper style={{ flex: 0 }}>
+            <View style={{ backgroundColor: '#FFFFFF', borderRadius: 20, padding: 25 }}>
+              <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1F2937', marginBottom: 20, textAlign: 'center' }}>
+                {editingExpense ? t('edit_expense') : t('add_expense')}
+              </Text>
+
+              <RequiredFieldIndicator label={t('amount')} required={true} />
+              <NumericInput
+                style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16 }}
+                placeholder={t('amount')}
+                value={formData.amount}
+                onChangeText={(text) => setFormData({ ...formData, amount: text })}
+              />
+
+              <RequiredFieldIndicator label={t('category')} required={true} />
+              <View style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, marginBottom: 15 }}>
+                <Picker
+                  selectedValue={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  style={{ height: 50 }}
+                >
+                  {categories.map((category) => {
+                    const fixedCategories = ['rent', 'food', 'transport', 'savings'];
+                    const label = fixedCategories.includes(category) ? t(category) : category;
+                    return <Picker.Item key={category} label={label} value={category} />;
+                  })}
+                </Picker>
+              </View>
+
+              <RequiredFieldIndicator label={t('income_source')} required={true} />
+              <View style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, marginBottom: 15 }}>
+                <Picker
+                  selectedValue={formData.revenueSourceId}
+                  onValueChange={(value) => setFormData({ ...formData, revenueSourceId: value })}
+                  style={{ height: 50 }}
+                >
+                  <Picker.Item label={t('select_income_source')} value="" />
+                  {revenues.map((revenue) => (
+                    <Picker.Item
+                      key={revenue.id}
+                      label={`${revenue.name} (${formatAmount(revenue.remainingAmount)})`}
+                      value={revenue.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+
+              <TouchableOpacity
+                style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15 }}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Calendar size={20} color="#6B7280" style={{ marginRight: 10 }} />
+                <Text style={{ fontSize: 16, color: '#1F2937' }}>{formatDate(formData.date)}</Text>
+              </TouchableOpacity>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={formData.date}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
+
+              <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16, textAlignVertical: 'top' }}
+                placeholder={t('description')}
+                value={formData.description}
+                onChangeText={(text) => setFormData({ ...formData, description: text })}
+                multiline
+              />
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: '#F3F4F6', borderRadius: 12, padding: 15, marginRight: 10 }}
+                  onPress={() => {
+                    setModalVisible(false);
+                    resetForm();
+                  }}
+                >
+                  <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#6B7280' }}>{t('cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: '#3B82F6', borderRadius: 12, padding: 15, marginLeft: 10 }}
+                  onPress={handleSaveExpense}
+                >
+                  <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>{t('save')}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardDismissWrapper>
+        </Modal>
       </LinearGradient>
     </KeyboardDismissWrapper>
   );

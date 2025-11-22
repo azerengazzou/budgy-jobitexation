@@ -87,14 +87,14 @@ class NotificationService {
     await Notifications.cancelAllScheduledNotificationsAsync();
   }
 
-  async sendBudgetAlert(category: string, amount: number, limit: number): Promise<void> {
+  async sendBudgetAlert(category: string, amount: number, limit: number, formatAmount: (amount: number) => string): Promise<void> {
     const hasPermission = await this.requestPermissions();
     if (!hasPermission) return;
 
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Budget Alert!', // Note: Notifications don't support i18n directly
-        body: `You've spent €${amount.toFixed(2)} in ${category}, exceeding your limit of €${limit.toFixed(2)}`,
+        title: 'Budget Alert!',
+        body: `You've spent ${formatAmount(amount)} in ${category}, exceeding your limit of ${formatAmount(limit)}`,
       },
       trigger: null,
     });

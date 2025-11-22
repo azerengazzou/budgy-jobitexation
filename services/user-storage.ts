@@ -9,7 +9,7 @@ export class UserStorageService extends BaseStorageService {
   }
 
   async getUserProfile(): Promise<UserProfile | null> {
-    return this.getItem<UserProfile>(STORAGE_KEYS.USER_PROFILE);
+    return (await this.getItem(STORAGE_KEYS.USER_PROFILE)) as UserProfile | null;
   }
 
   async setOnboardingComplete(): Promise<void> {
@@ -17,12 +17,16 @@ export class UserStorageService extends BaseStorageService {
   }
 
   async isOnboardingComplete(): Promise<boolean> {
-    const data = await AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
-    return data === 'true';
+    const raw = await AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+    // Treat missing or non-'true' values as false; accept 'true' case-insensitively for robustness
+    if (!raw) {
+      return false;
+    }
+    return raw.toLowerCase() === 'true';
   }
 
   async getSettings(): Promise<AppSettings | null> {
-    return this.getItem<AppSettings>(STORAGE_KEYS.SETTINGS);
+    return (await this.getItem(STORAGE_KEYS.SETTINGS)) as AppSettings | null;
   }
 
   async saveSettings(settings: AppSettings): Promise<void> {
@@ -30,7 +34,8 @@ export class UserStorageService extends BaseStorageService {
   }
 
   async getCategories(): Promise<string[]> {
-    return (await this.getItem<string[]>(STORAGE_KEYS.CATEGORIES)) || [];
+    const categories = await this.getItem(STORAGE_KEYS.CATEGORIES);
+    return (categories as string[]) || [];
   }
 
   async saveCategories(categories: string[]): Promise<void> {

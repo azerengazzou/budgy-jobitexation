@@ -6,6 +6,7 @@ import { SavingsStorageService } from './savings-storage';
 import { STORAGE_KEYS } from './storage-types';
 import { backupService } from './backup-service';
 import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
+import { normalizeAmount } from '@/components/NumericInput';
 
 class StorageService extends RevenueStorageService {
   private userStorage = new UserStorageService();
@@ -85,18 +86,19 @@ class StorageService extends RevenueStorageService {
     return this.savingsStorage.getSavingsTransactions();
   }
   async addSavingsTransaction(transaction: SavingsTransaction) {
-    console.log('Adding savings transaction:', transaction);
-    await this.savingsStorage.addSavingsTransaction(transaction);
+    const normalizedTransaction = {
+      ...transaction,
+      amount: normalizeAmount(transaction.amount)
+    };
+    await this.savingsStorage.addSavingsTransaction(normalizedTransaction);
     
     // Update goal's current amount
-    const currentAmount = await this.savingsStorage.calculateGoalCurrentAmount(transaction.goalId);
-    console.log('Calculated current amount:', currentAmount);
+    const currentAmount = normalizeAmount(await this.savingsStorage.calculateGoalCurrentAmount(transaction.goalId));
     
     const goals = await this.getGoals();
     const goalIndex = goals.findIndex(g => g.id === transaction.goalId);
     
     if (goalIndex !== -1) {
-      console.log('Before update - Goal current amount:', goals[goalIndex].currentAmount);
       goals[goalIndex].currentAmount = currentAmount;
       goals[goalIndex].updatedAt = new Date().toISOString();
       
@@ -106,9 +108,6 @@ class StorageService extends RevenueStorageService {
       }
       
       await this.expenseStorage.updateGoal(goals[goalIndex]);
-      console.log('After update - Goal current amount:', goals[goalIndex].currentAmount);
-    } else {
-      console.log('Goal not found with ID:', transaction.goalId);
     }
     
     await backupService.autoBackup();
@@ -142,7 +141,7 @@ class StorageService extends RevenueStorageService {
 
   // Deduct from revenue when saving
   async deductFromRevenueForSaving(revenueId: string, amount: number): Promise<void> {
-    await this.deductFromRevenue(revenueId, amount);
+    await this.deductFromRevenue(revenueId, normalizeAmount(amount));
   }
 
   // Monthly carry-over logic
@@ -154,7 +153,7 @@ class StorageService extends RevenueStorageService {
       const revenues = await this.getRevenues();
       const updatedRevenues = revenues.map(revenue => ({
         ...revenue,
-        remainingAmount: revenue.amount,
+        remainingAmount: normalizeAmount(revenue.amount),
       }));
 
       await this.setItem(STORAGE_KEYS.REVENUES, updatedRevenues);

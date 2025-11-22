@@ -7,7 +7,7 @@ import { Revenue } from '@/app/components/interfaces/revenues';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useTranslation } from 'react-i18next';
 import { RequiredFieldIndicator } from './RequiredFieldIndicator';
-import { NumericInput } from './NumericInput';
+import { NumericInput, normalizeAmount } from './NumericInput';
 import { KeyboardDismissWrapper } from './KeyboardDismissWrapper';
 
 interface AddSavingsModalProps {
@@ -40,7 +40,7 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
   ].filter(amount => amount > 0);
 
   const handleSave = () => {
-    const numAmount = parseFloat(amount);
+    const numAmount = normalizeAmount(amount);
     if (!numAmount || numAmount <= 0) {
       Alert.alert(t('error'), t('please_enter_valid_amount'));
       return;

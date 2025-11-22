@@ -15,7 +15,6 @@ import { storageService } from '../services/storage';
 import { User, Wallet, TrendingUp, PiggyBank } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { styles } from './styles/onboarding.styles';
-import { Revenue } from './components/interfaces/revenues';
 import { RequiredFieldIndicator } from '../components/RequiredFieldIndicator';
 import { KeyboardDismissWrapper } from '../components/KeyboardDismissWrapper';
 

@@ -43,7 +43,7 @@ export default function GoalDetailsScreen() {
       createdAt: new Date().toISOString(),
     },
     onCompletionFinished: () => {
-      console.log('Goal completion animation finished!');
+      // Animation completed
     },
   });
 

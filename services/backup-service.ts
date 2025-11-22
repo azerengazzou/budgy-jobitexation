@@ -109,6 +109,13 @@ class BackupService {
   async scanForBackups(): Promise<string | null> {
     try {
       const backupDir = `${FileSystem.documentDirectory}budgy_backup/`;
+      
+      // Check if directory exists first
+      const dirInfo = await FileSystem.getInfoAsync(backupDir);
+      if (!dirInfo.exists) {
+        return null;
+      }
+      
       const files = await FileSystem.readDirectoryAsync(backupDir);
       const backupFiles = files.filter(file => file.startsWith('finance_backup_') && file.endsWith('.json'));
       
