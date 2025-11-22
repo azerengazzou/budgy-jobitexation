@@ -11,7 +11,7 @@ const resources = {
       goals: 'Goals',
       settings: 'Settings',
       categories: 'Categories',
-      
+
       // Menu/UI
       soon: 'Soon',
 
@@ -37,7 +37,6 @@ const resources = {
       // Revenues
       manage_income_sources: 'Manage Your Income Sources',
       total_income: 'Total Income',
-      remaining: 'Remaining',
       add_revenue: 'Add Revenue',
       edit_revenue: 'Edit Revenue',
       revenue_name: 'Revenue Name',
@@ -145,13 +144,12 @@ const resources = {
       failed_to_delete_data: 'Failed to delete data',
       ok: 'OK',
       manual_savings_adjustment: 'Manual savings adjustment',
-      
+
       // Category Names
       rent: 'Rent',
       food: 'Food',
       transport: 'Transport',
-      savings: 'Savings',
-      
+
       // Categories Screen
       search_categories: 'Search categories',
       no_expense_categories: 'No expense categories found',
@@ -164,7 +162,7 @@ const resources = {
       expense_category: 'Expense Category',
       revenue_type: 'Revenue Type',
       fixed: 'FIXED',
-      
+
       // Revenue Components
       total_amount: 'Total Amount',
       delete_revenue: 'Delete Revenue',
@@ -175,14 +173,14 @@ const resources = {
       income_sources: 'income sources',
       available_funds: 'Available Funds',
       your_revenues: 'Your Revenues',
-      
+
       // Expenses
       no_expenses_yet: 'No Expenses Yet',
       start_tracking_your_expenses_to_better_manage_your_budget: 'Start tracking your expenses to better manage your budget and achieve your financial goals.',
       expenses_recorded: 'expenses recorded',
       your_expenses: 'Your Expenses',
       in: 'in',
-      
+
       // Notifications
       mybudget_reminder: 'MyBudget Reminder',
       daily_expense_reminder: "Don't forget to log your expenses today!",
@@ -192,7 +190,7 @@ const resources = {
       test_notification_body: 'hello , thank you for testing our application, wiouuuu',
       budget_alert: 'Budget Alert!',
       budget_alert_body: "You've spent €{amount} in {category}, exceeding your limit of €{limit}",
-      
+
       // Simulation Modal
       budget_simulation: 'Budget Simulation',
       select_category: 'Select Category',
@@ -204,15 +202,15 @@ const resources = {
       simulated_spending: 'Simulated Spending',
       difference: 'Difference',
       close: 'Close',
-      
+
       // Expense Deletion
       delete_expense: 'Delete Expense',
       delete_expense_confirm: 'Are you sure you want to delete this expense?',
       failed_to_delete_expense: 'Failed to delete expense',
-      
+
       // Profile
       profile_updated: 'Profile updated successfully',
-      
+
       // Savings Goals
       savings_goals: 'Savings Goals',
       track_your_financial_goals: 'Track your financial goals',
@@ -256,7 +254,18 @@ const resources = {
       of: 'of',
       please_enter_goal_title: 'Please enter a goal title',
       please_enter_valid_target_amount: 'Please enter a valid target amount',
-      failed_to_create_goal: 'Failed to create goal. Please try again.'
+      failed_to_create_goal: 'Failed to create goal. Please try again.',
+
+      // Revenue Category Details
+      used: 'Used',
+      history: 'History',
+      no_entries_yet: 'No entries yet',
+      add_your_first: 'Add your first',
+      entry_to_start_tracking: 'entry to start tracking',
+      go_back: 'Go back',
+      total_added: 'Total',
+      total_used: 'Total Used',
+      income_source: 'Income Source'
     },
   },
   fr: {
@@ -268,7 +277,7 @@ const resources = {
       goals: 'Objectifs',
       settings: 'Paramètres',
       categories: 'Catégories',
-      
+
       // Menu/UI
       soon: 'Bientôt',
 
@@ -286,7 +295,6 @@ const resources = {
       financial_overview: 'Aperçu financier',
       total_revenues: 'Revenus totaux',
       total_expenses: 'Dépenses totales',
-      savings: 'Épargne',
       active_goals: 'Objectifs actifs',
       remaining_balance: 'Solde restant',
       expenses_by_category: 'Dépenses par catégorie',
@@ -403,13 +411,13 @@ const resources = {
       failed_to_delete_data: 'Échec de la suppression des données',
       ok: 'OK',
       manual_savings_adjustment: 'Ajustement manuel de l\'épargne',
-      
+
       // Category Names
       rent: 'Loyer',
       food: 'Nourriture',
       transport: 'Transport',
       savings: 'Épargne',
-      
+
       // Categories Screen
       search_categories: 'Rechercher des catégories',
       no_expense_categories: 'Aucune catégorie de dépenses trouvée',
@@ -422,7 +430,7 @@ const resources = {
       expense_category: 'Catégorie de dépenses',
       revenue_type: 'Type de revenus',
       fixed: 'FIXE',
-      
+
       // Revenue Components
       total_amount: 'Montant total',
       delete_revenue: 'Supprimer le revenu',
@@ -433,14 +441,14 @@ const resources = {
       income_sources: 'sources de revenus',
       available_funds: 'Fonds disponibles',
       your_revenues: 'Vos revenus',
-      
+
       // Expenses
       no_expenses_yet: 'Aucune dépense pour le moment',
       start_tracking_your_expenses_to_better_manage_your_budget: 'Commencez à suivre vos dépenses pour mieux gérer votre budget et atteindre vos objectifs financiers.',
       expenses_recorded: 'dépenses enregistrées',
       your_expenses: 'Vos dépenses',
       in: 'dans',
-      
+
       // Notifications
       mybudget_reminder: 'Rappel MonBudget',
       daily_expense_reminder: "N'oubliez pas d'enregistrer vos dépenses aujourd'hui!",
@@ -450,7 +458,7 @@ const resources = {
       test_notification_body: 'bonjour , merci de tester notre application, wiouuuu',
       budget_alert: 'Alerte budget!',
       budget_alert_body: 'Vous avez dépensé €{amount} dans {category}, dépassant votre limite de €{limit}',
-      
+
       // Simulation Modal
       budget_simulation: 'Simulation de budget',
       select_category: 'Sélectionner une catégorie',
@@ -462,15 +470,15 @@ const resources = {
       simulated_spending: 'Dépenses simulées',
       difference: 'Différence',
       close: 'Fermer',
-      
+
       // Expense Deletion
       delete_expense: 'Supprimer la dépense',
       delete_expense_confirm: 'Êtes-vous sûr de vouloir supprimer cette dépense?',
       failed_to_delete_expense: 'Échec de la suppression de la dépense',
-      
+
       // Profile
       profile_updated: 'Profil mis à jour avec succès',
-      
+
       // Savings Goals
       savings_goals: 'Objectifs d\'épargne',
       track_your_financial_goals: 'Suivez vos objectifs financiers',
@@ -495,7 +503,6 @@ const resources = {
       recent_transactions: 'Transactions récentes',
       no_transactions_yet: 'Aucune transaction pour le moment. Commencez à épargner pour voir vos progrès!',
       add_to: 'Ajouter à',
-      remaining: 'Restant',
       quick_amounts: 'Montants rapides:',
       deduct_from: 'Déduire de',
       add_savings: 'Ajouter épargne',
@@ -514,7 +521,18 @@ const resources = {
       of: 'de',
       please_enter_goal_title: 'Veuillez entrer un titre d\'objectif',
       please_enter_valid_target_amount: 'Veuillez entrer un montant cible valide',
-      failed_to_create_goal: 'Échec de la création de l\'objectif. Veuillez réessayer.'
+      failed_to_create_goal: 'Échec de la création de l\'objectif. Veuillez réessayer.',
+
+      // Revenue Category Details
+      used: 'Utilisé',
+      history: 'Historique',
+      no_entries_yet: 'Aucune entrée pour le moment',
+      add_your_first: 'Ajoutez votre premier',
+      entry_to_start_tracking: 'entrée pour commencer le suivi',
+      go_back: 'Retour',
+      total_added: 'Total ajouté',
+      total_used: 'Total utilisé',
+      income_source: 'Source de revenus'
     },
   },
   ar: {
@@ -526,7 +544,7 @@ const resources = {
       goals: 'الأهداف',
       settings: 'الإعدادات',
       categories: 'الفئات',
-      
+
       // Menu/UI
       soon: 'قريباً',
 
@@ -661,13 +679,12 @@ const resources = {
       failed_to_delete_data: 'فشل في حذف البيانات',
       ok: 'موافق',
       manual_savings_adjustment: 'تعديل يدوي للمدخرات',
-      
+
       // Category Names
       rent: 'إيجار',
       food: 'طعام',
       transport: 'مواصلات',
-      savings: 'مدخرات',
-      
+
       // Categories Screen
       search_categories: 'البحث في الفئات',
       no_expense_categories: 'لم يتم العثور على فئات مصاريف',
@@ -680,7 +697,7 @@ const resources = {
       expense_category: 'فئة المصاريف',
       revenue_type: 'نوع الإيرادات',
       fixed: 'ثابت',
-      
+
       // Revenue Components
       total_amount: 'المبلغ الإجمالي',
       delete_revenue: 'حذف الإيراد',
@@ -691,14 +708,14 @@ const resources = {
       income_sources: 'مصادر الدخل',
       available_funds: 'الأموال المتاحة',
       your_revenues: 'إيراداتك',
-      
+
       // Expenses
       no_expenses_yet: 'لا توجد مصاريف بعد',
       start_tracking_your_expenses_to_better_manage_your_budget: 'ابدأ في تتبع مصاريفك لإدارة ميزانيتك بشكل أفضل وتحقيق أهدافك المالية.',
       expenses_recorded: 'مصاريف مسجلة',
       your_expenses: 'مصاريفك',
       in: 'في',
-      
+
       // Notifications
       mybudget_reminder: 'تذكير ميزانيتي',
       daily_expense_reminder: 'لا تنس تسجيل مصاريفك اليوم!',
@@ -708,7 +725,7 @@ const resources = {
       test_notification_body: 'مرحبا ، شكرا لك لاختبار تطبيقنا ، ويووو',
       budget_alert: 'تنبيه الميزانية!',
       budget_alert_body: 'لقد أنفقت €{amount} في {category}، متجاوزاً حدك البالغ €{limit}',
-      
+
       // Simulation Modal
       budget_simulation: 'محاكاة الميزانية',
       select_category: 'اختر الفئة',
@@ -720,15 +737,15 @@ const resources = {
       simulated_spending: 'الإنفاق المحاكى',
       difference: 'الفرق',
       close: 'إغلاق',
-      
+
       // Expense Deletion
       delete_expense: 'حذف المصروف',
       delete_expense_confirm: 'هل أنت متأكد من حذف هذا المصروف؟',
       failed_to_delete_expense: 'فشل في حذف المصروف',
-      
+
       // Profile
       profile_updated: 'تم تحديث الملف الشخصي بنجاح',
-      
+
       // Savings Goals
       savings_goals: 'أهداف الادخار',
       track_your_financial_goals: 'تتبع أهدافك المالية',
@@ -753,7 +770,6 @@ const resources = {
       recent_transactions: 'المعاملات الأخيرة',
       no_transactions_yet: 'لا توجد معاملات بعد. ابدأ الادخار لرؤية تقدمك!',
       add_to: 'إضافة إلى',
-      remaining: 'المتبقي',
       quick_amounts: 'مبالغ سريعة:',
       deduct_from: 'خصم من',
       add_savings: 'إضافة مدخرات',
@@ -772,7 +788,18 @@ const resources = {
       of: 'من',
       please_enter_goal_title: 'يرجى إدخال عنوان الهدف',
       please_enter_valid_target_amount: 'يرجى إدخال مبلغ مستهدف صالح',
-      failed_to_create_goal: 'فشل في إنشاء الهدف. يرجى المحاولة مرة أخرى.'
+      failed_to_create_goal: 'فشل في إنشاء الهدف. يرجى المحاولة مرة أخرى.',
+
+      // Revenue Category Details
+      used: 'مستخدم',
+      history: 'التاريخ',
+      no_entries_yet: 'لا توجد إدخالات بعد',
+      add_your_first: 'أضف أول',
+      entry_to_start_tracking: 'إدخال لبدء التتبع',
+      go_back: 'العودة',
+      total_added: 'إجمالي المضاف',
+      total_used: 'إجمالي المستخدم',
+      income_source: 'مصدر الدخل'
     },
   },
 };

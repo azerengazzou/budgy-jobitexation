@@ -7,7 +7,7 @@ import {
     Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Plus, DollarSign, Edit3, Trash2 } from 'lucide-react-native';
+import { Plus, DollarSign, Edit3, Trash2, Eye } from 'lucide-react-native';
 import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
@@ -17,6 +17,7 @@ import { RevenueModal } from '../components/RevenueModal';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 import { normalizeAmount } from '../../components/NumericInput';
 import { savingsStyles } from '../styles/savings.styles';
+import { router } from 'expo-router';
 
 export default function RevenuesScreen() {
     const { t } = useTranslation();
@@ -169,6 +170,14 @@ export default function RevenuesScreen() {
                         <Text style={savingsStyles.goalCategory}>{t(item.type)}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TouchableOpacity 
+                            onPress={() => router.push(`/revenue-category-details?category=${item.type}`)} 
+                            style={{ padding: 8, marginRight: 4 }}
+                            accessibilityRole="button"
+                            accessibilityLabel={`View ${item.type} details`}
+                        >
+                            <Eye size={16} color="#3B82F6" />
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => openModalForEdit(item)} style={{ padding: 8, marginRight: 4 }}>
                             <Edit3 size={16} color="#6B7280" />
                         </TouchableOpacity>
