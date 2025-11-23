@@ -151,6 +151,7 @@ export default function Dashboard() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
           <View style={styles.headerRow}>
@@ -210,16 +211,23 @@ export default function Dashboard() {
           <TouchableOpacity
             style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
             onPress={() => router.push('/(tabs)/categories')}
+            activeOpacity={0.7}
           >
             <Text style={styles.actionButtonText}>{t('manage_categories')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}
+            activeOpacity={0.7}
+          >
             <Text style={styles.actionButtonText}>{t('goals')}</Text>
             <View style={styles.soonBadge}>
               <Text style={styles.soonBadgeText}>{t('soon')}</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}
+            activeOpacity={0.7}
+          >
             <Text style={styles.actionButtonText}>{t('export')}</Text>
             <View style={styles.soonBadge}>
               <Text style={styles.soonBadgeText}>{t('soon')}</Text>

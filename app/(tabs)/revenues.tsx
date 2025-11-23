@@ -162,29 +162,19 @@ export default function RevenuesScreen() {
         };
 
         return (
-            <View style={[savingsStyles.goalCard, { marginBottom: 12 }]}>
+            <TouchableOpacity 
+                onPress={() => openModalForEdit(item)}
+                style={[savingsStyles.goalCard, { marginBottom: 12 }]}
+            >
                 <View style={savingsStyles.goalHeader}>
                     <Text style={savingsStyles.goalEmoji}>💰</Text>
                     <View style={savingsStyles.goalInfo}>
                         <Text style={savingsStyles.goalTitle}>{item.name}</Text>
                         <Text style={savingsStyles.goalCategory}>{t(item.type)}</Text>
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity 
-                            onPress={() => router.push(`/revenue-category-details?category=${item.type}`)} 
-                            style={{ padding: 8, marginRight: 4 }}
-                            accessibilityRole="button"
-                            accessibilityLabel={`View ${item.type} details`}
-                        >
-                            <Eye size={16} color="#3B82F6" />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => openModalForEdit(item)} style={{ padding: 8, marginRight: 4 }}>
-                            <Edit3 size={16} color="#6B7280" />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleDeleteRevenue(item.id)} style={{ padding: 8 }}>
-                            <Trash2 size={16} color="#EF4444" />
-                        </TouchableOpacity>
-                    </View>
+                    <Text style={savingsStyles.progressPercentage}>
+                        {usagePercentage.toFixed(0)}%
+                    </Text>
                 </View>
 
                 <View style={savingsStyles.goalProgress}>
@@ -209,7 +199,7 @@ export default function RevenuesScreen() {
                         {t('of')} {formatAmount(item.amount)}
                     </Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     }, [t, formatAmount, openModalForEdit, handleDeleteRevenue]);
 
@@ -303,10 +293,6 @@ export default function RevenuesScreen() {
                         keyExtractor={keyExtractor}
                         style={savingsStyles.goalsList}
                         showsVerticalScrollIndicator={false}
-                        initialNumToRender={5}
-                        maxToRenderPerBatch={3}
-                        windowSize={10}
-                        removeClippedSubviews={true}
                     />
                 </View>
                 
@@ -327,8 +313,12 @@ export default function RevenuesScreen() {
                         shadowOpacity: 0.3,
                         shadowRadius: 8,
                         elevation: 8,
+                        overflow: 'visible',
                     }}
                     onPress={openModalForNew}
+                    activeOpacity={0.7}
+                    delayPressIn={0}
+                    hitSlop={0}
                 >
                     <Plus size={28} color="#0A2540" />
                 </TouchableOpacity>

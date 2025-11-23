@@ -189,7 +189,14 @@ export default function SettingsScreen() {
         <Text style={styles.headerSubtitle}>{t('customize_your_experience')}</Text>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView 
+        style={styles.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        scrollEventThrottle={16}
+        nestedScrollEnabled={true}
+        showsVerticalScrollIndicator={false}
+      >
 
         {/* Language & Currency */}
         <View style={styles.section}>
@@ -257,7 +264,10 @@ export default function SettingsScreen() {
         {/* Backup */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Backup</Text>
-          <TouchableOpacity style={styles.settingCard} onPress={async () => {
+          <TouchableOpacity 
+            style={styles.settingCard} 
+            activeOpacity={0.7}
+            onPress={async () => {
             try {
               const filePath = await backupService.createBackup();
               if (filePath) {
@@ -319,7 +329,11 @@ export default function SettingsScreen() {
         {/* Data Management */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('data_management')}</Text>
-          <TouchableOpacity style={[styles.settingCard, { backgroundColor: '#FEF2F2' }]} onPress={handleDeleteAllData}>
+          <TouchableOpacity 
+            style={[styles.settingCard, { backgroundColor: '#FEF2F2' }]} 
+            onPress={handleDeleteAllData}
+            activeOpacity={0.7}
+          >
             <View style={styles.settingLeft}>
               <Trash2 size={24} color="#EF4444" />
               <View style={styles.settingText}>

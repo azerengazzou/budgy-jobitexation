@@ -170,7 +170,10 @@ export default function ExpensesScreen() {
     };
 
     return (
-      <View style={[savingsStyles.goalCard, { marginBottom: 12 }]}>
+      <TouchableOpacity 
+        onPress={() => openEditModal(item)}
+        style={[savingsStyles.goalCard, { marginBottom: 12 }]}
+      >
         <View style={savingsStyles.goalHeader}>
           <Text style={savingsStyles.goalEmoji}>
             {item.category === 'food' ? '🍽️' : 
@@ -186,17 +189,9 @@ export default function ExpensesScreen() {
               {item.description || new Date(item.date).toLocaleDateString()}
             </Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={[savingsStyles.currentAmount, { marginRight: 12 }]}>
-              {formatAmount(item.amount)}
-            </Text>
-            <TouchableOpacity onPress={() => openEditModal(item)} style={{ padding: 8, marginRight: 4 }}>
-              <Edit3 size={16} color="#6B7280" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteExpense(item)} style={{ padding: 8 }}>
-              <Trash2 size={16} color="#EF4444" />
-            </TouchableOpacity>
-          </View>
+          <Text style={savingsStyles.progressPercentage}>
+            {formatAmount(item.amount)}
+          </Text>
         </View>
 
         <View style={savingsStyles.goalProgress}>
@@ -217,11 +212,11 @@ export default function ExpensesScreen() {
           <Text style={savingsStyles.targetAmount}>
             {formatAmount(categoryTotal)} {t('in')} {['rent', 'food', 'transport', 'savings'].includes(item.category) ? t(item.category) : item.category}
           </Text>
-          <Text style={savingsStyles.progressPercentage}>
+          <Text style={savingsStyles.currentAmount}>
             {categoryPercentage.toFixed(1)}%
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }, [expenses, totalExpenses, expensesByCategory, t, formatAmount]);
 
@@ -433,10 +428,6 @@ export default function ExpensesScreen() {
             keyExtractor={keyExtractor}
             style={savingsStyles.goalsList}
             showsVerticalScrollIndicator={false}
-            initialNumToRender={5}
-            maxToRenderPerBatch={3}
-            windowSize={10}
-            removeClippedSubviews={true}
           />
         </View>
         
@@ -457,11 +448,15 @@ export default function ExpensesScreen() {
             shadowOpacity: 0.3,
             shadowRadius: 8,
             elevation: 8,
+            overflow: 'visible',
           }}
           onPress={() => {
             resetForm();
             setModalVisible(true);
           }}
+          activeOpacity={0.7}
+          delayPressIn={0}
+          hitSlop={0}
         >
           <Plus size={28} color="#0A2540" />
         </TouchableOpacity>

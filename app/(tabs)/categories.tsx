@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -174,145 +174,107 @@ export default function Categories() {
     return IconComponent;
   };
 
-  return (
-    <KeyboardDismissWrapper>
-      <View style={styles.container}>
-      <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.header}>
-        <Text style={styles.headerTitle}>{t('manage_categories')}</Text>
-
-        <View style={styles.searchContainer}>
-          <Search size={18} color="#FFFFFF" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder={t('search_categories')}
-            placeholderTextColor="rgba(255,255,255,0.7)"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'expenses' && styles.activeTab]}
-            onPress={() => setActiveTab('expenses')}
-          >
-            <Text style={[styles.tabText, activeTab === 'expenses' && styles.activeTabText]}>
-              {t('expenses')} ({filteredExpenseCategories.length})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'revenues' && styles.activeTab]}
-            onPress={() => setActiveTab('revenues')}
-          >
-            <Text style={[styles.tabText, activeTab === 'revenues' && styles.activeTabText]}>
-              {t('revenues')} ({filteredRevenueTypes.length})
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {activeTab === 'expenses' ? (
-          <View style={styles.categorySection}>
-            {filteredExpenseCategories.length === 0 ? (
-              <View style={styles.emptyState}>
-                <ShoppingBag size={64} color="#9CA3AF" />
-                <Text style={styles.emptyTitle}>{t('no_expense_categories')}</Text>
-                <Text style={styles.emptySubtitle}>{t('tap_plus_to_add')}</Text>
-              </View>
-            ) : (
-              filteredExpenseCategories.map((item, index) => {
-                const IconComponent = getIconForCategory(item);
-                const isFixed = fixedExpenseCategories.includes(item);
-                const actualIndex = isFixed ? -1 : expenseCategories.indexOf(item);
-                return (
-                  <View key={index} style={[styles.modernCard, isFixed && styles.fixedCard]}>
-                    <View style={styles.cardLeft}>
-                      <View style={[styles.iconContainer, { backgroundColor: '#FEF2F2' }]}>
-                        <IconComponent size={18} color="#DC2626" />
-                      </View>
-                      <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>{getTranslatedCategoryName(item, fixedExpenseCategories.includes(item))}</Text>
-                        <Text style={styles.cardSubtitle}>{t('expense_category')}</Text>
-                      </View>
-                    </View>
-                    {isFixed ? (
-                      <View style={styles.fixedBadge}>
-                        <Text style={styles.fixedText}>{t('fixed')}</Text>
-                      </View>
-                    ) : (
-                      <View style={styles.cardActions}>
-                        <TouchableOpacity
-                          onPress={() => handleEdit(item, actualIndex)}
-                          style={[styles.modernActionButton, styles.editAction]}
-                        >
-                          <Edit size={16} color="#3B82F6" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => handleDelete(actualIndex, item)}
-                          style={[styles.modernActionButton, styles.deleteAction]}
-                        >
-                          <Trash2 size={16} color="#EF4444" />
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
-                );
-              })
-            )}
+  const renderCategoryItem = ({ item, index }: { item: string; index: number }) => {
+    const isExpense = activeTab === 'expenses';
+    const IconComponent = isExpense ? getIconForCategory(item) : DollarSign;
+    const isFixed = isExpense ? fixedExpenseCategories.includes(item) : fixedRevenueTypes.includes(item);
+    const actualIndex = isFixed ? -1 : (isExpense ? expenseCategories.indexOf(item) : revenueCategories.indexOf(item));
+    
+    return (
+      <TouchableOpacity 
+        onPress={() => !isFixed && handleEdit(item, actualIndex)}
+        style={[styles.modernCard, isFixed && styles.fixedCard]}
+        disabled={isFixed}
+      >
+        <View style={styles.cardLeft}>
+          <View style={[styles.iconContainer, { backgroundColor: isExpense ? '#FEF2F2' : '#ECFDF5' }]}>
+            <IconComponent size={18} color={isExpense ? '#DC2626' : '#059669'} />
           </View>
-        ) : (
-          <View style={styles.categorySection}>
-            {filteredRevenueTypes.length === 0 ? (
-              <View style={styles.emptyState}>
-                <DollarSign size={64} color="#9CA3AF" />
-                <Text style={styles.emptyTitle}>{t('no_revenue_categories')}</Text>
-                <Text style={styles.emptySubtitle}>{t('tap_plus_to_add')}</Text>
-              </View>
-            ) : (
-              filteredRevenueTypes.map((item, index) => {
-                const isFixed = fixedRevenueTypes.includes(item);
-                const actualIndex = isFixed ? -1 : revenueCategories.indexOf(item);
-                return (
-                  <View key={index} style={[styles.modernCard, isFixed && styles.fixedCard]}>
-                    <View style={styles.cardLeft}>
-                      <View style={[styles.iconContainer, { backgroundColor: '#ECFDF5' }]}>
-                        <DollarSign size={18} color="#059669" />
-                      </View>
-                      <View style={styles.cardContent}>
-                        <Text style={styles.cardTitle}>{getTranslatedCategoryName(item, fixedRevenueTypes.includes(item))}</Text>
-                        <Text style={styles.cardSubtitle}>{t('revenue_type')}</Text>
-                      </View>
-                    </View>
-                    {isFixed ? (
-                      <View style={styles.fixedBadge}>
-                        <Text style={styles.fixedText}>{t('fixed')}</Text>
-                      </View>
-                    ) : (
-                      <View style={styles.cardActions}>
-                        <TouchableOpacity
-                          onPress={() => handleEdit(item, actualIndex)}
-                          style={[styles.modernActionButton, styles.editAction]}
-                        >
-                          <Edit size={16} color="#3B82F6" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => handleDelete(actualIndex, item)}
-                          style={[styles.modernActionButton, styles.deleteAction]}
-                        >
-                          <Trash2 size={16} color="#EF4444" />
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                  </View>
-                );
-              })
-            )}
+          <View style={styles.cardContent}>
+            <Text style={styles.cardTitle}>
+              {getTranslatedCategoryName(item, isFixed)}
+            </Text>
+            <Text style={styles.cardSubtitle}>
+              {isExpense ? t('expense_category') : t('revenue_type')}
+            </Text>
+          </View>
+        </View>
+        {isFixed && (
+          <View style={styles.fixedBadge}>
+            <Text style={styles.fixedText}>{t('fixed')}</Text>
           </View>
         )}
-      </ScrollView>
+      </TouchableOpacity>
+    );
+  };
 
-      <TouchableOpacity style={styles.fab} onPress={openModal}>
+  const currentData = activeTab === 'expenses' ? filteredExpenseCategories : filteredRevenueTypes;
+  const EmptyIcon = activeTab === 'expenses' ? ShoppingBag : DollarSign;
+  const emptyTitle = activeTab === 'expenses' ? t('no_expense_categories') : t('no_revenue_categories');
+
+  return (
+    <KeyboardDismissWrapper>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>{t('manage_categories')}</Text>
+
+          <View style={styles.searchContainer}>
+            <Search size={18} color="#FFFFFF" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder={t('search_categories')}
+              placeholderTextColor="rgba(255,255,255,0.7)"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'expenses' && styles.activeTab]}
+              onPress={() => setActiveTab('expenses')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabText, activeTab === 'expenses' && styles.activeTabText]}>
+                {t('expenses')} ({filteredExpenseCategories.length})
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'revenues' && styles.activeTab]}
+              onPress={() => setActiveTab('revenues')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabText, activeTab === 'revenues' && styles.activeTabText]}>
+                {t('revenues')} ({filteredRevenueTypes.length})
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          {currentData.length === 0 ? (
+            <View style={styles.emptyState}>
+              <EmptyIcon size={64} color="#9CA3AF" />
+              <Text style={styles.emptyTitle}>{emptyTitle}</Text>
+              <Text style={styles.emptySubtitle}>{t('tap_plus_to_add')}</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={currentData}
+              renderItem={renderCategoryItem}
+              keyExtractor={(item, index) => `${activeTab}-${item}-${index}`}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </View>
+
+      <TouchableOpacity 
+        style={styles.fab} 
+        onPress={openModal}
+        activeOpacity={0.7}
+        delayPressIn={0}
+        hitSlop={0}
+      >
         <LinearGradient colors={['#4A90E2', '#0A2540']} style={styles.fabGradient}>
           <Plus size={22} color="#FFFFFF" />
         </LinearGradient>
@@ -349,7 +311,7 @@ export default function Categories() {
           </View>
         </View>
       </Modal>
-      </View>
+      </LinearGradient>
     </KeyboardDismissWrapper>
   );
 }

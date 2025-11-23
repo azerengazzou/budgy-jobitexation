@@ -331,6 +331,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 6,
+    overflow: 'visible',
   },
   fabGradient: {
     width: 52,
