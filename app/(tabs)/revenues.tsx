@@ -297,7 +297,7 @@ export default function RevenuesScreen() {
                 </View>
                 
                 {/* Floating Action Button */}
-                <TouchableOpacity 
+                {/* <TouchableOpacity 
                     style={{
                         position: 'absolute',
                         bottom: 30,
@@ -321,7 +321,7 @@ export default function RevenuesScreen() {
                     hitSlop={0}
                 >
                     <Plus size={28} color="#0A2540" />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <RevenueModal
                     visible={isModalVisible}

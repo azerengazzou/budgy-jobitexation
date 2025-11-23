@@ -75,9 +75,9 @@ export default function ExpensesScreen() {
     const revenue = revenues.find(r => r.id === formData.revenueSourceId);
 
     // For editing, check if we have enough funds considering the original expense amount
-    const availableAmount = editingExpense 
-      ? revenue?.remainingAmount + editingExpense.amount 
-      : revenue?.remainingAmount;
+    const availableAmount = editingExpense
+  ? (revenue?.remainingAmount ?? 0) + editingExpense.amount
+  : (revenue?.remainingAmount ?? 0);
 
     if (!revenue || (availableAmount || 0) < amount) {
       Alert.alert(t('error'), t('insufficient_funds'));
@@ -432,7 +432,7 @@ export default function ExpensesScreen() {
         </View>
         
         {/* Floating Action Button */}
-        <TouchableOpacity 
+        {/* <TouchableOpacity 
           style={{
             position: 'absolute',
             bottom: 30,
@@ -459,7 +459,7 @@ export default function ExpensesScreen() {
           hitSlop={0}
         >
           <Plus size={28} color="#0A2540" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Modal for populated state */}
         <Modal
