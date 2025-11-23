@@ -12,6 +12,7 @@ import { ProgressRing } from '@/components/ProgressRing';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
 import { GoalCompletionAnimation } from '@/components/GoalCompletionAnimation';
 import { useGoalCompletionAnimation } from '@/hooks/useGoalCompletionAnimation';
+import { ActivityIndicator } from 'react-native';
 
 export default function GoalDetailsScreen() {
   // ✅ ALL HOOKS AT THE TOP - ALWAYS CALLED IN SAME ORDER
@@ -20,11 +21,13 @@ export default function GoalDetailsScreen() {
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
   const { goals, revenues, refreshData } = useData();
   const { formatAmount } = useCurrency();
-  
+
+  const [isLoading, setIsLoading] = useState(true);
+
   const [goal, setGoal] = useState<Goal | null>(null);
   const [transactions, setTransactions] = useState<SavingsTransaction[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  
+
   // ✅ ALWAYS call useGoalCompletionAnimation - handle null goal inside the hook
   const {
     isAnimating,
@@ -53,6 +56,7 @@ export default function GoalDetailsScreen() {
       const foundGoal = goals.find(g => g.id === goalId);
       if (foundGoal) {
         setGoal(foundGoal);
+        setIsLoading(false); // ✅ goal is ready
       }
     }
   }, [goals, goalId]);
@@ -63,6 +67,8 @@ export default function GoalDetailsScreen() {
       if (!goalId) return;
       const goalTransactions = await storageService.getTransactionsByGoalId(goalId);
       setTransactions(goalTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+
+      // don't set loading here if goal is not loaded yet
     };
     loadTransactions();
   }, [goalId]);
@@ -82,7 +88,18 @@ export default function GoalDetailsScreen() {
       console.error('Error adding savings:', error);
     }
   };
-
+  if (isLoading) {
+    return (
+      <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="white" />
+          <Text style={{ color: 'white', marginTop: 10, fontSize: 16 }}>
+            {t('loading_goal')}
+          </Text>
+        </View>
+      </LinearGradient>
+    );
+  }
   // ✅ VALIDATION AFTER ALL HOOKS - Safe to return early now
   if (!goal || !goal.id) {
     return (
@@ -94,8 +111,8 @@ export default function GoalDetailsScreen() {
     );
   }
 
-  const progressPercentage = currentProgress || (goal.targetAmount > 0 
-    ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100) 
+  const progressPercentage = currentProgress || (goal.targetAmount > 0
+    ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)
     : 0);
 
   const remainingAmount = Math.max(goal.targetAmount - goal.currentAmount, 0);
@@ -232,7 +249,7 @@ export default function GoalDetailsScreen() {
             </View>
             <Text style={{ color: 'white', fontWeight: '600' }}>{t('add_money')}</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -250,10 +267,10 @@ export default function GoalDetailsScreen() {
       </View>
 
       {/* Transactions Section */}
-      <View style={{ 
-        flex: 1, 
-        backgroundColor: 'white', 
-        borderTopLeftRadius: 24, 
+      <View style={{
+        flex: 1,
+        backgroundColor: 'white',
+        borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         paddingTop: 20,
       }}>
