@@ -47,7 +47,7 @@ export default function ExpensesScreen() {
       const customCategories = Array.isArray(expenseData) && expenseData.length > 0
         ? expenseData.map((item: any) => typeof item === 'string' ? item : (item?.name || String(item)))
         : [];
-      const fixedCategories = ['rent', 'food', 'transport', 'savings'];
+      const fixedCategories = ['rent', 'food', 'transport'];
       setCategories([...fixedCategories, ...customCategories]);
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -76,8 +76,8 @@ export default function ExpensesScreen() {
 
     // For editing, check if we have enough funds considering the original expense amount
     const availableAmount = editingExpense
-  ? (revenue?.remainingAmount ?? 0) + editingExpense.amount
-  : (revenue?.remainingAmount ?? 0);
+      ? (revenue?.remainingAmount ?? 0) + editingExpense.amount
+      : (revenue?.remainingAmount ?? 0);
 
     if (!revenue || (availableAmount || 0) < amount) {
       Alert.alert(t('error'), t('insufficient_funds'));
@@ -115,10 +115,6 @@ export default function ExpensesScreen() {
     }
   };
 
-
-
-
-
   const resetForm = () => {
     setFormData({
       amount: '',
@@ -129,8 +125,6 @@ export default function ExpensesScreen() {
     });
     setEditingExpense(null);
   };
-
-
 
   const formatDate = (date: Date) => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -158,7 +152,7 @@ export default function ExpensesScreen() {
   const renderExpenseCard = useCallback(({ item }: { item: Expense }) => {
     const categoryTotal = expensesByCategory[item.category] || 0;
     const categoryPercentage = totalExpenses > 0 ? (categoryTotal / totalExpenses) * 100 : 0;
-    
+
     const getCategoryColor = (category: string) => {
       const colors: Record<string, string> = {
         rent: '#EF4444',
@@ -170,20 +164,19 @@ export default function ExpensesScreen() {
     };
 
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={() => openEditModal(item)}
         style={[savingsStyles.goalCard, { marginBottom: 12 }]}
       >
         <View style={savingsStyles.goalHeader}>
           <Text style={savingsStyles.goalEmoji}>
-            {item.category === 'food' ? '🍽️' : 
-             item.category === 'transport' ? '🚗' :
-             item.category === 'rent' ? '🏠' :
-             item.category === 'savings' ? '💰' : '🛒'}
+            {item.category === 'food' ? '🍽️' :
+              item.category === 'transport' ? '🚗' :
+                item.category === 'rent' ? '🏠' : '🛒'}
           </Text>
           <View style={savingsStyles.goalInfo}>
             <Text style={savingsStyles.goalTitle}>
-              {['rent', 'food', 'transport', 'savings'].includes(item.category) ? t(item.category) : item.category}
+              {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
             </Text>
             <Text style={savingsStyles.goalCategory}>
               {item.description || new Date(item.date).toLocaleDateString()}
@@ -196,21 +189,21 @@ export default function ExpensesScreen() {
 
         <View style={savingsStyles.goalProgress}>
           <View style={savingsStyles.progressBar}>
-            <View 
+            <View
               style={[
                 savingsStyles.progressFill,
-                { 
+                {
                   width: `${Math.min(categoryPercentage, 100)}%`,
                   backgroundColor: getCategoryColor(item.category),
                 }
-              ]} 
+              ]}
             />
           </View>
         </View>
 
         <View style={savingsStyles.goalAmounts}>
           <Text style={savingsStyles.targetAmount}>
-            {formatAmount(categoryTotal)} {t('in')} {['rent', 'food', 'transport', 'savings'].includes(item.category) ? t(item.category) : item.category}
+            {formatAmount(categoryTotal)} {t('in')} {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
           </Text>
           <Text style={savingsStyles.currentAmount}>
             {categoryPercentage.toFixed(1)}%
@@ -288,7 +281,7 @@ export default function ExpensesScreen() {
               </TouchableOpacity>
             </View>
           </View>
-          
+
           {/* Modal for empty state */}
           <Modal
             isVisible={isModalVisible}
@@ -320,7 +313,7 @@ export default function ExpensesScreen() {
                     style={{ height: 50 }}
                   >
                     {categories.map((category) => {
-                      const fixedCategories = ['rent', 'food', 'transport', 'savings'];
+                      const fixedCategories = ['rent', 'food', 'transport'];
                       const label = fixedCategories.includes(category) ? t(category) : category;
                       return <Picker.Item key={category} label={label} value={category} />;
                     })}
@@ -430,36 +423,6 @@ export default function ExpensesScreen() {
             showsVerticalScrollIndicator={false}
           />
         </View>
-        
-        {/* Floating Action Button */}
-        {/* <TouchableOpacity 
-          style={{
-            position: 'absolute',
-            bottom: 30,
-            right: 20,
-            backgroundColor: '#F5F7FA',
-            width: 60,
-            height: 60,
-            borderRadius: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            elevation: 8,
-            overflow: 'visible',
-          }}
-          onPress={() => {
-            resetForm();
-            setModalVisible(true);
-          }}
-          activeOpacity={0.7}
-          delayPressIn={0}
-          hitSlop={0}
-        >
-          <Plus size={28} color="#0A2540" />
-        </TouchableOpacity> */}
 
         {/* Modal for populated state */}
         <Modal
@@ -492,7 +455,7 @@ export default function ExpensesScreen() {
                   style={{ height: 50 }}
                 >
                   {categories.map((category) => {
-                    const fixedCategories = ['rent', 'food', 'transport', 'savings'];
+                    const fixedCategories = ['rent', 'food', 'transport'];
                     const label = fixedCategories.includes(category) ? t(category) : category;
                     return <Picker.Item key={category} label={label} value={category} />;
                   })}
