@@ -53,7 +53,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="goals"
         options={{
-          title: 'Goals',
+          title: 'Savings',
+          tabBarIcon: ({ size, color }) => <Target size={size} color={color} />,
+        }}
+      />
+      {/* <Tabs.Screen
+        name="goals"
+        options={{
+          title: 'Savings',
           tabBarIcon: ({ size, color }) => (
             <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
               <Target size={size} color={color} />
@@ -83,7 +90,7 @@ export default function TabLayout() {
             </View>
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="settings"
         options={{
