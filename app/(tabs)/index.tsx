@@ -146,158 +146,153 @@ export default function Dashboard() {
         colors={['#0A2540', '#4A90E2']}
         style={styles.container}
       >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>{formatDate()}</Text>
-            <View style={styles.iconsContainer}>
-              <TouchableOpacity onPress={openProfileModal}>
-                <User size={20} color="#FFFFFF" style={styles.userIcon} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/settings')}>
-                <Settings size={20} color="#FFFFFF" style={styles.settingsIcon} />
-              </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <View style={styles.headerRow}>
+              <Text style={styles.headerTitle}>{formatDate()}</Text>
+              <View style={styles.iconsContainer}>
+                <TouchableOpacity onPress={openProfileModal}>
+                  <User size={20} color="#FFFFFF" style={styles.userIcon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/settings')}>
+                  <Settings size={20} color="#FFFFFF" style={styles.settingsIcon} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-          {/*<Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>*/}
-        </View>
-
-        <View style={styles.metricsContainer}>
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <DollarSign size={24} color="#10B981" />
-              <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
-            </View>
-            <Text style={styles.metricValue}>{formatAmount(data.totalRevenues)}</Text>
+            {/*<Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>*/}
           </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <TrendingUp size={24} color="#EF4444" />
-              <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
+          <View style={styles.metricsContainer}>
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <DollarSign size={24} color="#10B981" />
+                <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
+              </View>
+              <Text style={styles.metricValue}>{formatAmount(data.totalRevenues)}</Text>
             </View>
-            <Text style={styles.metricValue}>{formatAmount(data.totalExpenses)}</Text>
+
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <TrendingUp size={24} color="#EF4444" />
+                <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
+              </View>
+              <Text style={styles.metricValue}>{formatAmount(data.totalExpenses)}</Text>
+            </View>
+
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <PiggyBank size={24} color="#F59E0B" />
+                <Text style={styles.metricTitle}>{t('savings')}</Text>
+              </View>
+              <Text style={styles.metricValue}>{formatAmount(data.totalSavings)}</Text>
+            </View>
+
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
+                <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
+              </View>
+              <Text style={[
+                styles.metricValue,
+                { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
+              ]}>
+                {formatAmount(remainingBalance)}
+              </Text>
+            </View>
           </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <PiggyBank size={24} color="#F59E0B" />
-              <Text style={styles.metricTitle}>{t('savings')}</Text>
-            </View>
-            <Text style={styles.metricValue}>{formatAmount(data.totalSavings)}</Text>
-          </View>
-
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
-              <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
-            </View>
-            <Text style={[
-              styles.metricValue,
-              { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
-            ]}>
-              {formatAmount(remainingBalance)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
-            onPress={() => router.push('/(tabs)/categories')}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.actionButtonText}>{t('manage_categories')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.actionButtonText}>{t('goals')}</Text>
-            <View style={styles.soonBadge}>
-              <Text style={styles.soonBadgeText}>{t('soon')}</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity 
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
+              onPress={() => router.push('/(tabs)/categories')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.actionButtonText}>{t('manage_categories')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
+              onPress={() => router.push('/(tabs)/goals')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.actionButtonText}>{t('goals')}</Text>
+            </TouchableOpacity>
+            {/*  <TouchableOpacity 
             style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}
             activeOpacity={0.7}
           >
             <Text style={styles.actionButtonText}>{t('export')}</Text>
-            <View style={styles.soonBadge}>
-              <Text style={styles.soonBadgeText}>{t('soon')}</Text>
+          </TouchableOpacity> */}
+          </View>
+
+          {pieChartData.length > 0 && (
+            <View style={styles.chartCard}>
+              <Text style={styles.chartTitle}>{t('expenses_by_category')}</Text>
+              <PieChart
+                data={pieChartData}
+                width={screenWidth - 60}
+                height={220}
+                chartConfig={{
+                  backgroundColor: '#FFFFFF',
+                  backgroundGradientFrom: '#FFFFFF',
+                  backgroundGradientTo: '#FFFFFF',
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                }}
+                accessor="amount"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
+              />
             </View>
-          </TouchableOpacity>
-        </View>
+          )}
+        </ScrollView>
 
-        {pieChartData.length > 0 && (
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>{t('expenses_by_category')}</Text>
-            <PieChart
-              data={pieChartData}
-              width={screenWidth - 60}
-              height={220}
-              chartConfig={{
-                backgroundColor: '#FFFFFF',
-                backgroundGradientFrom: '#FFFFFF',
-                backgroundGradientTo: '#FFFFFF',
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              }}
-              accessor="amount"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              absolute
-            />
-          </View>
-        )}
-      </ScrollView>
+        {/* Profile Modal */}
+        <Modal
+          isVisible={isProfileModalVisible}
+          onBackdropPress={() => setProfileModalVisible(false)}
+          style={settingsStyles.modal}
+        >
+          <KeyboardDismissWrapper style={{ flex: 0 }}>
+            <View style={settingsStyles.modalContent}>
+              <Text style={settingsStyles.modalTitle}>{t('edit_profile')}</Text>
 
-      {/* Profile Modal */}
-      <Modal
-        isVisible={isProfileModalVisible}
-        onBackdropPress={() => setProfileModalVisible(false)}
-        style={settingsStyles.modal}
-      >
-        <KeyboardDismissWrapper style={{ flex: 0 }}>
-          <View style={settingsStyles.modalContent}>
-          <Text style={settingsStyles.modalTitle}>{t('edit_profile')}</Text>
+              <TextInput
+                style={settingsStyles.input}
+                placeholder={t('first_name')}
+                value={profileForm.firstName}
+                onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
+              />
 
-          <TextInput
-            style={settingsStyles.input}
-            placeholder={t('first_name')}
-            value={profileForm.firstName}
-            onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
-          />
+              <TextInput
+                style={settingsStyles.input}
+                placeholder={t('last_name')}
+                value={profileForm.lastName}
+                onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
+              />
 
-          <TextInput
-            style={settingsStyles.input}
-            placeholder={t('last_name')}
-            value={profileForm.lastName}
-            onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
-          />
-
-          <View style={settingsStyles.buttonContainer}>
-            <TouchableOpacity
-              style={settingsStyles.cancelButton}
-              onPress={() => setProfileModalVisible(false)}
-            >
-              <Text style={settingsStyles.cancelButtonText}>{t('cancel')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={settingsStyles.saveButton}
-              onPress={handleSaveProfile}
-            >
-              <Text style={settingsStyles.saveButtonText}>{t('save')}</Text>
-            </TouchableOpacity>
-          </View>
-          </View>
-        </KeyboardDismissWrapper>
-      </Modal>
+              <View style={settingsStyles.buttonContainer}>
+                <TouchableOpacity
+                  style={settingsStyles.cancelButton}
+                  onPress={() => setProfileModalVisible(false)}
+                >
+                  <Text style={settingsStyles.cancelButtonText}>{t('cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={settingsStyles.saveButton}
+                  onPress={handleSaveProfile}
+                >
+                  <Text style={settingsStyles.saveButtonText}>{t('save')}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardDismissWrapper>
+        </Modal>
       </LinearGradient>
     </KeyboardDismissWrapper>
   );

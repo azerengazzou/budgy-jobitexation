@@ -90,6 +90,7 @@ export const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 20,
+        
         marginBottom: 20,
     },
     chartCardShadow: {
@@ -167,7 +168,7 @@ export const styles = StyleSheet.create({
         flex: 0,
     },
     manageCategoriesButton: {
-        width: 130,
+        width: 150,
         flex: 0,
     }
 });
