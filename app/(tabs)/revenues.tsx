@@ -77,7 +77,7 @@ export default function RevenuesScreen() {
         try {
             const normalizedAmount = normalizeAmount(formData.amount);
             let remainingAmount = normalizedAmount;
-            
+
             // If editing, recalculate remaining amount based on related expenses
             if (editingRevenue) {
                 const expenses = await storageService.getExpenses();
@@ -113,8 +113,8 @@ export default function RevenuesScreen() {
             const expenses = await storageService.getExpenses();
             const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
             const hasRelatedExpenses = relatedExpenses.length > 0;
-            
-            const message = hasRelatedExpenses 
+
+            const message = hasRelatedExpenses
                 ? `${t('delete_revenue_confirmation')} ${t('all_expenses_related_will_be_deleted')}`
                 : t('delete_revenue_confirmation');
 
@@ -150,10 +150,10 @@ export default function RevenuesScreen() {
     }), [revenues]);
 
     const renderRevenueCard = useCallback(({ item }: { item: Revenue }) => {
-        const usagePercentage = item.amount > 0 
-            ? Math.min(((item.amount - item.remainingAmount) / item.amount) * 100, 100) 
+        const usagePercentage = item.amount > 0
+            ? Math.min(((item.amount - item.remainingAmount) / item.amount) * 100, 100)
             : 0;
-        
+
         const getUsageColor = (percentage: number) => {
             if (percentage >= 90) return '#EF4444';
             if (percentage >= 70) return '#F59E0B';
@@ -162,7 +162,7 @@ export default function RevenuesScreen() {
         };
 
         return (
-            <TouchableOpacity 
+            <TouchableOpacity
                 onPress={() => openModalForEdit(item)}
                 style={[savingsStyles.goalCard, { marginBottom: 12 }]}
             >
@@ -179,14 +179,14 @@ export default function RevenuesScreen() {
 
                 <View style={savingsStyles.goalProgress}>
                     <View style={savingsStyles.progressBar}>
-                        <View 
+                        <View
                             style={[
                                 savingsStyles.progressFill,
-                                { 
+                                {
                                     width: `${usagePercentage}%`,
                                     backgroundColor: getUsageColor(usagePercentage),
                                 }
-                            ]} 
+                            ]}
                         />
                     </View>
                 </View>
@@ -217,11 +217,11 @@ export default function RevenuesScreen() {
                     {/* Summary Cards */}
                     <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 20 }}>
                         <View style={[savingsStyles.totalSavingsCard, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
-                            <Text style={[savingsStyles.totalAmount, { fontSize: 24 }]}>{formatAmount(totalRevenues)}</Text>
+                            <Text style={[savingsStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRevenues)}</Text>
                             <Text style={savingsStyles.totalLabel}>{t('total_income')}</Text>
                         </View>
                         <View style={[savingsStyles.totalSavingsCard, { flex: 1, marginLeft: 10, marginHorizontal: 0 }]}>
-                            <Text style={[savingsStyles.totalAmount, { fontSize: 24 }]}>{formatAmount(totalRemaining)}</Text>
+                            <Text style={[savingsStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRemaining)}</Text>
                             <Text style={savingsStyles.totalLabel}>{t('remaining')}</Text>
                         </View>
                     </View>
@@ -238,7 +238,7 @@ export default function RevenuesScreen() {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    
+
                     <RevenueModal
                         visible={isModalVisible}
                         onClose={() => {
@@ -295,7 +295,7 @@ export default function RevenuesScreen() {
                         showsVerticalScrollIndicator={false}
                     />
                 </View>
-                
+
                 {/* Floating Action Button */}
                 {/* <TouchableOpacity 
                     style={{

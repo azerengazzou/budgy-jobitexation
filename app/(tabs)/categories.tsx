@@ -39,7 +39,7 @@ export default function Categories() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const fixedRevenueTypes = ['salary', 'freelance'];
-  const fixedExpenseCategories = ['rent', 'food', 'transport', 'savings'];
+  const fixedExpenseCategories = ['rent', 'food', 'transport'];
 
   const getTranslatedCategoryName = (category: string, isFixed: boolean) => {
     return isFixed ? t(category) : category;
@@ -49,7 +49,6 @@ export default function Categories() {
     Food: Coffee,
     Transport: Car,
     Rent: Home,
-    Savings: PiggyBank,
     Shopping: ShoppingBag,
     Entertainment: Gamepad2,
     default: DollarSign,
@@ -179,32 +178,57 @@ export default function Categories() {
     const IconComponent = isExpense ? getIconForCategory(item) : DollarSign;
     const isFixed = isExpense ? fixedExpenseCategories.includes(item) : fixedRevenueTypes.includes(item);
     const actualIndex = isFixed ? -1 : (isExpense ? expenseCategories.indexOf(item) : revenueCategories.indexOf(item));
-    
+
     return (
-      <TouchableOpacity 
-        onPress={() => !isFixed && handleEdit(item, actualIndex)}
-        style={[styles.modernCard, isFixed && styles.fixedCard]}
-        disabled={isFixed}
-      >
-        <View style={styles.cardLeft}>
-          <View style={[styles.iconContainer, { backgroundColor: isExpense ? '#FEF2F2' : '#ECFDF5' }]}>
-            <IconComponent size={18} color={isExpense ? '#DC2626' : '#059669'} />
+      <KeyboardDismissWrapper>
+        <View
+          style={[styles.modernCard, isFixed && styles.fixedCard]}
+          pointerEvents="box-none"
+        >
+          <View style={styles.cardLeft}>
+            <View style={[styles.iconContainer, { backgroundColor: isExpense ? '#FEF2F2' : '#ECFDF5' }]}>
+              <IconComponent size={18} color={isExpense ? '#DC2626' : '#059669'} />
+            </View>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>
+                {getTranslatedCategoryName(item, isFixed)}
+              </Text>
+              <Text style={styles.cardSubtitle}>
+                {isExpense ? t('expense_category') : t('revenue_type')}
+              </Text>
+            </View>
           </View>
-          <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>
-              {getTranslatedCategoryName(item, isFixed)}
-            </Text>
-            <Text style={styles.cardSubtitle}>
-              {isExpense ? t('expense_category') : t('revenue_type')}
-            </Text>
-          </View>
+          {isFixed ? (
+            <View style={styles.fixedBadge}>
+              <Text style={styles.fixedText}>{t('fixed')}</Text>
+            </View>
+          ) : (
+            <View
+              style={styles.cardActions}
+              pointerEvents="box-none"
+            >
+              <TouchableOpacity
+                onPress={() => handleEdit(item, actualIndex)}
+                style={[styles.modernActionButton, styles.editAction]}
+                activeOpacity={0.7}
+                delayPressIn={0}
+                hitSlop={0}
+              >
+                <Edit size={16} color="#3B82F6" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDelete(actualIndex, item)}
+                style={[styles.modernActionButton, styles.deleteAction]}
+                activeOpacity={0.7}
+                delayPressIn={0}
+                hitSlop={0}
+              >
+                <Trash2 size={16} color="#EF4444" />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-        {isFixed && (
-          <View style={styles.fixedBadge}>
-            <Text style={styles.fixedText}>{t('fixed')}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+      </KeyboardDismissWrapper>
     );
   };
 
@@ -264,53 +288,59 @@ export default function Categories() {
               renderItem={renderCategoryItem}
               keyExtractor={(item, index) => `${activeTab}-${item}-${index}`}
               showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              scrollEventThrottle={16}
+              nestedScrollEnabled={true}
+              removeClippedSubviews={false}
+              contentContainerStyle={{ paddingBottom: 100 }}
             />
           )}
         </View>
 
-      <TouchableOpacity 
-        style={styles.fab} 
-        onPress={openModal}
-        activeOpacity={0.7}
-        delayPressIn={0}
-        hitSlop={0}
-      >
-        <LinearGradient colors={['#4A90E2', '#0A2540']} style={styles.fabGradient}>
-          <Plus size={22} color="#FFFFFF" />
-        </LinearGradient>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={openModal}
+          activeOpacity={0.7}
+          delayPressIn={0}
+          hitSlop={0}
+        >
+          <LinearGradient colors={['#4A90E2', '#0A2540']} style={styles.fabGradient}>
+            <Plus size={22} color="#FFFFFF" />
+          </LinearGradient>
+        </TouchableOpacity>
 
-      {/* Modal */}
-      <Modal isVisible={isModalVisible} onBackdropPress={closeModal} style={styles.modal}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {editingIndex !== null ? t('edit_category') : t('add_category')}
-          </Text>
-          <View style={styles.modalDivider} />
+        {/* Modal */}
+        <Modal isVisible={isModalVisible} onBackdropPress={closeModal} style={styles.modal}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {editingIndex !== null ? t('edit_category') : t('add_category')}
+            </Text>
+            <View style={styles.modalDivider} />
 
-          <View style={styles.modalBody}>
-            <RequiredFieldIndicator label={t('category_name')} required={true} />
-            <TextInput
-              style={styles.modernInput}
-              placeholder={t('enter_category_name')}
-              value={newCategory}
-              onChangeText={setNewCategory}
-              autoFocus
-            />
+            <View style={styles.modalBody}>
+              <RequiredFieldIndicator label={t('category_name')} required={true} />
+              <TextInput
+                style={styles.modernInput}
+                placeholder={t('enter_category_name')}
+                value={newCategory}
+                onChangeText={setNewCategory}
+                autoFocus
+              />
+            </View>
+
+            <View style={styles.modernButtonContainer}>
+              <TouchableOpacity style={styles.modernCancelButton} onPress={closeModal}>
+                <Text style={styles.modernCancelText}>{t('cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modernSaveButton} onPress={handleSave}>
+                <LinearGradient colors={['#4A90E2', '#0A2540']} style={styles.saveGradient}>
+                  <Text style={styles.modernSaveText}>{t('save')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <View style={styles.modernButtonContainer}>
-            <TouchableOpacity style={styles.modernCancelButton} onPress={closeModal}>
-              <Text style={styles.modernCancelText}>{t('cancel')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modernSaveButton} onPress={handleSave}>
-              <LinearGradient colors={['#4A90E2', '#0A2540']} style={styles.saveGradient}>
-                <Text style={styles.modernSaveText}>{t('save')}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        </Modal>
       </LinearGradient>
     </KeyboardDismissWrapper>
   );

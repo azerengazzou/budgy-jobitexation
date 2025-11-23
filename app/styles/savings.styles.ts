@@ -29,7 +29,6 @@ export const savingsStyles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   totalAmount: {
-    fontSize: 32,
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',
