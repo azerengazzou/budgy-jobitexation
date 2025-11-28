@@ -1,4 +1,4 @@
-import { Revenue } from '@/app/components/interfaces/revenues';
+import { Revenue } from '@/components/interfaces/revenues';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS } from './storage-types';
 import { normalizeAmount } from '@/components/NumericInput';
@@ -11,7 +11,7 @@ export class RevenueStorageService extends BaseStorageService {
   async addRevenue(revenue: Revenue): Promise<void> {
     const revenues = await this.getRevenues();
     const existingRevenueIndex = revenues.findIndex(r => r.type === revenue.type);
-    
+
     if (existingRevenueIndex !== -1) {
       // Sum with existing revenue of same category
       revenues[existingRevenueIndex].amount = normalizeAmount(revenues[existingRevenueIndex].amount + revenue.amount);
@@ -24,7 +24,7 @@ export class RevenueStorageService extends BaseStorageService {
         remainingAmount: normalizeAmount(revenue.remainingAmount)
       });
     }
-    
+
     await this.setItem(STORAGE_KEYS.REVENUES, revenues);
   }
 

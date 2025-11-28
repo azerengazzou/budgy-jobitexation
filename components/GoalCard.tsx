@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Goal } from '@/app/interfaces/savings';
+import { Goal } from '@/components/interfaces/savings';
 import { useCurrency } from '@/contexts/CurrencyContext';
-import { savingsStyles } from '@/app/styles/savings.styles';
+import { savingsStyles } from '@/components/style/savings.styles';
 
 interface GoalCardProps {
   goal: Goal;
@@ -13,9 +13,9 @@ interface GoalCardProps {
 export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
   const { formatAmount } = useCurrency();
   const { t } = useTranslation();
-  
-  const progressPercentage = goal.targetAmount > 0 
-    ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100) 
+
+  const progressPercentage = goal.targetAmount > 0
+    ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)
     : 0;
 
   const getProgressColor = (percentage: number) => {
@@ -60,14 +60,14 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
 
       <View style={savingsStyles.goalProgress}>
         <View style={savingsStyles.progressBar}>
-          <View 
+          <View
             style={[
               savingsStyles.progressFill,
-              { 
+              {
                 width: `${progressPercentage}%`,
                 backgroundColor: progressColor,
               }
-            ]} 
+            ]}
           />
         </View>
       </View>

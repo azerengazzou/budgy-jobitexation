@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Goal } from '@/app/interfaces/savings';
+import { Goal } from '@/components/interfaces/savings';
 
 interface UseGoalCompletionAnimationProps {
   goal: Goal;

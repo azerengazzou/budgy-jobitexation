@@ -14,7 +14,7 @@ import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { User, Wallet, TrendingUp, PiggyBank } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { styles } from './styles/onboarding.styles';
+import { styles } from '../components/style/onboarding.styles';
 import { RequiredFieldIndicator } from '../components/RequiredFieldIndicator';
 import { KeyboardDismissWrapper } from '../components/KeyboardDismissWrapper';
 
@@ -73,15 +73,15 @@ export default function OnboardingScreen() {
     <KeyboardDismissWrapper>
       <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Animated.View style={[styles.logo, { transform: [{ scale: bounceAnim }] }]}>
-              <Image source={require('../assets/images/icon.png')} style={styles.logoImage} />
-            </Animated.View>
-            <Text style={styles.brandName}>{t('welcome_to_budgy')}</Text>
-            <Text style={styles.tagline}>{t('take_control_of_your_budget')}</Text>
-          </View>
-          {/*
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Animated.View style={[styles.logo, { transform: [{ scale: bounceAnim }] }]}>
+                <Image source={require('../assets/images/icon.png')} style={styles.logoImage} />
+              </Animated.View>
+              <Text style={styles.brandName}>{t('welcome_to_budgy')}</Text>
+              <Text style={styles.tagline}>{t('take_control_of_your_budget')}</Text>
+            </View>
+            {/*
           <View style={styles.illustrations}>
             <View style={styles.illustrationItem}>
               <Wallet size={20} color="#4A90E2" />
@@ -94,48 +94,48 @@ export default function OnboardingScreen() {
             </View>
           </View>
          */}
-        </View>
-        <View style={styles.form}>
-          <RequiredFieldIndicator label={t('first_name')} required={true} />
-          <View style={styles.inputGroup}>
-            <View style={styles.inputIcon}>
-              <User size={24} color="#0A2540" />
+          </View>
+          <View style={styles.form}>
+            <RequiredFieldIndicator label={t('first_name')} required={true} />
+            <View style={styles.inputGroup}>
+              <View style={styles.inputIcon}>
+                <User size={24} color="#0A2540" />
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder={t('first_name')}
+                value={formData.firstName}
+                onChangeText={(text) => setFormData({ ...formData, firstName: text })}
+                placeholderTextColor="#6B7280"
+                autoCapitalize="words"
+              />
             </View>
-            <TextInput
-              style={styles.input}
-              placeholder={t('first_name')}
-              value={formData.firstName}
-              onChangeText={(text) => setFormData({ ...formData, firstName: text })}
-              placeholderTextColor="#6B7280"
-              autoCapitalize="words"
-            />
+
+            <RequiredFieldIndicator label={t('last_name')} required={false} />
+            <View style={styles.inputGroup}>
+              <View style={styles.inputIcon}>
+                <User size={24} color="#0A2540" />
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder={t('last_name')}
+                value={formData.lastName}
+                onChangeText={(text) => setFormData({ ...formData, lastName: text })}
+                placeholderTextColor="#6B7280"
+                autoCapitalize="words"
+              />
+            </View>
+
+
+
+            <TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
+              <Text style={styles.completeButtonText}>{t('start_budgeting')}</Text>
+            </TouchableOpacity>
           </View>
 
-          <RequiredFieldIndicator label={t('last_name')} required={false} />
-          <View style={styles.inputGroup}>
-            <View style={styles.inputIcon}>
-              <User size={24} color="#0A2540" />
-            </View>
-            <TextInput
-              style={styles.input}
-              placeholder={t('last_name')}
-              value={formData.lastName}
-              onChangeText={(text) => setFormData({ ...formData, lastName: text })}
-              placeholderTextColor="#6B7280"
-              autoCapitalize="words"
-            />
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>{t('your_data_stays_private')}</Text>
           </View>
-
-
-
-          <TouchableOpacity style={styles.completeButton} onPress={handleComplete}>
-            <Text style={styles.completeButtonText}>{t('start_budgeting')}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>{t('your_data_stays_private')}</Text>
-        </View>
         </ScrollView>
       </LinearGradient>
     </KeyboardDismissWrapper>

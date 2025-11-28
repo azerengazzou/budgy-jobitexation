@@ -19,8 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { backupService } from '../../services/backup-service';
-import { UserProfile } from '../interfaces/settings';
-import { styles } from '../styles/settings.styles';
+import { UserProfile } from '../../components/interfaces/settings';
+import { styles } from '../../components/style/settings.styles';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -189,7 +189,7 @@ export default function SettingsScreen() {
         <Text style={styles.headerSubtitle}>{t('customize_your_experience')}</Text>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.content}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
@@ -264,28 +264,28 @@ export default function SettingsScreen() {
         {/* Backup */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Backup</Text>
-          <TouchableOpacity 
-            style={styles.settingCard} 
+          <TouchableOpacity
+            style={styles.settingCard}
             activeOpacity={0.7}
             onPress={async () => {
-            try {
-              const filePath = await backupService.createBackup();
-              if (filePath) {
-                Alert.alert('Success', 'Backup created successfully!');
-                await loadSettings();
-              } else {
+              try {
+                const filePath = await backupService.createBackup();
+                if (filePath) {
+                  Alert.alert('Success', 'Backup created successfully!');
+                  await loadSettings();
+                } else {
+                  Alert.alert('Error', 'Failed to create backup');
+                }
+              } catch (error) {
                 Alert.alert('Error', 'Failed to create backup');
               }
-            } catch (error) {
-              Alert.alert('Error', 'Failed to create backup');
-            }
-          }}>
+            }}>
             <View style={styles.settingLeft}>
               <FileText size={24} color="#10B981" />
               <View style={styles.settingText}>
                 <Text style={styles.settingTitle}>Manual Backup</Text>
                 <Text style={styles.settingSubtitle}>
-                  {lastBackupTime 
+                  {lastBackupTime
                     ? `Last backup: ${new Date(lastBackupTime).toLocaleString()}`
                     : 'No backup created yet'
                   }
@@ -329,8 +329,8 @@ export default function SettingsScreen() {
         {/* Data Management */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('data_management')}</Text>
-          <TouchableOpacity 
-            style={[styles.settingCard, { backgroundColor: '#FEF2F2' }]} 
+          <TouchableOpacity
+            style={[styles.settingCard, { backgroundColor: '#FEF2F2' }]}
             onPress={handleDeleteAllData}
             activeOpacity={0.7}
           >

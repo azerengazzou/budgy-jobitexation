@@ -12,11 +12,11 @@ import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
-import { Revenue, RevenueForm } from '../components/interfaces/revenues';
-import { RevenueModal } from '../components/RevenueModal';
+import { Revenue, RevenueForm } from '../../components/interfaces/revenues';
+import { RevenueModal } from '../../components/RevenueModal';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 import { normalizeAmount } from '../../components/NumericInput';
-import { genStyles } from '../styles/genstyle.styles';
+import { genStyles } from '../../components/style/genstyle.styles';
 import { router } from 'expo-router';
 
 export default function RevenuesScreen() {

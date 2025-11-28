@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { storageService } from '../services/storage';
 import { backupService } from '../services/backup-service';
-import { Expense } from '../app/interfaces/expenses';
-import { Revenue } from '../app/components/interfaces/revenues';
-import { Goal, SavingsTransaction } from '../app/interfaces/savings';
+import { Expense } from '../components/interfaces/expenses';
+import { Revenue } from '../components/interfaces/revenues';
+import { Goal, SavingsTransaction } from '../components/interfaces/savings';
 import { Saving } from '../services/storage-types';
 
 interface DataContextType {

@@ -1,5 +1,5 @@
-import { Expense } from '@/app/interfaces/expenses';
-import { Goal } from '@/app/interfaces/savings';
+import { Expense } from '@/components/interfaces/expenses';
+import { Goal } from '@/components/interfaces/savings';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS, Saving } from './storage-types';
 import { normalizeAmount } from '@/components/NumericInput';

@@ -11,7 +11,7 @@ import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { styles } from './styles/settings.styles';
+import { styles } from '../components/style/settings.styles';
 
 export default function PreferencesScreen() {
   const { t, i18n } = useTranslation();

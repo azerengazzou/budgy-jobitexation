@@ -12,7 +12,7 @@ import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { notificationService } from '../services/notifications';
 import { useTranslation } from 'react-i18next';
-import { styles } from './styles/settings.styles';
+import { styles } from '../components/style/settings.styles';
 
 export default function GeneralScreen() {
   const { t } = useTranslation();

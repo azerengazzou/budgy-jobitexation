@@ -17,11 +17,11 @@ import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useFocusEffect } from 'expo-router';
-import { Expense } from '../interfaces/expenses';
+import { Expense } from '../../components/interfaces/expenses';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
 import { NumericInput, normalizeAmount } from '../../components/NumericInput';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
-import { genStyles } from '../styles/genstyle.styles';
+import { genStyles } from '../../components/style/genstyle.styles';
 
 export default function ExpensesScreen() {
   const { t } = useTranslation();

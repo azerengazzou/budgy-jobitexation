@@ -58,40 +58,6 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => <Tag size={size} color={color} />,
         }}
       />
-      {/* <Tabs.Screen
-        name="goals"
-        options={{
-          title: 'Savings',
-          tabBarIcon: ({ size, color }) => (
-            <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
-              <Target size={size} color={color} />
-              <View style={{
-                position: 'absolute',
-                top: -8,
-                right: -10,
-                backgroundColor: '#F59E0B',
-                borderRadius: 8,
-                paddingHorizontal: 6,
-                paddingVertical: 2,
-                minWidth: 28,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.2,
-                shadowRadius: 2,
-                elevation: 2,
-              }}>
-                <Text style={{
-                  color: '#FFFFFF',
-                  fontSize: 9,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  lineHeight: 12,
-                }}>Soon</Text>
-              </View>
-            </View>
-          ),
-        }}
-      /> */}
       <Tabs.Screen
         name="settings"
         options={{

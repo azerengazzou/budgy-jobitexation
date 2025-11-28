@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserProfile } from '@/app/interfaces/settings';
+import { UserProfile } from '@/components/interfaces/settings';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS, AppSettings } from './storage-types';
 

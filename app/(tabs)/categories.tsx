@@ -24,7 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-native-modal';
 import { storageService } from '../../services/storage';
-import { styles } from '../styles/categories.styles';
+import { styles } from '../../components/style/categories.styles';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 

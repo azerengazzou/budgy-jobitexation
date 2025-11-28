@@ -8,9 +8,9 @@ import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { GoalCard } from '@/components/GoalCard';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
-import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
+import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
 import { storageService } from '@/services/storage';
-import { genStyles } from '@/app/styles/genstyle.styles';
+import { genStyles } from '@/components/style/genstyle.styles';
 
 export default function GoalsScreen() {
   const { t } = useTranslation();

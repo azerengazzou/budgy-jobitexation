@@ -5,7 +5,7 @@ import { ExpenseStorageService } from './expense-storage';
 import { SavingsStorageService } from './savings-storage';
 import { STORAGE_KEYS } from './storage-types';
 import { backupService } from './backup-service';
-import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
+import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
 import { normalizeAmount } from '@/components/NumericInput';
 
 class StorageService extends RevenueStorageService {
@@ -19,37 +19,37 @@ class StorageService extends RevenueStorageService {
   async setOnboardingComplete() { return this.userStorage.setOnboardingComplete(); }
   async isOnboardingComplete() { return this.userStorage.isOnboardingComplete(); }
   async getSettings() { return this.userStorage.getSettings(); }
-  async saveSettings(settings: any) { 
+  async saveSettings(settings: any) {
     const result = await this.userStorage.saveSettings(settings);
     await backupService.autoBackup();
     return result;
   }
   async getCategories() { return this.userStorage.getCategories(); }
-  async saveCategories(categories: string[]) { 
+  async saveCategories(categories: string[]) {
     const result = await this.userStorage.saveCategories(categories);
     await backupService.autoBackup();
     return result;
   }
-  async getItem(key: string): Promise<any> { 
-    return await this.userStorage.getItem(key); 
+  async getItem(key: string): Promise<any> {
+    return await this.userStorage.getItem(key);
   }
-  async setItem(key: string, value: any): Promise<void> { 
-    return await this.userStorage.setItem(key, value); 
+  async setItem(key: string, value: any): Promise<void> {
+    return await this.userStorage.setItem(key, value);
   }
 
   // Expense methods
   async getExpenses() { return this.expenseStorage.getExpenses(); }
-  async addExpense(expense: any) { 
+  async addExpense(expense: any) {
     const result = await this.expenseStorage.addExpense(expense);
     await backupService.autoBackup();
     return result;
   }
-  async updateExpense(expense: any) { 
+  async updateExpense(expense: any) {
     const result = await this.expenseStorage.updateExpense(expense);
     await backupService.autoBackup();
     return result;
   }
-  async deleteExpense(id: string) { 
+  async deleteExpense(id: string) {
     const result = await this.expenseStorage.deleteExpense(id);
     await backupService.autoBackup();
     return result;
@@ -63,17 +63,17 @@ class StorageService extends RevenueStorageService {
 
   // Goals methods with savings integration
   async getGoals(): Promise<Goal[]> { return this.expenseStorage.getGoals(); }
-  async addGoal(goal: Goal) { 
+  async addGoal(goal: Goal) {
     const result = await this.expenseStorage.addGoal(goal);
     await backupService.autoBackup();
     return result;
   }
-  async updateGoal(goal: Goal) { 
+  async updateGoal(goal: Goal) {
     const result = await this.expenseStorage.updateGoal(goal);
     await backupService.autoBackup();
     return result;
   }
-  async deleteGoal(id: string) { 
+  async deleteGoal(id: string) {
     // Delete related savings transactions
     await this.savingsStorage.deleteTransactionsByGoalId(id);
     const result = await this.expenseStorage.deleteGoal(id);
@@ -91,25 +91,25 @@ class StorageService extends RevenueStorageService {
       amount: normalizeAmount(transaction.amount)
     };
     await this.savingsStorage.addSavingsTransaction(normalizedTransaction);
-    
+
     // Update goal's current amount
     const currentAmount = normalizeAmount(await this.savingsStorage.calculateGoalCurrentAmount(transaction.goalId));
-    
+
     const goals = await this.getGoals();
     const goalIndex = goals.findIndex(g => g.id === transaction.goalId);
-    
+
     if (goalIndex !== -1) {
       goals[goalIndex].currentAmount = currentAmount;
       goals[goalIndex].updatedAt = new Date().toISOString();
-      
+
       // Check if goal is completed
       if (currentAmount >= goals[goalIndex].targetAmount && goals[goalIndex].status === 'active') {
         goals[goalIndex].status = 'completed';
       }
-      
+
       await this.expenseStorage.updateGoal(goals[goalIndex]);
     }
-    
+
     await backupService.autoBackup();
   }
   async getTransactionsByGoalId(goalId: string): Promise<SavingsTransaction[]> {

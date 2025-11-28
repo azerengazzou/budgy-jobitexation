@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { X, DollarSign } from 'lucide-react-native';
-import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
-import { Revenue } from '@/app/components/interfaces/revenues';
+import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
+import { Revenue } from '@/components/interfaces/revenues';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useTranslation } from 'react-i18next';
 import { RequiredFieldIndicator } from './RequiredFieldIndicator';
@@ -72,9 +72,9 @@ export const AddSavingsModal: React.FC<AddSavingsModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <KeyboardDismissWrapper style={{ backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-        <View style={{ 
-          backgroundColor: 'white', 
-          borderTopLeftRadius: 24, 
+        <View style={{
+          backgroundColor: 'white',
+          borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           paddingTop: 20,
           paddingHorizontal: 20,

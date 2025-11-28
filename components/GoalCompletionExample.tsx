@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { GoalCompletionAnimation } from './GoalCompletionAnimation';
 import { useGoalCompletionAnimation } from '@/hooks/useGoalCompletionAnimation';
-import { Goal } from '@/app/interfaces/savings';
+import { Goal } from '@/components/interfaces/savings';
 
 /**
  * Example usage of GoalCompletionAnimation
@@ -10,7 +10,7 @@ import { Goal } from '@/app/interfaces/savings';
  */
 export const GoalCompletionExample: React.FC = () => {
   const [progress, setProgress] = useState(75);
-  
+
   // Mock goal for demonstration
   const mockGoal: Goal = {
     id: '1',
@@ -46,7 +46,7 @@ export const GoalCompletionExample: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Goal Completion Animation Demo</Text>
-      
+
       <GoalCompletionAnimation
         isComplete={isComplete}
         size={160}
@@ -64,16 +64,16 @@ export const GoalCompletionExample: React.FC = () => {
       </GoalCompletionAnimation>
 
       <View style={styles.controls}>
-        <TouchableOpacity 
-          style={[styles.button, styles.completeButton]} 
+        <TouchableOpacity
+          style={[styles.button, styles.completeButton]}
           onPress={completeGoal}
           disabled={isAnimating}
         >
           <Text style={styles.buttonText}>Complete Goal</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.button, styles.resetButton]} 
+
+        <TouchableOpacity
+          style={[styles.button, styles.resetButton]}
           onPress={resetGoal}
           disabled={isAnimating}
         >

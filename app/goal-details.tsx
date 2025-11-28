@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Plus, Minus, TrendingUp } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
+import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
 import { storageService } from '@/services/storage';
 import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';

@@ -13,11 +13,11 @@ import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 import { useData } from '../contexts/DataContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { Revenue, RevenueForm } from './components/interfaces/revenues';
-import { RevenueModal } from './components/RevenueModal';
+import { Revenue, RevenueForm } from '../components/interfaces/revenues';
+import { RevenueModal } from '../components/RevenueModal';
 import { KeyboardDismissWrapper } from '../components/KeyboardDismissWrapper';
 import { normalizeAmount } from '../components/NumericInput';
-import { savingsStyles } from './styles/savings.styles';
+import { savingsStyles } from '../components/style/savings.styles';
 import { storageService } from '../services/storage';
 
 interface CategoryData {
@@ -65,12 +65,12 @@ export default function RevenueCategoryDetailsScreen() {
   const categoryData: CategoryData = useMemo(() => {
     const categoryRevenues = revenues.filter(rev => rev.type === category);
     const totalAdded = categoryRevenues.reduce((sum, rev) => sum + rev.amount, 0);
-    
+
     // Calculate total used from expenses linked to these revenues
     const categoryRevenueIds = categoryRevenues.map(rev => rev.id);
     const relatedExpenses = expenses.filter(exp => categoryRevenueIds.includes(exp.revenueSourceId));
     const totalUsed = relatedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-    
+
     const remaining = totalAdded - totalUsed;
     const percentage = totalAdded > 0 ? (remaining / totalAdded) * 100 : 0;
 
@@ -129,7 +129,7 @@ export default function RevenueCategoryDetailsScreen() {
     try {
       const normalizedAmount = normalizeAmount(formData.amount);
       let remainingAmount = normalizedAmount;
-      
+
       if (editingRevenue) {
         const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === editingRevenue.id);
         const totalExpenses = relatedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
@@ -152,7 +152,7 @@ export default function RevenueCategoryDetailsScreen() {
       await updateRevenues();
       await updateExpenses();
       setModalVisible(false);
-      
+
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch (error) {
       console.error('Error saving revenue:', error);
@@ -161,7 +161,7 @@ export default function RevenueCategoryDetailsScreen() {
 
   const renderRevenueItem = useCallback(({ item, index }: { item: Revenue; index: number }) => {
     const itemAnim = new Animated.Value(0);
-    
+
     Animated.timing(itemAnim, {
       toValue: 1,
       duration: 200,

@@ -19,9 +19,9 @@ import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
 import Modal from 'react-native-modal';
 import { storageService } from '../../services/storage';
-import { styles } from '../styles/dashboard.styles';
-import { styles as settingsStyles } from '../styles/settings.styles';
-import { UserProfile } from '../interfaces/settings';
+import { styles } from '../../components/style/dashboard.styles';
+import { styles as settingsStyles } from '../../components/style/settings.styles';
+import { UserProfile } from '../../components/interfaces/settings';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 import { normalizeAmount } from '../../components/NumericInput';
 

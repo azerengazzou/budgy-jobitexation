@@ -12,8 +12,8 @@ import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../contexts/DataContext';
-import { UserProfile } from './interfaces/settings';
-import { styles } from './styles/settings.styles';
+import { UserProfile } from '../components/interfaces/settings';
+import { styles } from '../components/style/settings.styles';
 import { RequiredFieldIndicator } from '../components/RequiredFieldIndicator';
 import { KeyboardDismissWrapper } from '../components/KeyboardDismissWrapper';
 
@@ -64,42 +64,42 @@ export default function ProfileScreen() {
   return (
     <KeyboardDismissWrapper>
       <LinearGradient colors={['#6B7280', '#4B5563']} style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('profile')}</Text>
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.section}>
-          <View style={styles.settingCard}>
-            <View style={styles.settingLeft}>
-              <User size={24} color="#3B82F6" />
-              <Text style={styles.settingTitle}>{t('personal_information')}</Text>
-            </View>
-          </View>
-          <RequiredFieldIndicator label={t('first_name')} required={true} />
-          <TextInput
-            style={styles.input}
-            placeholder={t('first_name')}
-            value={profileForm.firstName}
-            onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
-          />
-          
-          <RequiredFieldIndicator label={t('last_name')} required={false} />
-          <TextInput
-            style={styles.input}
-            placeholder={t('last_name')}
-            value={profileForm.lastName}
-            onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
-          />
-
-          <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
-            <Text style={styles.saveButtonText}>{t('save')}</Text>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <ArrowLeft size={24} color="#FFFFFF" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t('profile')}</Text>
         </View>
-      </View>
+
+        <View style={styles.content}>
+          <View style={styles.section}>
+            <View style={styles.settingCard}>
+              <View style={styles.settingLeft}>
+                <User size={24} color="#3B82F6" />
+                <Text style={styles.settingTitle}>{t('personal_information')}</Text>
+              </View>
+            </View>
+            <RequiredFieldIndicator label={t('first_name')} required={true} />
+            <TextInput
+              style={styles.input}
+              placeholder={t('first_name')}
+              value={profileForm.firstName}
+              onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
+            />
+
+            <RequiredFieldIndicator label={t('last_name')} required={false} />
+            <TextInput
+              style={styles.input}
+              placeholder={t('last_name')}
+              value={profileForm.lastName}
+              onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
+            />
+
+            <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
+              <Text style={styles.saveButtonText}>{t('save')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </LinearGradient>
     </KeyboardDismissWrapper>
   );
