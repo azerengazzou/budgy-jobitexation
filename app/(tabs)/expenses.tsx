@@ -21,7 +21,7 @@ import { Expense } from '../interfaces/expenses';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
 import { NumericInput, normalizeAmount } from '../../components/NumericInput';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
-import { savingsStyles } from '../styles/savings.styles';
+import { genStyles } from '../styles/genstyle.styles';
 
 export default function ExpensesScreen() {
   const { t } = useTranslation();
@@ -166,32 +166,32 @@ export default function ExpensesScreen() {
     return (
       <TouchableOpacity
         onPress={() => openEditModal(item)}
-        style={[savingsStyles.goalCard, { marginBottom: 12 }]}
+        style={[genStyles.goalCard, { marginBottom: 12 }]}
       >
-        <View style={savingsStyles.goalHeader}>
-          <Text style={savingsStyles.goalEmoji}>
+        <View style={genStyles.goalHeader}>
+          <Text style={genStyles.goalEmoji}>
             {item.category === 'food' ? '🍽️' :
               item.category === 'transport' ? '🚗' :
                 item.category === 'rent' ? '🏠' : '🛒'}
           </Text>
-          <View style={savingsStyles.goalInfo}>
-            <Text style={savingsStyles.goalTitle}>
+          <View style={genStyles.goalInfo}>
+            <Text style={genStyles.goalTitle}>
               {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
             </Text>
-            <Text style={savingsStyles.goalCategory}>
+            <Text style={genStyles.goalCategory}>
               {item.description || new Date(item.date).toLocaleDateString()}
             </Text>
           </View>
-          <Text style={savingsStyles.progressPercentage}>
+          <Text style={genStyles.progressPercentage}>
             {formatAmount(item.amount)}
           </Text>
         </View>
 
-        <View style={savingsStyles.goalProgress}>
-          <View style={savingsStyles.progressBar}>
+        <View style={genStyles.goalProgress}>
+          <View style={genStyles.progressBar}>
             <View
               style={[
-                savingsStyles.progressFill,
+                genStyles.progressFill,
                 {
                   width: `${Math.min(categoryPercentage, 100)}%`,
                   backgroundColor: getCategoryColor(item.category),
@@ -201,11 +201,11 @@ export default function ExpensesScreen() {
           </View>
         </View>
 
-        <View style={savingsStyles.goalAmounts}>
-          <Text style={savingsStyles.targetAmount}>
+        <View style={genStyles.goalAmounts}>
+          <Text style={genStyles.targetAmount}>
             {formatAmount(categoryTotal)} {t('in')} {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
           </Text>
-          <Text style={savingsStyles.currentAmount}>
+          <Text style={genStyles.currentAmount}>
             {categoryPercentage.toFixed(1)}%
           </Text>
         </View>
@@ -255,29 +255,29 @@ export default function ExpensesScreen() {
   if (expenses.length === 0) {
     return (
       <KeyboardDismissWrapper>
-        <LinearGradient colors={['#0A2540', '#4A90E2']} style={savingsStyles.container}>
-          <View style={savingsStyles.header}>
-            <Text style={savingsStyles.headerTitle}>{t('expenses')}</Text>
-            <Text style={savingsStyles.headerSubtitle}>{t('track_your_spending')}</Text>
+        <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+          <View style={genStyles.header}>
+            <Text style={genStyles.headerTitle}>{t('expenses')}</Text>
+            <Text style={genStyles.headerSubtitle}>{t('track_your_spending')}</Text>
           </View>
 
-          <View style={savingsStyles.totalSavingsCard}>
-            <Text style={savingsStyles.totalAmount}>{formatAmount(totalExpenses)}</Text>
-            <Text style={savingsStyles.totalLabel}>{t('total_expenses')}</Text>
+          <View style={genStyles.totalSavingsCard}>
+            <Text style={genStyles.totalAmount}>{formatAmount(totalExpenses)}</Text>
+            <Text style={genStyles.totalLabel}>{t('total_expenses')}</Text>
           </View>
 
-          <View style={savingsStyles.goalsSection}>
-            <View style={savingsStyles.emptyState}>
-              <ShoppingCart size={64} color="#D1D5DB" style={savingsStyles.emptyStateIcon} />
-              <Text style={savingsStyles.emptyStateTitle}>{t('no_expenses_yet')}</Text>
-              <Text style={savingsStyles.emptyStateText}>
+          <View style={genStyles.contentSection}>
+            <View style={genStyles.emptyState}>
+              <ShoppingCart size={64} color="#D1D5DB" style={genStyles.emptyStateIcon} />
+              <Text style={genStyles.emptyStateTitle}>{t('no_expenses_yet')}</Text>
+              <Text style={genStyles.emptyStateText}>
                 {t('start_tracking_your_expenses_to_better_manage_your_budget')}
               </Text>
               <TouchableOpacity onPress={() => {
                 resetForm();
                 setModalVisible(true);
-              }} style={[savingsStyles.addButton, { marginTop: 20 }]}>
-                <Text style={savingsStyles.addButtonText}>{t('add_expense')}</Text>
+              }} style={[genStyles.addButton, { marginTop: 20 }]}>
+                <Text style={genStyles.addButtonText}>{t('add_expense')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -391,27 +391,27 @@ export default function ExpensesScreen() {
 
   return (
     <KeyboardDismissWrapper>
-      <LinearGradient colors={['#0A2540', '#4A90E2']} style={savingsStyles.container}>
-        <View style={savingsStyles.header}>
-          <Text style={savingsStyles.headerTitle}>{t('expenses')}</Text>
-          <Text style={savingsStyles.headerSubtitle}>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+        <View style={genStyles.header}>
+          <Text style={genStyles.headerTitle}>{t('expenses')}</Text>
+          <Text style={genStyles.headerSubtitle}>
             {expenses.length} {t('expenses_recorded')}
           </Text>
         </View>
 
-        <View style={savingsStyles.totalSavingsCard}>
-          <Text style={savingsStyles.totalAmount}>{formatAmount(totalExpenses)}</Text>
-          <Text style={savingsStyles.totalLabel}>{t('total_expenses')}</Text>
+        <View style={genStyles.totalSavingsCard}>
+          <Text style={[genStyles.totalAmount, { fontSize: 20 }]}>{formatAmount(totalExpenses)}</Text>
+          <Text style={genStyles.totalLabel}>{t('total_expenses')}</Text>
         </View>
 
-        <View style={savingsStyles.goalsSection}>
-          <View style={savingsStyles.sectionHeader}>
-            <Text style={savingsStyles.sectionTitle}>{t('your_expenses')}</Text>
+        <View style={genStyles.contentSection}>
+          <View style={genStyles.sectionHeader}>
+            <Text style={genStyles.sectionTitle}>{t('your_expenses')}</Text>
             <TouchableOpacity onPress={() => {
               resetForm();
               setModalVisible(true);
-            }} style={savingsStyles.addButton}>
-              <Text style={savingsStyles.addButtonText}>{t('add_expense')}</Text>
+            }} style={genStyles.addButton}>
+              <Text style={genStyles.addButtonText}>{t('add_expense')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -419,7 +419,7 @@ export default function ExpensesScreen() {
             data={expenses}
             renderItem={renderExpenseCard}
             keyExtractor={keyExtractor}
-            style={savingsStyles.goalsList}
+            style={genStyles.goalsList}
             showsVerticalScrollIndicator={false}
           />
         </View>

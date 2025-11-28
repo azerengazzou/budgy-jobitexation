@@ -28,7 +28,6 @@ export default function GoalDetailsScreen() {
   const [transactions, setTransactions] = useState<SavingsTransaction[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  // ✅ ALWAYS call useGoalCompletionAnimation - handle null goal inside the hook
   const {
     isAnimating,
     showAnimation,
@@ -88,18 +87,17 @@ export default function GoalDetailsScreen() {
       console.error('Error adding savings:', error);
     }
   };
+
   if (isLoading) {
     return (
-      <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={{ flex: 1 }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color="white" />
-          <Text style={{ color: 'white', marginTop: 10, fontSize: 16 }}>
-            {t('loading_goal')}
-          </Text>
         </View>
       </LinearGradient>
     );
   }
+
   // ✅ VALIDATION AFTER ALL HOOKS - Safe to return early now
   if (!goal || !goal.id) {
     return (

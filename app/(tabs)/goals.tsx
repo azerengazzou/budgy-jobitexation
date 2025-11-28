@@ -10,7 +10,7 @@ import { GoalCard } from '@/components/GoalCard';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
 import { Goal, SavingsTransaction } from '@/app/interfaces/savings';
 import { storageService } from '@/services/storage';
-import { savingsStyles } from '@/app/styles/savings.styles';
+import { genStyles } from '@/app/styles/genstyle.styles';
 
 export default function GoalsScreen() {
   const { t } = useTranslation();
@@ -35,7 +35,7 @@ export default function GoalsScreen() {
   const handleAddGoal = () => {
     router.push('/add-goal');
   };
-  
+
 
   const handleAddSavings = async (transaction: SavingsTransaction, revenueSourceId?: string) => {
     try {
@@ -50,34 +50,34 @@ export default function GoalsScreen() {
   };
 
   const renderGoalCard = ({ item }: { item: Goal }) => (
-    <GoalCard 
-      goal={item} 
+    <GoalCard
+      goal={item}
       onPress={() => handleGoalPress(item)}
     />
   );
 
   if (allVisibleGoals.length === 0) {
     return (
-      <LinearGradient colors={['#6B7280', '#9CA3AF']} style={savingsStyles.container}>
-        <View style={savingsStyles.header}>
-          <Text style={savingsStyles.headerTitle}>{t('savings_goals')}</Text>
-          <Text style={savingsStyles.headerSubtitle}>{t('track_your_financial_goals')}</Text>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+        <View style={genStyles.header}>
+          <Text style={genStyles.headerTitle}>{t('savings_goals')}</Text>
+          <Text style={genStyles.headerSubtitle}>{t('track_your_financial_goals')}</Text>
         </View>
 
-        <View style={savingsStyles.totalSavingsCard}>
-          <Text style={savingsStyles.totalAmount}>{formatAmount(totalSavings)}</Text>
-          <Text style={savingsStyles.totalLabel}>{t('total_savings')}</Text>
+        <View style={genStyles.totalSavingsCard}>
+          <Text style={genStyles.totalAmount}>{formatAmount(totalSavings)}</Text>
+          <Text style={genStyles.totalLabel}>{t('total_savings')}</Text>
         </View>
 
-        <View style={savingsStyles.goalsSection}>
-          <View style={savingsStyles.emptyState}>
-            <Target size={64} color="#D1D5DB" style={savingsStyles.emptyStateIcon} />
-            <Text style={savingsStyles.emptyStateTitle}>{t('no_goals_yet')}</Text>
-            <Text style={savingsStyles.emptyStateText}>
+        <View style={genStyles.contentSection}>
+          <View style={genStyles.emptyState}>
+            <Target size={64} color="#D1D5DB" style={genStyles.emptyStateIcon} />
+            <Text style={genStyles.emptyStateTitle}>{t('no_goals_yet')}</Text>
+            <Text style={genStyles.emptyStateText}>
               {t('create_your_first_savings_goal_to_start_tracking_progress')}
             </Text>
-            <TouchableOpacity onPress={handleAddGoal} style={[savingsStyles.addButton, { marginTop: 20 }]}>
-              <Text style={savingsStyles.addButtonText}>{t('create_goal')}</Text>
+            <TouchableOpacity onPress={handleAddGoal} style={[genStyles.addButton, { marginTop: 20 }]}>
+              <Text style={genStyles.addButtonText}>{t('create_goal')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -86,24 +86,24 @@ export default function GoalsScreen() {
   }
 
   return (
-    <LinearGradient colors={['#6B7280', '#9CA3AF']} style={savingsStyles.container}>
-      <View style={savingsStyles.header}>
-        <Text style={savingsStyles.headerTitle}>{t('savings_goals')}</Text>
-        <Text style={savingsStyles.headerSubtitle}>
+    <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+      <View style={genStyles.header}>
+        <Text style={genStyles.headerTitle}>{t('savings_goals')}</Text>
+        <Text style={genStyles.headerSubtitle}>
           {activeGoals.length} {t('active_goals')}
         </Text>
       </View>
 
-      <View style={savingsStyles.totalSavingsCard}>
-        <Text style={savingsStyles.totalAmount}>{formatAmount(totalSavings)}</Text>
-        <Text style={savingsStyles.totalLabel}>{t('total_savings')}</Text>
+      <View style={genStyles.totalSavingsCard}>
+        <Text style={[genStyles.totalAmount, { fontSize: 20 }]}>{formatAmount(totalSavings)}</Text>
+        <Text style={genStyles.totalLabel}>{t('total_savings')}</Text>
       </View>
 
-      <View style={savingsStyles.goalsSection}>
-        <View style={savingsStyles.sectionHeader}>
-          <Text style={savingsStyles.sectionTitle}>{t('your_goals')}</Text>
-          <TouchableOpacity onPress={handleAddGoal} style={savingsStyles.addButton}>
-            <Text style={savingsStyles.addButtonText}>{t('add_goal')}</Text>
+      <View style={genStyles.contentSection}>
+        <View style={genStyles.sectionHeader}>
+          <Text style={genStyles.sectionTitle}>{t('your_goals')}</Text>
+          <TouchableOpacity onPress={handleAddGoal} style={genStyles.addButton}>
+            <Text style={genStyles.addButtonText}>{t('add_goal')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -111,7 +111,7 @@ export default function GoalsScreen() {
           data={allVisibleGoals}
           renderItem={renderGoalCard}
           keyExtractor={(item) => item.id}
-          style={savingsStyles.goalsList}
+          style={genStyles.goalsList}
           showsVerticalScrollIndicator={false}
         />
       </View>

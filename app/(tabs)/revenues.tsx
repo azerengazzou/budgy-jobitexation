@@ -16,7 +16,7 @@ import { Revenue, RevenueForm } from '../components/interfaces/revenues';
 import { RevenueModal } from '../components/RevenueModal';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 import { normalizeAmount } from '../../components/NumericInput';
-import { savingsStyles } from '../styles/savings.styles';
+import { genStyles } from '../styles/genstyle.styles';
 import { router } from 'expo-router';
 
 export default function RevenuesScreen() {
@@ -41,7 +41,7 @@ export default function RevenuesScreen() {
         setFormData({
             name: '',
             amount: '',
-            type: hasSalarySet ? 'freelance' : 'salary', // 👈 default changes
+            type: hasSalarySet ? 'freelance' : 'salary',
             date: new Date(),
         });
         setEditingRevenue(null);
@@ -77,8 +77,6 @@ export default function RevenuesScreen() {
         try {
             const normalizedAmount = normalizeAmount(formData.amount);
             let remainingAmount = normalizedAmount;
-
-            // If editing, recalculate remaining amount based on related expenses
             if (editingRevenue) {
                 const expenses = await storageService.getExpenses();
                 const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === editingRevenue.id);
@@ -109,7 +107,6 @@ export default function RevenuesScreen() {
 
     const handleDeleteRevenue = useCallback(async (id: string) => {
         try {
-            // Check if there are related expenses
             const expenses = await storageService.getExpenses();
             const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
             const hasRelatedExpenses = relatedExpenses.length > 0;
@@ -164,24 +161,24 @@ export default function RevenuesScreen() {
         return (
             <TouchableOpacity
                 onPress={() => openModalForEdit(item)}
-                style={[savingsStyles.goalCard, { marginBottom: 12 }]}
+                style={[genStyles.goalCard, { marginBottom: 12 }]}
             >
-                <View style={savingsStyles.goalHeader}>
-                    <Text style={savingsStyles.goalEmoji}>💰</Text>
-                    <View style={savingsStyles.goalInfo}>
-                        <Text style={savingsStyles.goalTitle}>{item.name}</Text>
-                        <Text style={savingsStyles.goalCategory}>{t(item.type)}</Text>
+                <View style={genStyles.goalHeader}>
+                    <Text style={genStyles.goalEmoji}>💰</Text>
+                    <View style={genStyles.goalInfo}>
+                        <Text style={genStyles.goalTitle}>{item.name}</Text>
+                        <Text style={genStyles.goalCategory}>{t(item.type)}</Text>
                     </View>
-                    <Text style={savingsStyles.progressPercentage}>
+                    <Text style={genStyles.progressPercentage}>
                         {usagePercentage.toFixed(0)}%
                     </Text>
                 </View>
 
-                <View style={savingsStyles.goalProgress}>
-                    <View style={savingsStyles.progressBar}>
+                <View style={genStyles.goalProgress}>
+                    <View style={genStyles.progressBar}>
                         <View
                             style={[
-                                savingsStyles.progressFill,
+                                genStyles.progressFill,
                                 {
                                     width: `${usagePercentage}%`,
                                     backgroundColor: getUsageColor(usagePercentage),
@@ -191,11 +188,11 @@ export default function RevenuesScreen() {
                     </View>
                 </View>
 
-                <View style={savingsStyles.goalAmounts}>
-                    <Text style={savingsStyles.currentAmount}>
+                <View style={genStyles.goalAmounts}>
+                    <Text style={genStyles.currentAmount}>
                         {formatAmount(item.remainingAmount)}
                     </Text>
-                    <Text style={savingsStyles.targetAmount}>
+                    <Text style={genStyles.targetAmount}>
                         {t('of')} {formatAmount(item.amount)}
                     </Text>
                 </View>
@@ -208,33 +205,33 @@ export default function RevenuesScreen() {
     if (revenues.length === 0) {
         return (
             <KeyboardDismissWrapper>
-                <LinearGradient colors={['#0A2540', '#4A90E2']} style={savingsStyles.container}>
-                    <View style={savingsStyles.header}>
-                        <Text style={savingsStyles.headerTitle}>{t('revenues')}</Text>
-                        <Text style={savingsStyles.headerSubtitle}>{t('manage_income_sources')}</Text>
+                <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+                    <View style={genStyles.header}>
+                        <Text style={genStyles.headerTitle}>{t('revenues')}</Text>
+                        <Text style={genStyles.headerSubtitle}>{t('manage_income_sources')}</Text>
                     </View>
 
                     {/* Summary Cards */}
                     <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 20 }}>
-                        <View style={[savingsStyles.totalSavingsCard, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
-                            <Text style={[savingsStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRevenues)}</Text>
-                            <Text style={savingsStyles.totalLabel}>{t('total_income')}</Text>
+                        <View style={[genStyles.totalSavingsCard, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
+                            <Text style={[genStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRevenues)}</Text>
+                            <Text style={genStyles.totalLabel}>{t('total_income')}</Text>
                         </View>
-                        <View style={[savingsStyles.totalSavingsCard, { flex: 1, marginLeft: 10, marginHorizontal: 0 }]}>
-                            <Text style={[savingsStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRemaining)}</Text>
-                            <Text style={savingsStyles.totalLabel}>{t('remaining')}</Text>
+                        <View style={[genStyles.totalSavingsCard, { flex: 1, marginLeft: 10, marginHorizontal: 0 }]}>
+                            <Text style={[genStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRemaining)}</Text>
+                            <Text style={genStyles.totalLabel}>{t('remaining')}</Text>
                         </View>
                     </View>
 
-                    <View style={savingsStyles.goalsSection}>
-                        <View style={savingsStyles.emptyState}>
-                            <DollarSign size={64} color="#D1D5DB" style={savingsStyles.emptyStateIcon} />
-                            <Text style={savingsStyles.emptyStateTitle}>{t('no_revenues_yet')}</Text>
-                            <Text style={savingsStyles.emptyStateText}>
+                    <View style={genStyles.contentSection}>
+                        <View style={genStyles.emptyState}>
+                            <DollarSign size={64} color="#D1D5DB" style={genStyles.emptyStateIcon} />
+                            <Text style={genStyles.emptyStateTitle}>{t('no_revenues_yet')}</Text>
+                            <Text style={genStyles.emptyStateText}>
                                 {t('add_your_first_income_source_to_start_tracking')}
                             </Text>
-                            <TouchableOpacity onPress={openModalForNew} style={[savingsStyles.addButton, { marginTop: 20 }]}>
-                                <Text style={savingsStyles.addButtonText}>{t('add_revenue')}</Text>
+                            <TouchableOpacity onPress={openModalForNew} style={[genStyles.addButton, { marginTop: 20 }]}>
+                                <Text style={genStyles.addButtonText}>{t('add_revenue')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -259,31 +256,31 @@ export default function RevenuesScreen() {
 
     return (
         <KeyboardDismissWrapper>
-            <LinearGradient colors={['#0A2540', '#4A90E2']} style={savingsStyles.container}>
-                <View style={savingsStyles.header}>
-                    <Text style={savingsStyles.headerTitle}>{t('revenues')}</Text>
-                    <Text style={savingsStyles.headerSubtitle}>
+            <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+                <View style={genStyles.header}>
+                    <Text style={genStyles.headerTitle}>{t('revenues')}</Text>
+                    <Text style={genStyles.headerSubtitle}>
                         {revenues.length} {t('income_sources')}
                     </Text>
                 </View>
 
                 {/* Summary Cards */}
-                <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 20 }}>
-                    <View style={[savingsStyles.totalSavingsCard, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
-                        <Text style={[savingsStyles.totalAmount, { fontSize: 24 }]}>{formatAmount(totalRevenues)}</Text>
-                        <Text style={savingsStyles.totalLabel}>{t('total_income')}</Text>
+                <View style={{ flexDirection: 'row', paddingHorizontal: 20 }}>
+                    <View style={[genStyles.totalSavingsCard, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
+                        <Text style={[genStyles.totalAmount, { fontSize: 20 }]}>{formatAmount(totalRevenues)}</Text>
+                        <Text style={genStyles.totalLabel}>{t('total_income')}</Text>
                     </View>
-                    <View style={[savingsStyles.totalSavingsCard, { flex: 1, marginLeft: 10, marginHorizontal: 0 }]}>
-                        <Text style={[savingsStyles.totalAmount, { fontSize: 24 }]}>{formatAmount(totalRemaining)}</Text>
-                        <Text style={savingsStyles.totalLabel}>{t('remaining')}</Text>
+                    <View style={[genStyles.totalSavingsCard, { flex: 1, marginLeft: 10, marginHorizontal: 0 }]}>
+                        <Text style={[genStyles.totalAmount, { fontSize: 20 }]}>{formatAmount(totalRemaining)}</Text>
+                        <Text style={genStyles.totalLabel}>{t('remaining')}</Text>
                     </View>
                 </View>
 
-                <View style={savingsStyles.goalsSection}>
-                    <View style={savingsStyles.sectionHeader}>
-                        <Text style={savingsStyles.sectionTitle}>{t('your_revenues')}</Text>
-                        <TouchableOpacity onPress={openModalForNew} style={savingsStyles.addButton}>
-                            <Text style={savingsStyles.addButtonText}>{t('add_revenue')}</Text>
+                <View style={genStyles.contentSection}>
+                    <View style={genStyles.sectionHeader}>
+                        <Text style={genStyles.sectionTitle}>{t('your_revenues')}</Text>
+                        <TouchableOpacity onPress={openModalForNew} style={genStyles.addButton}>
+                            <Text style={genStyles.addButtonText}>{t('add_revenue')}</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -291,38 +288,10 @@ export default function RevenuesScreen() {
                         data={revenues}
                         renderItem={renderRevenueCard}
                         keyExtractor={keyExtractor}
-                        style={savingsStyles.goalsList}
+                        style={genStyles.goalsList}
                         showsVerticalScrollIndicator={false}
                     />
                 </View>
-
-                {/* Floating Action Button */}
-                {/* <TouchableOpacity 
-                    style={{
-                        position: 'absolute',
-                        bottom: 30,
-                        right: 20,
-                        backgroundColor: '#F5F7FA',
-                        width: 60,
-                        height: 60,
-                        borderRadius: 30,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 8,
-                        elevation: 8,
-                        overflow: 'visible',
-                    }}
-                    onPress={openModalForNew}
-                    activeOpacity={0.7}
-                    delayPressIn={0}
-                    hitSlop={0}
-                >
-                    <Plus size={28} color="#0A2540" />
-                </TouchableOpacity> */}
-
                 <RevenueModal
                     visible={isModalVisible}
                     onClose={() => {

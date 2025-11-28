@@ -43,18 +43,19 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => <PieChart size={size} color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="categories"
-        options={{
-          title: 'Categories',
-          tabBarIcon: ({ size, color }) => <Tag size={size} color={color} />,
-        }}
-      />
+      
       <Tabs.Screen
         name="goals"
         options={{
           title: 'Savings',
           tabBarIcon: ({ size, color }) => <Target size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Categories',
+          tabBarIcon: ({ size, color }) => <Tag size={size} color={color} />,
         }}
       />
       {/* <Tabs.Screen

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart, BarChart } from 'react-native-chart-kit';
@@ -27,6 +28,8 @@ import { normalizeAmount } from '../../components/NumericInput';
 const screenWidth = Dimensions.get('window').width;
 
 export default function Dashboard() {
+  const [isLoading, setIsLoading] = useState(true);
+
   const { t, i18n } = useTranslation();
   const { revenues, expenses, savings, refreshData } = useData();
   const { formatAmount } = useCurrency();
@@ -63,7 +66,10 @@ export default function Dashboard() {
       } else {
         acc.push({ name: expense.category, amount: expense.amount });
       }
+      setIsLoading(false);
+
       return acc;
+
     }, []);
 
     setData({
@@ -140,12 +146,22 @@ export default function Dashboard() {
     return `${dayName}\n${dateString}`;
   };
 
+  if (isLoading) {
+    return (
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      </LinearGradient>
+    );
+  }
+
   return (
-    <KeyboardDismissWrapper>
-      <LinearGradient
-        colors={['#0A2540', '#4A90E2']}
-        style={styles.container}
-      >
+    <LinearGradient
+      colors={['#0A2540', '#4A90E2']}
+      style={styles.container}
+    >
+      <KeyboardDismissWrapper>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           refreshControl={
@@ -153,7 +169,7 @@ export default function Dashboard() {
           }
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
+          <View style={styles.header} pointerEvents='none'>
             <View style={styles.headerRow}>
               <Text style={styles.headerTitle}>{formatDate()}</Text>
               <View style={styles.iconsContainer}>
@@ -165,48 +181,48 @@ export default function Dashboard() {
                 </TouchableOpacity>
               </View>
             </View>
-            {/*<Text style={styles.headerSubtitle}>{t('financial_overview')}</Text>*/}
           </View>
+          <View pointerEvents="none">
 
-          <View style={styles.metricsContainer}>
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
-                <DollarSign size={24} color="#10B981" />
-                <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
+            <View style={styles.metricsContainer}>
+              <View style={styles.metricCard}>
+                <View style={styles.metricHeader}>
+                  <DollarSign size={24} color="#10B981" />
+                  <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
+                </View>
+                <Text style={styles.metricValue}>{formatAmount(data.totalRevenues)}</Text>
               </View>
-              <Text style={styles.metricValue}>{formatAmount(data.totalRevenues)}</Text>
-            </View>
 
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
-                <TrendingUp size={24} color="#EF4444" />
-                <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
+              <View style={styles.metricCard}>
+                <View style={styles.metricHeader}>
+                  <TrendingUp size={24} color="#EF4444" />
+                  <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
+                </View>
+                <Text style={styles.metricValue}>{formatAmount(data.totalExpenses)}</Text>
               </View>
-              <Text style={styles.metricValue}>{formatAmount(data.totalExpenses)}</Text>
-            </View>
 
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
-                <PiggyBank size={24} color="#F59E0B" />
-                <Text style={styles.metricTitle}>{t('savings')}</Text>
+              <View style={styles.metricCard}>
+                <View style={styles.metricHeader}>
+                  <PiggyBank size={24} color="#F59E0B" />
+                  <Text style={styles.metricTitle}>{t('savings')}</Text>
+                </View>
+                <Text style={styles.metricValue}>{formatAmount(data.totalSavings)}</Text>
               </View>
-              <Text style={styles.metricValue}>{formatAmount(data.totalSavings)}</Text>
-            </View>
 
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
-                <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
-                <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
+              <View style={styles.metricCard}>
+                <View style={styles.metricHeader}>
+                  <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
+                  <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
+                </View>
+                <Text style={[
+                  styles.metricValue,
+                  { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
+                ]}>
+                  {formatAmount(remainingBalance)}
+                </Text>
               </View>
-              <Text style={[
-                styles.metricValue,
-                { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
-              ]}>
-                {formatAmount(remainingBalance)}
-              </Text>
             </View>
           </View>
-
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
@@ -222,34 +238,31 @@ export default function Dashboard() {
             >
               <Text style={styles.actionButtonText}>{t('goals')}</Text>
             </TouchableOpacity>
-            {/*  <TouchableOpacity 
-            style={[styles.actionButton, styles.actionButtonShadow, styles.goalsButton, { opacity: 0.5, position: 'relative' }]}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.actionButtonText}>{t('export')}</Text>
-          </TouchableOpacity> */}
           </View>
 
           {pieChartData.length > 0 && (
             <View style={styles.chartCard}>
               <Text style={styles.chartTitle}>{t('expenses_by_category')}</Text>
-              <PieChart
-                data={pieChartData}
-                width={screenWidth - 60}
-                height={220}
-                chartConfig={{
-                  backgroundColor: '#FFFFFF',
-                  backgroundGradientFrom: '#FFFFFF',
-                  backgroundGradientTo: '#FFFFFF',
-                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                }}
-                accessor="amount"
-                backgroundColor="transparent"
-                paddingLeft="15"
-                absolute
-              />
+              <View pointerEvents="none">
+                <PieChart
+                  data={pieChartData}
+                  width={screenWidth - 60}
+                  height={220}
+                  chartConfig={{
+                    backgroundColor: '#FFFFFF',
+                    backgroundGradientFrom: '#FFFFFF',
+                    backgroundGradientTo: '#FFFFFF',
+                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  }}
+                  accessor="amount"
+                  backgroundColor="transparent"
+                  paddingLeft="15"
+                  absolute
+                />
+              </View>
             </View>
           )}
+
         </ScrollView>
 
         {/* Profile Modal */}
@@ -293,7 +306,7 @@ export default function Dashboard() {
             </View>
           </KeyboardDismissWrapper>
         </Modal>
-      </LinearGradient>
-    </KeyboardDismissWrapper>
+      </KeyboardDismissWrapper>
+    </LinearGradient>
   );
 }
