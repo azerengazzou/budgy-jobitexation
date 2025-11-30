@@ -18,11 +18,14 @@ import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper'
 import { normalizeAmount } from '../../components/NumericInput';
 import { genStyles } from '../../components/style/genstyle.styles';
 import { router } from 'expo-router';
+import { Animated } from "react-native";
 
 export default function RevenuesScreen() {
     const { t } = useTranslation();
     const { revenues, updateRevenues, updateExpenses } = useData();
     const { formatAmount } = useCurrency();
+    const [showAnimatedModal, setShowAnimatedModal] = useState(false);
+    const animatedValue = React.useRef(new Animated.Value(0)).current;
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
@@ -37,6 +40,33 @@ export default function RevenuesScreen() {
         (rev) => rev.type === 'salary' && rev.amount > 0
     );
 
+
+
+    const openModalSmooth = () => {
+        resetForm();
+        setShowAnimatedModal(true);
+
+        Animated.timing(animatedValue, {
+            toValue: 1,
+            duration: 180,
+            useNativeDriver: true,
+        }).start(() => {
+            setModalVisible(true);
+        });
+    };
+
+
+    const closeModalSmooth = () => {
+        Animated.timing(animatedValue, {
+            toValue: 0,
+            duration: 140,
+            useNativeDriver: true,
+        }).start(() => {
+            setModalVisible(false);
+            setShowAnimatedModal(false);
+            resetForm();
+        });
+    };
     const resetForm = () => {
         setFormData({
             name: '',
@@ -47,10 +77,8 @@ export default function RevenuesScreen() {
         setEditingRevenue(null);
     };
 
-    const openModalForNew = () => {
-        resetForm();
-        setModalVisible(true);
-    };
+    const openModalForNew = () => openModalSmooth();
+
 
     const openModalForEdit = useCallback((revenue: Revenue) => {
         setEditingRevenue(revenue);
@@ -60,7 +88,14 @@ export default function RevenuesScreen() {
             type: revenue.type,
             date: new Date(revenue.createdAt),
         });
-        setModalVisible(true);
+
+        setShowAnimatedModal(true);
+
+        Animated.timing(animatedValue, {
+            toValue: 1,
+            duration: 180,
+            useNativeDriver: true,
+        }).start(() => setModalVisible(true));
     }, []);
 
     const handleCloseModal = () => {

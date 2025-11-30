@@ -13,6 +13,7 @@ import { AddSavingsModal } from '@/components/AddSavingsModal';
 import { GoalCompletionAnimation } from '@/components/GoalCompletionAnimation';
 import { useGoalCompletionAnimation } from '@/hooks/useGoalCompletionAnimation';
 import { ActivityIndicator } from 'react-native';
+import AddGoalModal from '@/app/addGoalModal';
 
 export default function GoalDetailsScreen() {
   // ✅ ALL HOOKS AT THE TOP - ALWAYS CALLED IN SAME ORDER
@@ -21,12 +22,11 @@ export default function GoalDetailsScreen() {
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
   const { goals, revenues, refreshData } = useData();
   const { formatAmount } = useCurrency();
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [goal, setGoal] = useState<Goal | null>(null);
   const [transactions, setTransactions] = useState<SavingsTransaction[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddGoal, setShowAddGoal] = useState(false);
 
   const {
     isAnimating,
@@ -163,7 +163,7 @@ export default function GoalDetailsScreen() {
 
   return (
     <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
-      <View style={{ paddingTop: 60, paddingHorizontal: 20, paddingBottom: 20 }}>
+      <View style={{ paddingTop: 50, paddingHorizontal: 20, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 16 }}>
             <ArrowLeft size={24} color="white" />
@@ -182,17 +182,17 @@ export default function GoalDetailsScreen() {
         <View style={{ alignItems: 'center', marginBottom: 20 }}>
           <GoalCompletionAnimation
             isComplete={isCompleted}
-            size={160}
+            size={130}
             strokeWidth={12}
             progress={progressPercentage}
             color={getProgressColor(progressPercentage)}
             onFinished={handleAnimationFinished}
           >
             <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 32, fontWeight: 'bold', color: 'white' }}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>
                 {progressPercentage.toFixed(0)}%
               </Text>
-              <Text style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.8)' }}>
+              <Text style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.8)' }}>
                 {t('complete')}
               </Text>
             </View>
@@ -229,9 +229,14 @@ export default function GoalDetailsScreen() {
         </View>
 
         {/* Action Buttons */}
-        <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}>
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <AddGoalModal
+            visible={showAddGoal}
+            onClose={() => setShowAddGoal(false)}
+          />
+
           <TouchableOpacity
-            onPress={() => setShowAddModal(true)}
+            onPress={() => setShowAddGoal(true)}
             style={{
               flex: 1,
               backgroundColor: '#10B981',
@@ -247,7 +252,7 @@ export default function GoalDetailsScreen() {
             </View>
             <Text style={{ color: 'white', fontWeight: '600' }}>{t('add_money')}</Text>
           </TouchableOpacity>
-
+          {/* 
           <TouchableOpacity
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -260,7 +265,7 @@ export default function GoalDetailsScreen() {
             }}
           >
             <TrendingUp size={20} color="white" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
 

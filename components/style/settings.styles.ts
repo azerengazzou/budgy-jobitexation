@@ -118,6 +118,11 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 10,
     },
+    backButton: {
+  marginRight: 16,
+  padding: 8,
+},
+
     cancelButton: {
         flex: 1,
         backgroundColor: '#F3F4F6',

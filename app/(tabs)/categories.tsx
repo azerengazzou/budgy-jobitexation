@@ -24,7 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-native-modal';
 import { storageService } from '../../services/storage';
-import { styles } from '../../components/style/categories.styles';
+import { genStyles } from '../../components/style/genstyle.styles';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
@@ -180,55 +180,49 @@ export default function Categories() {
     const actualIndex = isFixed ? -1 : (isExpense ? expenseCategories.indexOf(item) : revenueCategories.indexOf(item));
 
     return (
-      <KeyboardDismissWrapper>
-        <View
-          style={[styles.modernCard, isFixed && styles.fixedCard]}
-          pointerEvents="box-none"
-        >
-          <View style={styles.cardLeft}>
-            <View style={[styles.iconContainer, { backgroundColor: isExpense ? '#FEF2F2' : '#ECFDF5' }]}>
-              <IconComponent size={18} color={isExpense ? '#DC2626' : '#059669'} />
-            </View>
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>
-                {getTranslatedCategoryName(item, isFixed)}
-              </Text>
-              <Text style={styles.cardSubtitle}>
-                {isExpense ? t('expense_category') : t('revenue_type')}
-              </Text>
-            </View>
+      <TouchableOpacity
+        onPress={() => !isFixed && handleEdit(item, actualIndex)}
+        style={[genStyles.goalCard, { marginBottom: 12, opacity: isFixed ? 0.7 : 1 }]}
+      >
+        <View style={genStyles.goalHeader}>
+          <Text style={genStyles.goalEmoji}>
+            {isExpense ? (item === 'food' ? '🍽️' : item === 'transport' ? '🚗' : item === 'rent' ? '🏠' : '🛒') : '💰'}
+          </Text>
+          <View style={genStyles.goalInfo}>
+            <Text style={genStyles.goalTitle}>
+              {getTranslatedCategoryName(item, isFixed)}
+            </Text>
+            <Text style={genStyles.goalCategory}>
+              {isExpense ? t('expense_category') : t('revenue_type')}
+              {isFixed && ` • ${t('fixed')}`}
+            </Text>
           </View>
-          {isFixed ? (
-            <View style={styles.fixedBadge}>
-              <Text style={styles.fixedText}>{t('fixed')}</Text>
-            </View>
-          ) : (
-            <View
-              style={styles.cardActions}
-              pointerEvents="box-none"
-            >
+          {!isFixed && (
+            <View style={{ flexDirection: 'row', gap: 8 }}>
               <TouchableOpacity
                 onPress={() => handleEdit(item, actualIndex)}
-                style={[styles.modernActionButton, styles.editAction]}
-                activeOpacity={0.7}
-                delayPressIn={0}
-                hitSlop={0}
+                style={{
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  borderRadius: 8,
+                  padding: 8,
+                }}
               >
                 <Edit size={16} color="#3B82F6" />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleDelete(actualIndex, item)}
-                style={[styles.modernActionButton, styles.deleteAction]}
-                activeOpacity={0.7}
-                delayPressIn={0}
-                hitSlop={0}
+                style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  borderRadius: 8,
+                  padding: 8,
+                }}
               >
                 <Trash2 size={16} color="#EF4444" />
               </TouchableOpacity>
             </View>
           )}
         </View>
-      </KeyboardDismissWrapper>
+      </TouchableOpacity>
     );
   };
 
@@ -236,110 +230,172 @@ export default function Categories() {
   const EmptyIcon = activeTab === 'expenses' ? ShoppingBag : DollarSign;
   const emptyTitle = activeTab === 'expenses' ? t('no_expense_categories') : t('no_revenue_categories');
 
+  if (currentData.length === 0) {
+    return (
+      <KeyboardDismissWrapper>
+        <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+          <View style={genStyles.header}>
+            <Text style={genStyles.headerTitle}>{t('manage_categories')}</Text>
+            <Text style={genStyles.headerSubtitle}>{t('organize_your_finances')}</Text>
+          </View>
+
+          <View style={genStyles.contentSection}>
+            <View style={genStyles.emptyState}>
+              <EmptyIcon size={64} color="#D1D5DB" style={genStyles.emptyStateIcon} />
+              <Text style={genStyles.emptyStateTitle}>{emptyTitle}</Text>
+              <Text style={genStyles.emptyStateText}>{t('tap_plus_to_add')}</Text>
+              <TouchableOpacity onPress={openModal} style={[genStyles.addButton, { marginTop: 20 }]}>
+                <Text style={genStyles.addButtonText}>{t('add_category')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </LinearGradient>
+      </KeyboardDismissWrapper>
+    );
+  }
+
   return (
     <KeyboardDismissWrapper>
-      <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('manage_categories')}</Text>
-
-          <View style={styles.searchContainer}>
-            <Search size={18} color="#FFFFFF" style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder={t('search_categories')}
-              placeholderTextColor="rgba(255,255,255,0.7)"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'expenses' && styles.activeTab]}
-              onPress={() => setActiveTab('expenses')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabText, activeTab === 'expenses' && styles.activeTabText]}>
-                {t('expenses')} ({filteredExpenseCategories.length})
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'revenues' && styles.activeTab]}
-              onPress={() => setActiveTab('revenues')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabText, activeTab === 'revenues' && styles.activeTabText]}>
-                {t('revenues')} ({filteredRevenueTypes.length})
-              </Text>
-            </TouchableOpacity>
-          </View>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+        <View style={genStyles.header}>
+          <Text style={genStyles.headerTitle}>{t('manage_categories')}</Text>
+          <Text style={genStyles.headerSubtitle}>
+            {currentData.length} {activeTab === 'expenses' ? t('expense_categories') : t('revenue_types')}
+          </Text>
         </View>
 
-        <View style={styles.content}>
-          {currentData.length === 0 ? (
-            <View style={styles.emptyState}>
-              <EmptyIcon size={64} color="#9CA3AF" />
-              <Text style={styles.emptyTitle}>{emptyTitle}</Text>
-              <Text style={styles.emptySubtitle}>{t('tap_plus_to_add')}</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={currentData}
-              renderItem={renderCategoryItem}
-              keyExtractor={(item, index) => `${activeTab}-${item}-${index}`}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              keyboardDismissMode="on-drag"
-              scrollEventThrottle={16}
-              nestedScrollEnabled={true}
-              removeClippedSubviews={false}
-              contentContainerStyle={{ paddingBottom: 100 }}
-            />
-          )}
+        {/* Tab Container */}
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: 12,
+          marginHorizontal: 20,
+          marginBottom: 20,
+          padding: 4,
+        }}>
+          <TouchableOpacity
+            style={[
+              {
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                alignItems: 'center',
+              },
+              activeTab === 'expenses' && { backgroundColor: 'rgba(255, 255, 255, 0.2)' }
+            ]}
+            onPress={() => setActiveTab('expenses')}
+          >
+            <Text style={[
+              { color: 'rgba(255, 255, 255, 0.7)', fontSize: 14, fontWeight: '500' },
+              activeTab === 'expenses' && { color: 'white', fontWeight: '600' }
+            ]}>
+              {t('expenses')} ({filteredExpenseCategories.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              {
+                flex: 1,
+                paddingVertical: 12,
+                borderRadius: 8,
+                alignItems: 'center',
+              },
+              activeTab === 'revenues' && { backgroundColor: 'rgba(255, 255, 255, 0.2)' }
+            ]}
+            onPress={() => setActiveTab('revenues')}
+          >
+            <Text style={[
+              { color: 'rgba(255, 255, 255, 0.7)', fontSize: 14, fontWeight: '500' },
+              activeTab === 'revenues' && { color: 'white', fontWeight: '600' }
+            ]}>
+              {t('revenues')} ({filteredRevenueTypes.length})
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={openModal}
-          activeOpacity={0.7}
-          delayPressIn={0}
-          hitSlop={0}
-        >
-          <LinearGradient colors={['#4A90E2', '#0A2540']} style={styles.fabGradient}>
-            <Plus size={22} color="#FFFFFF" />
-          </LinearGradient>
-        </TouchableOpacity>
+        {/* Search Bar */}
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: 12,
+          marginHorizontal: 20,
+          marginBottom: 20,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+        }}>
+          <Search size={18} color="rgba(255, 255, 255, 0.7)" style={{ marginRight: 12 }} />
+          <TextInput
+            style={{
+              flex: 1,
+              color: 'white',
+              fontSize: 16,
+            }}
+            placeholder={t('search_categories')}
+            placeholderTextColor="rgba(255,255,255,0.5)"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+
+        <View style={genStyles.contentSection}>
+          <View style={genStyles.sectionHeader}>
+            <Text style={genStyles.sectionTitle}>
+              {activeTab === 'expenses' ? t('expense_categories') : t('revenue_types')}
+            </Text>
+            <TouchableOpacity onPress={openModal} style={genStyles.addButton}>
+              <Text style={genStyles.addButtonText}>{t('add_category')}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={currentData}
+            renderItem={renderCategoryItem}
+            keyExtractor={(item, index) => `${activeTab}-${item}-${index}`}
+            style={genStyles.goalsList}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+
+
 
         {/* Modal */}
-        <Modal isVisible={isModalVisible} onBackdropPress={closeModal} style={styles.modal}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {editingIndex !== null ? t('edit_category') : t('add_category')}
-            </Text>
-            <View style={styles.modalDivider} />
+        <Modal
+          isVisible={isModalVisible}
+          onBackdropPress={closeModal}
+          style={{ justifyContent: 'center', margin: 20 }}
+        >
+          <KeyboardDismissWrapper style={{ flex: 0 }}>
+            <View style={{ backgroundColor: '#FFFFFF', borderRadius: 20, padding: 25 }}>
+              <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1F2937', marginBottom: 20, textAlign: 'center' }}>
+                {editingIndex !== null ? t('edit_category') : t('add_category')}
+              </Text>
 
-            <View style={styles.modalBody}>
               <RequiredFieldIndicator label={t('category_name')} required={true} />
               <TextInput
-                style={styles.modernInput}
+                style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16 }}
                 placeholder={t('enter_category_name')}
                 value={newCategory}
                 onChangeText={setNewCategory}
                 autoFocus
               />
-            </View>
 
-            <View style={styles.modernButtonContainer}>
-              <TouchableOpacity style={styles.modernCancelButton} onPress={closeModal}>
-                <Text style={styles.modernCancelText}>{t('cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modernSaveButton} onPress={handleSave}>
-                <LinearGradient colors={['#4A90E2', '#0A2540']} style={styles.saveGradient}>
-                  <Text style={styles.modernSaveText}>{t('save')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: '#F3F4F6', borderRadius: 12, padding: 15, marginRight: 10 }}
+                  onPress={closeModal}
+                >
+                  <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#6B7280' }}>{t('cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: '#3B82F6', borderRadius: 12, padding: 15, marginLeft: 10 }}
+                  onPress={handleSave}
+                >
+                  <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>{t('save')}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </KeyboardDismissWrapper>
         </Modal>
       </LinearGradient>
     </KeyboardDismissWrapper>
