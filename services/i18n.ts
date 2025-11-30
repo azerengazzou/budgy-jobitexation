@@ -118,6 +118,8 @@ const resources = {
 
       // Confirmations
       delete_revenue_confirmation: 'Are you sure you want to delete this revenue source?',
+      delete_revenue_category: 'Delete Revenue Category?',
+      delete_revenue_category_message: 'This action will delete this revenue and all transactions linked to it.',
       delete_expense_confirmation: 'Are you sure you want to delete this expense?',
       delete_goal_confirmation: 'Are you sure you want to delete this goal?',
 
@@ -265,7 +267,18 @@ const resources = {
       go_back: 'Go back',
       total_added: 'Total',
       total_used: 'Total Used',
-      income_source: 'Income Source'
+      income_source: 'Income Source',
+      revenue_not_found: 'Revenue not found',
+      transaction_history: 'Transaction History',
+      no_transactions_for_filter: 'No transactions found for the selected filter',
+      all: 'All',
+      this_month: 'This Month',
+      last_month: 'Last Month',
+      this_year: 'This Year',
+      organize_your_finances: 'Organize your finances',
+      expense_categories: 'expense categories',
+      revenue_types: 'revenue types',
+      category_already_exists: 'A category with this name already exists'
     },
   },
   fr: {
@@ -385,6 +398,8 @@ const resources = {
 
       // Confirmations
       delete_revenue_confirmation: 'Êtes-vous sûr de vouloir supprimer cette source de revenus?',
+      delete_revenue_category: 'Supprimer la catégorie de revenus?',
+      delete_revenue_category_message: 'Cette action supprimera ce revenu et toutes les transactions qui y sont liées.',
       delete_expense_confirmation: 'Êtes-vous sûr de vouloir supprimer cette dépense?',
       delete_goal_confirmation: 'Êtes-vous sûr de vouloir supprimer cet objectif?',
 
@@ -532,7 +547,18 @@ const resources = {
       go_back: 'Retour',
       total_added: 'Total ajouté',
       total_used: 'Total utilisé',
-      income_source: 'Source de revenus'
+      income_source: 'Source de revenus',
+      revenue_not_found: 'Revenu non trouvé',
+      transaction_history: 'Historique des transactions',
+      no_transactions_for_filter: 'Aucune transaction trouvée pour le filtre sélectionné',
+      all: 'Tout',
+      this_month: 'Ce mois',
+      last_month: 'Le mois dernier',
+      this_year: 'Cette année',
+      organize_your_finances: 'Organisez vos finances',
+      expense_categories: 'catégories de dépenses',
+      revenue_types: 'types de revenus',
+      category_already_exists: 'Une catégorie avec ce nom existe déjà'
     },
   },
   ar: {
@@ -653,6 +679,8 @@ const resources = {
 
       // Confirmations
       delete_revenue_confirmation: 'هل أنت متأكد من حذف مصدر الإيراد هذا؟',
+      delete_revenue_category: 'حذف فئة الإيرادات؟',
+      delete_revenue_category_message: 'سيؤدي هذا الإجراء إلى حذف هذا الإيراد وجميع المعاملات المرتبطة به.',
       delete_expense_confirmation: 'هل أنت متأكد من حذف هذا المصروف؟',
       delete_goal_confirmation: 'هل أنت متأكد من حذف هذا الهدف؟',
 
@@ -799,7 +827,18 @@ const resources = {
       go_back: 'العودة',
       total_added: 'إجمالي المضاف',
       total_used: 'إجمالي المستخدم',
-      income_source: 'مصدر الدخل'
+      income_source: 'مصدر الدخل',
+      revenue_not_found: 'الإيراد غير موجود',
+      transaction_history: 'تاريخ المعاملات',
+      no_transactions_for_filter: 'لم يتم العثور على معاملات للفلتر المحدد',
+      all: 'الكل',
+      this_month: 'هذا الشهر',
+      last_month: 'الشهر الماضي',
+      this_year: 'هذا العام',
+      organize_your_finances: 'نظم أموالك',
+      expense_categories: 'فئات المصاريف',
+      revenue_types: 'أنواع الإيرادات',
+      category_already_exists: 'توجد فئة بهذا الاسم بالفعل'
     },
   },
 };

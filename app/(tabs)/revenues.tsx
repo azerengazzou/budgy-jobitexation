@@ -146,35 +146,57 @@ export default function RevenuesScreen() {
             const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
             const hasRelatedExpenses = relatedExpenses.length > 0;
 
-            const message = hasRelatedExpenses
-                ? `${t('delete_revenue_confirmation')} ${t('all_expenses_related_will_be_deleted')}`
-                : t('delete_revenue_confirmation');
-
-            Alert.alert(t('delete_revenue'), message, [
-                { text: t('cancel'), style: 'cancel' },
-                {
-                    text: t('delete'),
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await storageService.deleteRevenue(id);
-                            if (hasRelatedExpenses) {
-                                await storageService.deleteExpensesByRevenueId(id);
+            Alert.alert(
+                t('delete_revenue_category'),
+                t('delete_revenue_category_message'),
+                [
+                    { text: t('cancel'), style: 'cancel' },
+                    {
+                        text: t('delete'),
+                        style: 'destructive',
+                        onPress: async () => {
+                            try {
+                                // Atomic operation: delete revenue and all related data
+                                await storageService.deleteRevenue(id);
+                                if (hasRelatedExpenses) {
+                                    await storageService.deleteExpensesByRevenueId(id);
+                                }
+                                // Update all contexts to recalculate totals
+                                await updateRevenues();
+                                await updateExpenses();
+                            } catch (error) {
+                                console.error('Error deleting revenue:', error);
+                                Alert.alert(t('error'), t('failed_to_delete_revenue'));
                             }
-                            await updateRevenues();
-                            await updateExpenses();
-                        } catch (error) {
-                            console.error('Error deleting revenue:', error);
-                            Alert.alert(t('error'), t('failed_to_delete_revenue'));
-                        }
+                        },
                     },
-                },
-            ]);
+                ]
+            );
         } catch (error) {
             console.error('Error checking related expenses:', error);
             Alert.alert(t('error'), t('failed_to_delete_revenue'));
         }
     }, [t, updateRevenues, updateExpenses]);
+
+    // Group revenues by name+type for display
+    const groupedRevenues = useMemo(() => {
+        const groups = revenues.reduce((acc, rev) => {
+            const key = `${rev.name}-${rev.type}`;
+            if (!acc[key]) {
+                acc[key] = {
+                    ...rev,
+                    amount: 0,
+                    remainingAmount: 0,
+                    entries: []
+                };
+            }
+            acc[key].amount += rev.amount;
+            acc[key].remainingAmount += rev.remainingAmount;
+            acc[key].entries.push(rev);
+            return acc;
+        }, {} as Record<string, any>);
+        return Object.values(groups);
+    }, [revenues]);
 
     const { totalRevenues, totalRemaining } = useMemo(() => ({
         totalRevenues: revenues.reduce((sum, rev) => sum + rev.amount, 0),
@@ -195,7 +217,6 @@ export default function RevenuesScreen() {
 
         return (
             <TouchableOpacity
-                onPress={() => openModalForEdit(item)}
                 style={[genStyles.goalCard, { marginBottom: 12 }]}
             >
                 <View style={genStyles.goalHeader}>

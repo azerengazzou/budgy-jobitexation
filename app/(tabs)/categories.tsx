@@ -89,23 +89,51 @@ export default function Categories() {
       return;
     }
 
+    const trimmedCategory = newCategory.trim();
+
     if (activeTab === 'expenses') {
+      // Check for duplicates in expense categories
+      const allExpenseNames = [...fixedExpenseCategories, ...expenseCategories];
+      const isDuplicate = editingIndex !== null 
+        ? allExpenseNames.some((cat, index) => 
+            cat.toLowerCase() === trimmedCategory.toLowerCase() && 
+            index !== (editingIndex + fixedExpenseCategories.length))
+        : allExpenseNames.some(cat => cat.toLowerCase() === trimmedCategory.toLowerCase());
+      
+      if (isDuplicate) {
+        Alert.alert(t('error'), t('category_already_exists'));
+        return;
+      }
+
       let updatedCategories;
       if (editingIndex !== null) {
         updatedCategories = [...expenseCategories];
-        updatedCategories[editingIndex] = newCategory.trim();
+        updatedCategories[editingIndex] = trimmedCategory;
       } else {
-        updatedCategories = [...expenseCategories, newCategory.trim()];
+        updatedCategories = [...expenseCategories, trimmedCategory];
       }
       setExpenseCategories(updatedCategories);
       await storageService.saveCategories(updatedCategories);
     } else {
+      // Check for duplicates in revenue categories
+      const allRevenueNames = [...fixedRevenueTypes, ...revenueCategories];
+      const isDuplicate = editingIndex !== null 
+        ? allRevenueNames.some((cat, index) => 
+            cat.toLowerCase() === trimmedCategory.toLowerCase() && 
+            index !== (editingIndex + fixedRevenueTypes.length))
+        : allRevenueNames.some(cat => cat.toLowerCase() === trimmedCategory.toLowerCase());
+      
+      if (isDuplicate) {
+        Alert.alert(t('error'), t('category_already_exists'));
+        return;
+      }
+
       let updatedCategories;
       if (editingIndex !== null) {
         updatedCategories = [...revenueCategories];
-        updatedCategories[editingIndex] = newCategory.trim();
+        updatedCategories[editingIndex] = trimmedCategory;
       } else {
-        updatedCategories = [...revenueCategories, newCategory.trim()];
+        updatedCategories = [...revenueCategories, trimmedCategory];
       }
       setRevenueCategories(updatedCategories);
       await storageService.setItem('revenue_categories', updatedCategories);

@@ -66,10 +66,7 @@ export default function Dashboard() {
       } else {
         acc.push({ name: expense.category, amount: expense.amount });
       }
-      setIsLoading(false);
-
       return acc;
-
     }, []);
 
     setData({
@@ -79,6 +76,8 @@ export default function Dashboard() {
       expensesByCategory,
       monthlyData: [],
     });
+    
+    setIsLoading(false);
   };
 
   const onRefresh = async () => {
