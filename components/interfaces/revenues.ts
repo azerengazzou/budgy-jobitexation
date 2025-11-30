@@ -2,7 +2,7 @@ export interface Revenue {
     id: string;
     name: string;
     amount: number;
-    type: 'salary' | 'freelance' | 'business' | 'investment' | 'other';
+    type: 'salary' | 'freelance';
     remainingAmount: number;
     createdAt: string;
 }

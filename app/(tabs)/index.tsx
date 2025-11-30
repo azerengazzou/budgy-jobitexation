@@ -23,6 +23,7 @@ import { styles } from '../../components/style/dashboard.styles';
 import { styles as settingsStyles } from '../../components/style/settings.styles';
 import { UserProfile } from '../../components/interfaces/settings';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
+import { LoadingScreen } from '../../components/LoadingScreen';
 import { normalizeAmount } from '../../components/NumericInput';
 
 const screenWidth = Dimensions.get('window').width;
@@ -146,13 +147,7 @@ export default function Dashboard() {
   };
 
   if (isLoading) {
-    return (
-      <LinearGradient colors={['#0A2540', '#4A90E2']} style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color="white" />
-        </View>
-      </LinearGradient>
-    );
+    return <LoadingScreen />;
   }
 
   return (

@@ -24,6 +24,10 @@ const resources = {
       confirm_delete: 'Confirm Delete',
       error: 'Error',
       success: 'Success',
+      carry_over_preference: 'Carry-over Preference',
+      monthly_carry_over: 'Monthly Reset',
+      weekly_carry_over: 'Weekly Reset',
+      total_amount: 'Total Amount',
 
       // Dashboard
       financial_overview: 'Financial Overview',
@@ -303,6 +307,10 @@ const resources = {
       confirm_delete: 'Confirmer la suppression',
       error: 'Erreur',
       success: 'Succès',
+      carry_over_preference: 'Préférence de report',
+      monthly_carry_over: 'Remise à zéro mensuelle',
+      weekly_carry_over: 'Remise à zéro hebdomadaire',
+      total_amount: 'Montant total',
 
       // Dashboard
       financial_overview: 'Aperçu financier',
@@ -583,6 +591,10 @@ const resources = {
       confirm_delete: 'تأكيد الحذف',
       error: 'خطأ',
       success: 'نجح',
+      carry_over_preference: 'تفضيل النقل',
+      monthly_carry_over: 'إعادة تعيين شهرية',
+      weekly_carry_over: 'إعادة تعيين أسبوعية',
+      total_amount: 'المبلغ الإجمالي',
 
       // Dashboard
       financial_overview: 'نظرة عامة مالية',

@@ -145,19 +145,33 @@ class StorageService extends RevenueStorageService {
   }
 
   // Monthly carry-over logic
-  async processMonthlyCarryOver(): Promise<void> {
-    const lastProcessedMonth = await AsyncStorage.getItem('last_processed_month');
-    const currentMonth = new Date().toISOString().slice(0, 7);
-
-    if (lastProcessedMonth !== currentMonth) {
+  async processCarryOver(): Promise<void> {
+    const profile = await this.getUserProfile();
+    const carryOverType = profile?.carryOverPreference || 'monthly';
+    
+    const lastProcessedKey = `last_processed_${carryOverType}`;
+    const lastProcessed = await AsyncStorage.getItem(lastProcessedKey);
+    
+    const now = new Date();
+    let currentPeriod = '';
+    
+    if (carryOverType === 'weekly') {
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const weekNumber = Math.ceil(((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
+      currentPeriod = `${now.getFullYear()}-W${weekNumber}`;
+    } else {
+      currentPeriod = now.toISOString().slice(0, 7);
+    }
+    
+    if (lastProcessed !== currentPeriod) {
       const revenues = await this.getRevenues();
       const updatedRevenues = revenues.map(revenue => ({
         ...revenue,
         remainingAmount: normalizeAmount(revenue.amount),
       }));
-
+      
       await this.setItem(STORAGE_KEYS.REVENUES, updatedRevenues);
-      await AsyncStorage.setItem('last_processed_month', currentMonth);
+      await AsyncStorage.setItem(lastProcessedKey, currentPeriod);
     }
   }
 }

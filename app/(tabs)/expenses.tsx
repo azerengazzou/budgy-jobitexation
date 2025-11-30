@@ -21,12 +21,14 @@ import { Expense } from '../../components/interfaces/expenses';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
 import { NumericInput, normalizeAmount } from '../../components/NumericInput';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
+import { LoadingScreen } from '../../components/LoadingScreen';
 import { genStyles } from '../../components/style/genstyle.styles';
 
 export default function ExpensesScreen() {
   const { t } = useTranslation();
   const { expenses, revenues, updateExpenses, updateRevenues } = useData();
   const { formatAmount } = useCurrency();
+  const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([
     'Rent', 'Food', 'Transport', 'Family', 'Children', 'Sports', 'Misc'
   ]);
@@ -149,6 +151,12 @@ export default function ExpensesScreen() {
     return { totalExpenses: total, expensesByCategory: byCategory };
   }, [expenses]);
 
+  useEffect(() => {
+    if (expenses.length >= 0) {
+      setIsLoading(false);
+    }
+  }, [expenses]);
+
   const renderExpenseCard = useCallback(({ item }: { item: Expense }) => {
     const categoryTotal = expensesByCategory[item.category] || 0;
     const categoryPercentage = totalExpenses > 0 ? (categoryTotal / totalExpenses) * 100 : 0;
@@ -251,6 +259,10 @@ export default function ExpensesScreen() {
       ]
     );
   }, [t, updateExpenses, updateRevenues]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   if (expenses.length === 0) {
     return (

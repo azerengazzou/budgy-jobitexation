@@ -26,12 +26,14 @@ import Modal from 'react-native-modal';
 import { storageService } from '../../services/storage';
 import { genStyles } from '../../components/style/genstyle.styles';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
+import { LoadingScreen } from '../../components/LoadingScreen';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 
 export default function Categories() {
   const { t } = useTranslation();
   const [expenseCategories, setExpenseCategories] = useState<string[]>([]);
   const [revenueCategories, setRevenueCategories] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [newCategory, setNewCategory] = useState('');
@@ -76,10 +78,12 @@ export default function Categories() {
         ? revenueData.map((item: any) => typeof item === 'string' ? item : item?.name || String(item))
         : [];
       setRevenueCategories(revenueCategories);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error loading categories:', error);
       setExpenseCategories([]);
       setRevenueCategories([]);
+      setIsLoading(false);
     }
   };
 
@@ -257,6 +261,10 @@ export default function Categories() {
   const currentData = activeTab === 'expenses' ? filteredExpenseCategories : filteredRevenueTypes;
   const EmptyIcon = activeTab === 'expenses' ? ShoppingBag : DollarSign;
   const emptyTitle = activeTab === 'expenses' ? t('no_expense_categories') : t('no_revenue_categories');
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   if (currentData.length === 0) {
     return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Target, Plus } from 'lucide-react-native';
@@ -10,6 +10,7 @@ import { GoalCard } from '@/components/GoalCard';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
 import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
 import { storageService } from '@/services/storage';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { genStyles } from '@/components/style/genstyle.styles';
 
 export default function GoalsScreen() {
@@ -17,6 +18,7 @@ export default function GoalsScreen() {
   const router = useRouter();
   const { goals, revenues, refreshData } = useData();
   const { formatAmount } = useCurrency();
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [showAddSavingsModal, setShowAddSavingsModal] = useState(false);
 
@@ -55,6 +57,16 @@ export default function GoalsScreen() {
       onPress={() => handleGoalPress(item)}
     />
   );
+
+  useEffect(() => {
+    if (goals.length >= 0) {
+      setIsLoading(false);
+    }
+  }, [goals]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   if (allVisibleGoals.length === 0) {
     return (

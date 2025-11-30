@@ -17,6 +17,7 @@ import { RevenueModal } from '../../components/RevenueModal';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
 import { normalizeAmount } from '../../components/NumericInput';
 import { genStyles } from '../../components/style/genstyle.styles';
+import { LoadingScreen } from '../../components/LoadingScreen';
 import { router } from 'expo-router';
 import { Animated } from "react-native";
 
@@ -24,6 +25,7 @@ export default function RevenuesScreen() {
     const { t } = useTranslation();
     const { revenues, updateRevenues, updateExpenses } = useData();
     const { formatAmount } = useCurrency();
+    const [isLoading, setIsLoading] = useState(true);
     const [showAnimatedModal, setShowAnimatedModal] = useState(false);
     const animatedValue = React.useRef(new Animated.Value(0)).current;
 
@@ -178,21 +180,22 @@ export default function RevenuesScreen() {
         }
     }, [t, updateRevenues, updateExpenses]);
 
-    // Group revenues by name+type for display
+
+    // Group revenues by type for display
     const groupedRevenues = useMemo(() => {
         const groups = revenues.reduce((acc, rev) => {
-            const key = `${rev.name}-${rev.type}`;
-            if (!acc[key]) {
-                acc[key] = {
-                    ...rev,
+            if (!acc[rev.type]) {
+                acc[rev.type] = {
+                    id: rev.type,
+                    name: rev.type,
+                    type: rev.type,
                     amount: 0,
                     remainingAmount: 0,
-                    entries: []
+                    createdAt: rev.createdAt
                 };
             }
-            acc[key].amount += rev.amount;
-            acc[key].remainingAmount += rev.remainingAmount;
-            acc[key].entries.push(rev);
+            acc[rev.type].amount += rev.amount;
+            acc[rev.type].remainingAmount += rev.remainingAmount;
             return acc;
         }, {} as Record<string, any>);
         return Object.values(groups);
@@ -203,31 +206,46 @@ export default function RevenuesScreen() {
         totalRemaining: revenues.reduce((sum, rev) => sum + rev.remainingAmount, 0),
     }), [revenues]);
 
+    useEffect(() => {
+        if (revenues.length >= 0) {
+            setIsLoading(false);
+        }
+    }, [revenues]);
+
     const renderRevenueCard = useCallback(({ item }: { item: Revenue }) => {
         const usagePercentage = item.amount > 0
             ? Math.min(((item.amount - item.remainingAmount) / item.amount) * 100, 100)
             : 0;
-
         const getUsageColor = (percentage: number) => {
             if (percentage >= 90) return '#EF4444';
             if (percentage >= 70) return '#F59E0B';
             if (percentage >= 50) return '#3B82F6';
             return '#10B981';
         };
-
         return (
             <TouchableOpacity
                 style={[genStyles.goalCard, { marginBottom: 12 }]}
+                onPress={() => router.push({
+                    pathname: '/revenue-category-details',
+                    params: {
+                        revenueId: item.id,
+                        categoryName: item.name,
+                        categoryType: item.type
+                    }
+                })}
             >
                 <View style={genStyles.goalHeader}>
                     <Text style={genStyles.goalEmoji}>💰</Text>
                     <View style={genStyles.goalInfo}>
                         <Text style={genStyles.goalTitle}>{item.name}</Text>
-                        <Text style={genStyles.goalCategory}>{t(item.type)}</Text>
+                        <Text style={genStyles.goalCategory}>
+                            {t(item.type)}
+                        </Text>
                     </View>
                     <Text style={genStyles.progressPercentage}>
-                        {usagePercentage.toFixed(0)}%
+                        {formatAmount(item.amount)}
                     </Text>
+
                 </View>
 
                 <View style={genStyles.goalProgress}>
@@ -254,9 +272,13 @@ export default function RevenuesScreen() {
                 </View>
             </TouchableOpacity>
         );
-    }, [t, formatAmount, openModalForEdit, handleDeleteRevenue]);
+    }, [t, formatAmount, router]);
 
     const keyExtractor = useCallback((item: Revenue) => item.id, []);
+
+    if (isLoading) {
+        return <LoadingScreen />;
+    }
 
     if (revenues.length === 0) {
         return (
@@ -316,7 +338,7 @@ export default function RevenuesScreen() {
                 <View style={genStyles.header}>
                     <Text style={genStyles.headerTitle}>{t('revenues')}</Text>
                     <Text style={genStyles.headerSubtitle}>
-                        {revenues.length} {t('income_sources')}
+                        {groupedRevenues.length} {t('categories')}
                     </Text>
                 </View>
 
@@ -341,7 +363,7 @@ export default function RevenuesScreen() {
                     </View>
 
                     <FlatList
-                        data={revenues}
+                        data={groupedRevenues}
                         renderItem={renderRevenueCard}
                         keyExtractor={keyExtractor}
                         style={genStyles.goalsList}

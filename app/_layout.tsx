@@ -55,8 +55,8 @@ export default function RootLayout() {
         await storageService.setItem('app_initialized', true);
       }
       
-      // Process monthly carry-over
-      await storageService.processMonthlyCarryOver();
+      // Process carry-over
+      await storageService.processCarryOver();
 
       // Setup notifications
       await notificationService.requestPermissions();
