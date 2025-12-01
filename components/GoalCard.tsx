@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { AlertTriangle, Plane, Home, Car, GraduationCap, DollarSign } from 'lucide-react-native';
 import { Goal } from '@/components/interfaces/savings';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { savingsStyles } from '@/components/style/savings.styles';
@@ -28,6 +29,31 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
   const progressColor = getProgressColor(progressPercentage);
   const isCompleted = goal.status === 'completed';
 
+  const getCategoryIcon = (category?: string) => {
+    const iconColor = getIconColor(category);
+    const iconSize = 18;
+
+    switch (category) {
+      case 'emergency_fund': return <AlertTriangle size={iconSize} color={iconColor} />;
+      case 'vacation': return <Plane size={iconSize} color={iconColor} />;
+      case 'house_property': return <Home size={iconSize} color={iconColor} />;
+      case 'car_vehicle': return <Car size={iconSize} color={iconColor} />;
+      case 'education': return <GraduationCap size={iconSize} color={iconColor} />;
+      default: return <DollarSign size={iconSize} color={iconColor} />;
+    }
+  };
+
+  const getIconColor = (category?: string) => {
+    switch (category) {
+      case 'emergency_fund': return '#EF4444';
+      case 'vacation': return '#3B82F6';
+      case 'house_property': return '#10B981';
+      case 'car_vehicle': return '#F59E0B';
+      case 'education': return '#8B5CF6';
+      default: return '#6B7280';
+    }
+  };
+
   return (
     <TouchableOpacity onPress={onPress} style={[
       savingsStyles.goalCard,
@@ -35,7 +61,14 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
       isCompleted && { opacity: 0.8, borderColor: '#10B981', borderWidth: 2 }
     ]}>
       <View style={savingsStyles.goalHeader}>
-        <Text style={savingsStyles.goalEmoji}>{goal.emoji || '💰'}</Text>
+        <View style={{
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          borderRadius: 10,
+          padding: 10,
+          marginRight: 12,
+        }}>
+          {getCategoryIcon(goal.category)}
+        </View>
         <View style={savingsStyles.goalInfo}>
           <Text style={savingsStyles.goalTitle}>{goal.title}</Text>
           <Text style={savingsStyles.goalCategory}>{goal.category ? t(goal.category) : t('general')}</Text>
