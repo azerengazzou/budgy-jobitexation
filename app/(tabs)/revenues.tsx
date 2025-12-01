@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus, DollarSign, Edit3, Trash2, Eye } from 'lucide-react-native';
+import { CategoryIcon } from '../../components/CategoryIcons';
 import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
@@ -235,7 +236,19 @@ export default function RevenuesScreen() {
                 })}
             >
                 <View style={genStyles.goalHeader}>
-                    <Text style={genStyles.goalEmoji}>💰</Text>
+                    <View style={{
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderRadius: 10,
+                        padding: 10,
+                        marginRight: 12,
+                    }}>
+                        <CategoryIcon 
+                            category={item.type}
+                            type="revenue"
+                            size={24}
+                            color="#10B981"
+                        />
+                    </View>
                     <View style={genStyles.goalInfo}>
                         <Text style={genStyles.goalTitle}>{item.name}</Text>
                         <Text style={genStyles.goalCategory}>

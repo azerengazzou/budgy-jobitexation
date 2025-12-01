@@ -12,6 +12,7 @@ import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Plus, Edit3, Trash2, ShoppingCart, Calendar } from 'lucide-react-native';
+import { CategoryIcon } from '../../components/CategoryIcons';
 import { storageService } from '../../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../../contexts/DataContext';
@@ -177,11 +178,19 @@ export default function ExpensesScreen() {
         style={[genStyles.goalCard, { marginBottom: 12 }]}
       >
         <View style={genStyles.goalHeader}>
-          <Text style={genStyles.goalEmoji}>
-            {item.category === 'food' ? '🍽️' :
-              item.category === 'transport' ? '🚗' :
-                item.category === 'rent' ? '🏠' : '🛒'}
-          </Text>
+          <View style={{
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: 10,
+            padding: 10,
+            marginRight: 12,
+          }}>
+            <CategoryIcon 
+              category={item.category}
+              type="expense"
+              size={24}
+              color="#EF4444"
+            />
+          </View>
           <View style={genStyles.goalInfo}>
             <Text style={genStyles.goalTitle}>
               {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}

@@ -179,6 +179,9 @@ const resources = {
       income_sources: 'income sources',
       available_funds: 'Available Funds',
       your_revenues: 'Your Revenues',
+      transactions: 'transactions',
+      no_transactions: 'No Transactions',
+      transactions_will_appear_here: 'Your transactions will appear here when you add income or expenses.',
 
       // Expenses
       no_expenses_yet: 'No Expenses Yet',
@@ -282,7 +285,21 @@ const resources = {
       organize_your_finances: 'Organize your finances',
       expense_categories: 'expense categories',
       revenue_types: 'revenue types',
-      category_already_exists: 'A category with this name already exists'
+      category_already_exists: 'A category with this name already exists',
+      
+      // Date Filters
+      all_time: 'All Time',
+      today: 'Today',
+      this_week: 'This Week',
+      this_month: 'This Month',
+      this_year: 'This Year',
+      select_period: 'Select Period',
+      custom_range: 'Custom Range',
+      select_date_range: 'Select Date Range',
+      quick_suggestions: 'Quick Suggestions',
+      start_date: 'Start Date',
+      end_date: 'End Date',
+      apply: 'Apply'
     },
   },
   fr: {
@@ -566,7 +583,21 @@ const resources = {
       organize_your_finances: 'Organisez vos finances',
       expense_categories: 'catégories de dépenses',
       revenue_types: 'types de revenus',
-      category_already_exists: 'Une catégorie avec ce nom existe déjà'
+      category_already_exists: 'Une catégorie avec ce nom existe déjà',
+      
+      // Date Filters
+      all_time: 'Tout le temps',
+      today: 'Aujourd\'hui',
+      this_week: 'Cette semaine',
+      this_month: 'Ce mois',
+      this_year: 'Cette année',
+      select_period: 'Sélectionner la période',
+      custom_range: 'Plage personnalisée',
+      select_date_range: 'Sélectionner la plage de dates',
+      quick_suggestions: 'Suggestions rapides',
+      start_date: 'Date de début',
+      end_date: 'Date de fin',
+      apply: 'Appliquer'
     },
   },
   ar: {
@@ -850,7 +881,21 @@ const resources = {
       organize_your_finances: 'نظم أموالك',
       expense_categories: 'فئات المصاريف',
       revenue_types: 'أنواع الإيرادات',
-      category_already_exists: 'توجد فئة بهذا الاسم بالفعل'
+      category_already_exists: 'توجد فئة بهذا الاسم بالفعل',
+      
+      // Date Filters
+      all_time: 'كل الوقت',
+      today: 'اليوم',
+      this_week: 'هذا الأسبوع',
+      this_month: 'هذا الشهر',
+      this_year: 'هذا العام',
+      select_period: 'اختر الفترة',
+      custom_range: 'نطاق مخصص',
+      select_date_range: 'اختر نطاق التاريخ',
+      quick_suggestions: 'اقتراحات سريعة',
+      start_date: 'تاريخ البداية',
+      end_date: 'تاريخ النهاية',
+      apply: 'تطبيق'
     },
   },
 };

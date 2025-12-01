@@ -15,11 +15,6 @@ import {
   Search,
   DollarSign,
   ShoppingBag,
-  Car,
-  Home,
-  Coffee,
-  Gamepad2,
-  PiggyBank,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-native-modal';
@@ -28,6 +23,7 @@ import { genStyles } from '../../components/style/genstyle.styles';
 import { RequiredFieldIndicator } from '../../components/RequiredFieldIndicator';
 import { LoadingScreen } from '../../components/LoadingScreen';
 import { KeyboardDismissWrapper } from '../../components/KeyboardDismissWrapper';
+import { CategoryIcon } from '@/components/CategoryIcons';
 
 export default function Categories() {
   const { t } = useTranslation();
@@ -46,16 +42,7 @@ export default function Categories() {
   const getTranslatedCategoryName = (category: string, isFixed: boolean) => {
     return isFixed ? t(category) : category;
   };
-
-  const categoryIcons = {
-    Food: Coffee,
-    Transport: Car,
-    Rent: Home,
-    Shopping: ShoppingBag,
-    Entertainment: Gamepad2,
-    default: DollarSign,
-  };
-
+  
   useEffect(() => {
     loadCategories();
   }, []);
@@ -199,15 +186,10 @@ export default function Categories() {
     type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getIconForCategory = (categoryName: string) => {
-    const IconComponent =
-      categoryIcons[categoryName as keyof typeof categoryIcons] || categoryIcons.default;
-    return IconComponent;
-  };
+
 
   const renderCategoryItem = ({ item, index }: { item: string; index: number }) => {
     const isExpense = activeTab === 'expenses';
-    const IconComponent = isExpense ? getIconForCategory(item) : DollarSign;
     const isFixed = isExpense ? fixedExpenseCategories.includes(item) : fixedRevenueTypes.includes(item);
     const actualIndex = isFixed ? -1 : (isExpense ? expenseCategories.indexOf(item) : revenueCategories.indexOf(item));
 
@@ -217,9 +199,19 @@ export default function Categories() {
         style={[genStyles.goalCard, { marginBottom: 12, opacity: isFixed ? 0.7 : 1 }]}
       >
         <View style={genStyles.goalHeader}>
-          <Text style={genStyles.goalEmoji}>
-            {isExpense ? (item === 'food' ? '🍽️' : item === 'transport' ? '🚗' : item === 'rent' ? '🏠' : '🛒') : '💰'}
-          </Text>
+          <View style={{
+            backgroundColor: isExpense ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+            borderRadius: 10,
+            padding: 10,
+            marginRight: 12,
+          }}>
+            <CategoryIcon 
+              category={item}
+              type={isExpense ? 'expense' : 'revenue'}
+              size={24}
+              color={isExpense ? '#EF4444' : '#10B981'}
+            />
+          </View>
           <View style={genStyles.goalInfo}>
             <Text style={genStyles.goalTitle}>
               {getTranslatedCategoryName(item, isFixed)}
