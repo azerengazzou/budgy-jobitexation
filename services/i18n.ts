@@ -179,6 +179,7 @@ const resources = {
       income_sources: 'income sources',
       available_funds: 'Available Funds',
       your_revenues: 'Your Revenues',
+      transaction: 'Transaction',
       transactions: 'transactions',
       no_transactions: 'No Transactions',
       transactions_will_appear_here: 'Your transactions will appear here when you add income or expenses.',
@@ -216,6 +217,8 @@ const resources = {
       delete_expense: 'Delete Expense',
       delete_expense_confirm: 'Are you sure you want to delete this expense?',
       failed_to_delete_expense: 'Failed to delete expense',
+      expense_name: 'Expense Name',
+      enter_expense_name: 'Enter expense name',
 
       // Profile
       profile_updated: 'Profile updated successfully',
@@ -286,7 +289,7 @@ const resources = {
       expense_categories: 'expense categories',
       revenue_types: 'revenue types',
       category_already_exists: 'A category with this name already exists',
-      
+
       // Date Filters
       all_time: 'All Time',
       today: 'Today',
@@ -299,7 +302,11 @@ const resources = {
       quick_suggestions: 'Quick Suggestions',
       start_date: 'Start Date',
       end_date: 'End Date',
-      apply: 'Apply'
+      apply: 'Apply',
+      update: 'Update',
+      quick_amounts: 'Quick amounts:',
+      total_spent: 'Total Spent',
+      total_transactions: 'Transactions'
     },
   },
   fr: {
@@ -515,6 +522,8 @@ const resources = {
       delete_expense: 'Supprimer la dépense',
       delete_expense_confirm: 'Êtes-vous sûr de vouloir supprimer cette dépense?',
       failed_to_delete_expense: 'Échec de la suppression de la dépense',
+      expense_name: 'Nom de la dépense',
+      enter_expense_name: 'Entrez le nom de la dépense',
 
       // Profile
       profile_updated: 'Profil mis à jour avec succès',
@@ -584,7 +593,7 @@ const resources = {
       expense_categories: 'catégories de dépenses',
       revenue_types: 'types de revenus',
       category_already_exists: 'Une catégorie avec ce nom existe déjà',
-      
+
       // Date Filters
       all_time: 'Tout le temps',
       today: 'Aujourd\'hui',
@@ -597,7 +606,11 @@ const resources = {
       quick_suggestions: 'Suggestions rapides',
       start_date: 'Date de début',
       end_date: 'Date de fin',
-      apply: 'Appliquer'
+      apply: 'Appliquer',
+      update: 'Mettre à jour',
+      quick_amounts: 'Montants rapides:',
+      total_spent: 'Total dépensé',
+      total_transactions: 'transactions'
     },
   },
   ar: {
@@ -813,6 +826,8 @@ const resources = {
       delete_expense: 'حذف المصروف',
       delete_expense_confirm: 'هل أنت متأكد من حذف هذا المصروف؟',
       failed_to_delete_expense: 'فشل في حذف المصروف',
+      expense_name: 'اسم المصروف',
+      enter_expense_name: 'أدخل اسم المصروف',
 
       // Profile
       profile_updated: 'تم تحديث الملف الشخصي بنجاح',
@@ -882,7 +897,7 @@ const resources = {
       expense_categories: 'فئات المصاريف',
       revenue_types: 'أنواع الإيرادات',
       category_already_exists: 'توجد فئة بهذا الاسم بالفعل',
-      
+
       // Date Filters
       all_time: 'كل الوقت',
       today: 'اليوم',
@@ -895,7 +910,12 @@ const resources = {
       quick_suggestions: 'اقتراحات سريعة',
       start_date: 'تاريخ البداية',
       end_date: 'تاريخ النهاية',
-      apply: 'تطبيق'
+      apply: 'تطبيق',
+      update: 'تحديث',
+      quick_amounts: 'مبالغ سريعة:',
+      total_spent: 'إجمالي المصروف',
+      transaction: 'معاملة',
+      total_transactions: 'المعاملات'
     },
   },
 };

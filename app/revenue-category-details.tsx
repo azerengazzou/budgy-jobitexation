@@ -21,26 +21,26 @@ export default function RevenueCategoryDetails() {
     const { categoryType } = useLocalSearchParams();
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
-    
+
     const isRevenue = (item: CategoryEntry): item is Revenue => {
         return "remainingAmount" in item;
     };
-    
+
     const categoryRevenues = revenues.filter(r => r.type === categoryType);
     const revenueIdsForCategory = categoryRevenues.map(r => r.id);
     const categoryExpenses = expenses.filter(e =>
         revenueIdsForCategory.includes(e.revenueSourceId)
     );
-    
+
     const allEntries: CategoryEntry[] = useMemo(() => {
         const entries = [...categoryRevenues, ...categoryExpenses]
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         return filterTransactionsByDate(entries, dateFilter, customDateRange);
     }, [categoryRevenues, categoryExpenses, dateFilter, customDateRange]);
-    
+
     const totalAmount = categoryRevenues.reduce((s, r) => s + r.amount, 0);
     const totalRemaining = categoryRevenues.reduce((s, r) => s + r.remainingAmount, 0);
-    
+
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
@@ -49,11 +49,11 @@ export default function RevenueCategoryDetails() {
             year: 'numeric'
         });
     };
-    
+
     const renderTransaction = ({ item }: { item: CategoryEntry }) => {
         const isRevenueItem = isRevenue(item);
         const category = isRevenueItem ? (categoryType as string) : (item as Expense).category;
-        
+
         return (
             <View style={revenueCategoryStyles.transactionCard}>
                 <View style={revenueCategoryStyles.transactionRow}>
@@ -64,7 +64,7 @@ export default function RevenueCategoryDetails() {
                             padding: 8,
                             marginRight: 12,
                         }}>
-                            <CategoryIcon 
+                            <CategoryIcon
                                 category={category}
                                 type={isRevenueItem ? 'revenue' : 'expense'}
                                 size={18}
@@ -85,7 +85,7 @@ export default function RevenueCategoryDetails() {
                             </View>
                         </View>
                     </View>
-                    
+
                     <Text style={[
                         revenueCategoryStyles.transactionAmount,
                         isRevenueItem ? revenueCategoryStyles.revenueAmount : revenueCategoryStyles.expenseAmount
@@ -96,53 +96,71 @@ export default function RevenueCategoryDetails() {
             </View>
         );
     };
-    
+
     return (
         <LinearGradient colors={['#0A2540', '#4A90E2']} style={revenueCategoryStyles.container}>
             {/* Header */}
             <View style={revenueCategoryStyles.headerContainer}>
                 <View style={revenueCategoryStyles.headerRow}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={revenueCategoryStyles.backButton}
                         onPress={() => router.back()}
                         activeOpacity={0.7}
                     >
                         <ArrowLeft size={20} color="white" />
                     </TouchableOpacity>
-                    
                     <Text style={revenueCategoryStyles.headerTitle}>
                         {t(categoryType as string)}
                     </Text>
                 </View>
-                
+
                 <Text style={revenueCategoryStyles.headerSubtitle}>
-                    {allEntries.length} {t('transactions')}
+                    {allEntries.length} {allEntries.length === 1 ? t('transaction') : t('transactions')}
                 </Text>
             </View>
-            
-            {/* Totals Cards */}
-            <View style={revenueCategoryStyles.totalsContainer}>
-                <View style={revenueCategoryStyles.totalCard}>
-                    <Text style={revenueCategoryStyles.totalAmount}>
-                        {formatAmount(totalAmount)}
-                    </Text>
-                    <Text style={revenueCategoryStyles.totalLabel}>
-                        {t('total_amount')}
-                    </Text>
+
+            {/* Summary Cards */}
+            <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 20 }}>
+                <View style={[{
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 12,
+                    padding: 16,
+                    alignItems: 'center',
+                }, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
+                    <Text style={[{
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                        color: '#FFFFFF',
+                        marginBottom: 8,
+                    }, { fontSize: 20 }]}>{formatAmount(totalAmount)}</Text>
+                    <Text style={{
+                        fontSize: 14,
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        textAlign: 'center',
+                    }}>{t('total_amount')}</Text>
                 </View>
-                
-                <View style={revenueCategoryStyles.totalCard}>
-                    <Text style={revenueCategoryStyles.totalAmount}>
-                        {formatAmount(totalRemaining)}
-                    </Text>
-                    <Text style={revenueCategoryStyles.totalLabel}>
-                        {t('remaining')}
-                    </Text>
+                <View style={[{
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 12,
+                    padding: 16,
+                    alignItems: 'center',
+                }, { flex: 1, marginLeft: 10, marginHorizontal: 0 }]}>
+                    <Text style={[{
+                        fontSize: 28,
+                        fontWeight: 'bold',
+                        color: '#FFFFFF',
+                        marginBottom: 8,
+                    }, { fontSize: 20 }]}>{formatAmount(totalRemaining)}</Text>
+                    <Text style={{
+                        fontSize: 14,
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        textAlign: 'center',
+                    }}>{t('remaining')}</Text>
                 </View>
             </View>
-            
+
             {/* Date Filter */}
-            <DateFilter 
+            <DateFilter
                 selectedFilter={dateFilter}
                 onFilterChange={(filter, customDates) => {
                     setDateFilter(filter);
@@ -150,7 +168,7 @@ export default function RevenueCategoryDetails() {
                 }}
                 t={t}
             />
-            
+
             {/* Transaction History */}
             <View style={revenueCategoryStyles.contentContainer}>
                 <View style={revenueCategoryStyles.sectionHeader}>
@@ -161,10 +179,10 @@ export default function RevenueCategoryDetails() {
                         color: 'rgba(255, 255, 255, 0.6)',
                         fontSize: 14,
                     }}>
-                        {allEntries.length} {t('transactions')}
+                        {allEntries.length} {allEntries.length === 1 ? t('transaction') : t('transactions')}
                     </Text>
                 </View>
-                
+
                 {allEntries.length === 0 ? (
                     <View style={revenueCategoryStyles.emptyState}>
                         <Receipt size={48} color="#9CA3AF" style={revenueCategoryStyles.emptyIcon} />
