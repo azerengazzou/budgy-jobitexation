@@ -21,6 +21,7 @@ import { genStyles } from '../../components/style/genstyle.styles';
 import { LoadingScreen } from '../../components/LoadingScreen';
 import { router } from 'expo-router';
 import { Animated } from "react-native";
+import { SwipeToDelete } from '@/components/SwipeToDelete';
 
 export default function RevenuesScreen() {
     const { t } = useTranslation();
@@ -143,7 +144,7 @@ export default function RevenuesScreen() {
         }
     };
 
-    const handleDeleteRevenue = useCallback(async (id: string) => {
+    const handleDeleteRevenue = useCallback(async (id: string, onCancel?: () => void) => {
         try {
             const expenses = await storageService.getExpenses();
             const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
@@ -153,7 +154,11 @@ export default function RevenuesScreen() {
                 t('delete_revenue_category'),
                 t('delete_revenue_category_message'),
                 [
-                    { text: t('cancel'), style: 'cancel' },
+                    { 
+                        text: t('cancel'), 
+                        style: 'cancel',
+                        onPress: onCancel
+                    },
                     {
                         text: t('delete'),
                         style: 'destructive',
@@ -224,66 +229,70 @@ export default function RevenuesScreen() {
             return '#10B981';
         };
         return (
-            <TouchableOpacity
-                style={[genStyles.goalCard, { marginBottom: 12 }]}
-                onPress={() => router.push({
-                    pathname: '/revenue-category-details',
-                    params: {
-                        revenueId: item.id,
-                        categoryName: item.name,
-                        categoryType: item.type
-                    }
-                })}
+            <SwipeToDelete 
+                onDelete={(onCancel) => handleDeleteRevenue(item.id, onCancel)}
             >
-                <View style={genStyles.goalHeader}>
-                    <View style={{
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderRadius: 10,
-                        padding: 10,
-                        marginRight: 12,
-                    }}>
-                        <CategoryIcon 
-                            category={item.type}
-                            type="revenue"
-                            size={24}
-                            color="#10B981"
-                        />
+                <TouchableOpacity
+                    style={[genStyles.goalCard, { marginBottom: 12 }]}
+                    onPress={() => router.push({
+                        pathname: '/revenue-category-details',
+                        params: {
+                            revenueId: item.id,
+                            categoryName: item.name,
+                            categoryType: item.type
+                        }
+                    })}
+                >
+                    <View style={genStyles.goalHeader}>
+                        <View style={{
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderRadius: 10,
+                            padding: 10,
+                            marginRight: 12,
+                        }}>
+                            <CategoryIcon
+                                category={item.type}
+                                type="revenue"
+                                size={24}
+                                color="#10B981"
+                            />
+                        </View>
+                        <View style={genStyles.goalInfo}>
+                            <Text style={genStyles.goalTitle}>{item.name}</Text>
+                            <Text style={genStyles.goalCategory}>
+                                {t(item.type)}
+                            </Text>
+                        </View>
+                        <Text style={genStyles.progressPercentage}>
+                            {formatAmount(item.amount)}
+                        </Text>
+
                     </View>
-                    <View style={genStyles.goalInfo}>
-                        <Text style={genStyles.goalTitle}>{item.name}</Text>
-                        <Text style={genStyles.goalCategory}>
-                            {t(item.type)}
+
+                    <View style={genStyles.goalProgress}>
+                        <View style={genStyles.progressBar}>
+                            <View
+                                style={[
+                                    genStyles.progressFill,
+                                    {
+                                        width: `${usagePercentage}%`,
+                                        backgroundColor: getUsageColor(usagePercentage),
+                                    }
+                                ]}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={genStyles.goalAmounts}>
+                        <Text style={genStyles.currentAmount}>
+                            {formatAmount(item.remainingAmount)}
+                        </Text>
+                        <Text style={genStyles.targetAmount}>
+                            {t('of')} {formatAmount(item.amount)}
                         </Text>
                     </View>
-                    <Text style={genStyles.progressPercentage}>
-                        {formatAmount(item.amount)}
-                    </Text>
-
-                </View>
-
-                <View style={genStyles.goalProgress}>
-                    <View style={genStyles.progressBar}>
-                        <View
-                            style={[
-                                genStyles.progressFill,
-                                {
-                                    width: `${usagePercentage}%`,
-                                    backgroundColor: getUsageColor(usagePercentage),
-                                }
-                            ]}
-                        />
-                    </View>
-                </View>
-
-                <View style={genStyles.goalAmounts}>
-                    <Text style={genStyles.currentAmount}>
-                        {formatAmount(item.remainingAmount)}
-                    </Text>
-                    <Text style={genStyles.targetAmount}>
-                        {t('of')} {formatAmount(item.amount)}
-                    </Text>
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </SwipeToDelete>
         );
     }, [t, formatAmount, router]);
 

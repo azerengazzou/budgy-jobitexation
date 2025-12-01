@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { CategoryIcon } from './CategoryIcons';
+import { SwipeToDelete } from './SwipeToDelete';
 import { Expense } from './interfaces/expenses';
 import { genStyles } from './style/genstyle.styles';
 
@@ -9,6 +10,7 @@ interface ExpenseCardProps {
   totalExpenses: number;
   expensesByCategory: Record<string, number>;
   onPress: (expense: Expense) => void;
+  onDelete: (expense: Expense, onCancel: () => void) => void;
   formatAmount: (amount: number) => string;
   t: (key: string) => string;
 }
@@ -18,6 +20,7 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
   totalExpenses,
   expensesByCategory,
   onPress,
+  onDelete,
   formatAmount,
   t,
 }) => {
@@ -35,10 +38,13 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      onPress={() => onPress(item)}
-      style={[genStyles.goalCard, { marginBottom: 12 }]}
+    <SwipeToDelete
+      onDelete={(onCancel) => onDelete(item, onCancel)}
     >
+      <TouchableOpacity
+        onPress={() => onPress(item)}
+        style={[genStyles.goalCard, { marginBottom: 12 }]}
+      >
       <View style={genStyles.goalHeader}>
         <View style={{
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -74,6 +80,7 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
           {categoryPercentage.toFixed(1)}%
         </Text>
       </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </SwipeToDelete>
   );
 };

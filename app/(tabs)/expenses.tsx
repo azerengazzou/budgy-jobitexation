@@ -115,10 +115,11 @@ export default function ExpensesScreen() {
           categoryType: expense.category
         }
       })}
+      onDelete={(expense, onCancel) => handleDeleteExpense(expense, onCancel)}
       formatAmount={formatAmount}
       t={t}
     />
-  ), [totalExpenses, expensesByCategory, formatAmount, t, router]);
+  ), [totalExpenses, expensesByCategory, formatAmount, t, router, handleDeleteExpense]);
 
   const keyExtractor = useCallback((item: Expense) => item.id, []);
 
@@ -135,12 +136,16 @@ export default function ExpensesScreen() {
     setModalVisible(true);
   }, []);
 
-  const handleDeleteExpense = useCallback((expense: Expense) => {
+  const handleDeleteExpense = useCallback((expense: Expense, onCancel?: () => void) => {
     Alert.alert(
       t('delete_expense'),
       t('delete_expense_confirm'),
       [
-        { text: t('cancel'), style: 'cancel' },
+        { 
+          text: t('cancel'), 
+          style: 'cancel',
+          onPress: onCancel
+        },
         {
           text: t('delete'),
           style: 'destructive',
