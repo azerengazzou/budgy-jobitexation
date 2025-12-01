@@ -105,6 +105,7 @@ class StorageService extends RevenueStorageService {
       // Check if goal is completed
       if (currentAmount >= goals[goalIndex].targetAmount && goals[goalIndex].status === 'active') {
         goals[goalIndex].status = 'completed';
+        goals[goalIndex].completedAt = new Date().toISOString();
       }
 
       await this.expenseStorage.updateGoal(goals[goalIndex]);

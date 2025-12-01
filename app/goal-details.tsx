@@ -10,10 +10,10 @@ import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { ProgressRing } from '@/components/ProgressRing';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
+import { CreateGoalModal } from '@/components/CreateGoalModal';
 import { GoalCompletionAnimation } from '@/components/GoalCompletionAnimation';
 import { useGoalCompletionAnimation } from '@/hooks/useGoalCompletionAnimation';
 import { ActivityIndicator } from 'react-native';
-import AddGoalModal from '@/app/addGoalModal';
 
 export default function GoalDetailsScreen() {
   // ✅ ALL HOOKS AT THE TOP - ALWAYS CALLED IN SAME ORDER
@@ -26,7 +26,7 @@ export default function GoalDetailsScreen() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [transactions, setTransactions] = useState<SavingsTransaction[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showAddGoal, setShowAddGoal] = useState(false);
+  const [showCreateGoal, setShowCreateGoal] = useState(false);
 
   const {
     isAnimating,
@@ -124,28 +124,21 @@ export default function GoalDetailsScreen() {
   };
 
   const renderTransaction = ({ item }: { item: SavingsTransaction }) => (
-    <View style={[
-      {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        backgroundColor: 'white',
-        borderRadius: 12,
-        marginBottom: 8,
-        elevation: 1,
-      },
-      {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 2,
-      }
-    ]}>
+    <View style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      backgroundColor: 'white',
+      borderRadius: 12,
+      marginBottom: 8,
+      borderWidth: isCompleted ? 1 : 0,
+      borderColor: isCompleted ? '#D1FAE5' : 'transparent',
+    }}>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 16, fontWeight: '500', color: '#1F2937', marginBottom: 2 }}>
-          {item.description}
+          {item.description || (item.type === 'deposit' ? t('savings_deposit') : t('withdrawal'))}
         </Text>
         <Text style={{ fontSize: 12, color: '#6B7280' }}>
           {new Date(item.date).toLocaleDateString()}
@@ -162,7 +155,7 @@ export default function GoalDetailsScreen() {
   );
 
   return (
-    <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
+    <LinearGradient colors={isCompleted ? ['#0F766E', '#10B981'] : ['#0A2540', '#4A90E2']} style={{ flex: 1 }}>
       <View style={{ paddingTop: 50, paddingHorizontal: 20, paddingBottom: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 16 }}>
@@ -173,7 +166,7 @@ export default function GoalDetailsScreen() {
               {goal.title}
             </Text>
             <Text style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.8)' }}>
-              {goal.category}
+              {t(goal.category || 'general')}
             </Text>
           </View>
         </View>
@@ -206,7 +199,7 @@ export default function GoalDetailsScreen() {
           padding: 20,
           marginBottom: 20,
           borderWidth: 1,
-          borderColor: 'rgba(255, 255, 255, 0.2)',
+          borderColor: isCompleted ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.2)',
         }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
             <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 14 }}>{t('current')}</Text>
@@ -220,73 +213,100 @@ export default function GoalDetailsScreen() {
               {formatAmount(goal.targetAmount)}
             </Text>
           </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 14 }}>{t('remaining')}</Text>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: 16 }}>
-              {formatAmount(remainingAmount)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Action Buttons */}
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          <AddGoalModal
-            visible={showAddGoal}
-            onClose={() => setShowAddGoal(false)}
-          />
-
-          <TouchableOpacity
-            onPress={() => setShowAddGoal(true)}
-            style={{
-              flex: 1,
-              backgroundColor: '#10B981',
-              borderRadius: 12,
-              paddingVertical: 12,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <View style={{ marginRight: 8 }}>
-              <Plus size={20} color="white" />
+          {!isCompleted && (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 14 }}>{t('remaining')}</Text>
+              <Text style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: 16 }}>
+                {formatAmount(remainingAmount)}
+              </Text>
             </View>
-            <Text style={{ color: 'white', fontWeight: '600' }}>{t('add_money')}</Text>
-          </TouchableOpacity>
-          {/* 
-          <TouchableOpacity
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              borderRadius: 12,
-              paddingVertical: 12,
-              paddingHorizontal: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <TrendingUp size={20} color="white" />
-          </TouchableOpacity> */}
+          )}
+          {isCompleted && (
+            <View style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: 8,
+              padding: 12,
+              marginTop: 8,
+              alignItems: 'center'
+            }}>
+              <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>
+                ✓ {t('completed')}
+              </Text>
+              <View style={{ alignItems: 'center', marginTop: 4 }}>
+                <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 12 }}>
+                  {goal.completedAt 
+                    ? `${t('achieved_on')} ${new Date(goal.completedAt).toLocaleDateString()}`
+                    : t('goal_completed')
+                  }
+                </Text>
+                {goal.deadline && goal.completedAt && (
+                  <Text style={{
+                    color: new Date(goal.completedAt) <= new Date(goal.deadline) ? '#FFD700' : 'rgba(255, 255, 255, 0.6)',
+                    fontSize: 11,
+                    marginTop: 2,
+                    fontWeight: new Date(goal.completedAt) <= new Date(goal.deadline) ? '600' : '400'
+                  }}>
+                    {new Date(goal.completedAt) <= new Date(goal.deadline) 
+                      ? `🎯 ${t('completed_on_time')}` 
+                      : `⏰ ${t('deadline_was')} ${new Date(goal.deadline).toLocaleDateString()}`
+                    }
+                  </Text>
+                )}
+              </View>
+            </View>
+          )}
         </View>
+
+        {!isCompleted ? (
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <TouchableOpacity
+              onPress={() => setShowAddModal(true)}
+              style={{
+                flex: 1,
+                backgroundColor: '#10B981',
+                borderRadius: 12,
+                paddingVertical: 14,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowColor: '#10B981',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15,
+                shadowRadius: 4,
+                elevation: 3,
+              }}
+            >
+              <Plus size={20} color="white" style={{ marginRight: 8 }} />
+              <Text style={{ color: 'white', fontWeight: '600', fontSize: 16 }}>{t('add_savings')}</Text>
+            </TouchableOpacity>
+
+          </View>
+        ) : (
+          null
+        )}
       </View>
 
       {/* Transactions Section */}
       <View style={{
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: isCompleted ? '#F0FDF4' : 'white',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         paddingTop: 20,
       }}>
         <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
           <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1F2937' }}>
-            {t('recent_transactions')}
+            {t('transaction_history')}
           </Text>
         </View>
 
         {transactions.length === 0 ? (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
             <Text style={{ fontSize: 16, color: '#6B7280', textAlign: 'center' }}>
-              {t('no_transactions_yet')}
+              {isCompleted ? t('no_transactions_recorded') : t('no_transactions_yet')}
+            </Text>
+            <Text style={{ fontSize: 14, color: '#9CA3AF', textAlign: 'center', marginTop: 8 }}>
+              {isCompleted ? t('goal_completed_without_transactions') : t('start_saving_to_see_progress')}
             </Text>
           </View>
         ) : (
@@ -296,6 +316,7 @@ export default function GoalDetailsScreen() {
             keyExtractor={(item) => item.id}
             style={{ paddingHorizontal: 20 }}
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
           />
         )}
       </View>
@@ -306,6 +327,11 @@ export default function GoalDetailsScreen() {
         revenues={revenues}
         onClose={() => setShowAddModal(false)}
         onSave={handleAddSavings}
+      />
+      
+      <CreateGoalModal
+        visible={showCreateGoal}
+        onClose={() => setShowCreateGoal(false)}
       />
     </LinearGradient>
   );

@@ -5,6 +5,7 @@ import { AlertTriangle, Plane, Home, Car, GraduationCap, DollarSign } from 'luci
 import { Goal } from '@/components/interfaces/savings';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { savingsStyles } from '@/components/style/savings.styles';
+import { CompletionCelebration } from '@/components/CompletionCelebration';
 
 interface GoalCardProps {
   goal: Goal;
@@ -58,8 +59,17 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
     <TouchableOpacity onPress={onPress} style={[
       savingsStyles.goalCard,
       savingsStyles.goalCardShadow,
-      isCompleted && { opacity: 0.8, borderColor: '#10B981', borderWidth: 2 }
+      isCompleted && { 
+        borderColor: '#10B981', 
+        borderWidth: 2,
+        backgroundColor: '#F0FDF4',
+        shadowColor: '#10B981',
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 6
+      }
     ]}>
+      <CompletionCelebration isCompleted={isCompleted} />
       <View style={savingsStyles.goalHeader}>
         <View style={{
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -77,11 +87,16 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
           <View style={{
             backgroundColor: '#10B981',
             borderRadius: 12,
-            paddingHorizontal: 8,
-            paddingVertical: 4,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            shadowColor: '#10B981',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 4,
           }}>
-            <Text style={{ color: 'white', fontSize: 12, fontWeight: '600' }}>
-              {t('completed')}
+            <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}>
+              ✓ {t('completed')}
             </Text>
           </View>
         ) : (
@@ -98,7 +113,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
               savingsStyles.progressFill,
               {
                 width: `${progressPercentage}%`,
-                backgroundColor: progressColor,
+                backgroundColor: isCompleted ? '#10B981' : progressColor,
               }
             ]}
           />

@@ -129,6 +129,8 @@ const resources = {
 
       // Success messages
       report_exported_successfully: 'Report exported successfully',
+      achieved: 'Achieved',
+      completed_on: 'Completed on',
 
       // Error messages
       failed_to_save_revenue: 'Failed to save revenue',
@@ -437,6 +439,8 @@ const resources = {
 
       // Success messages
       report_exported_successfully: 'Rapport exporté avec succès',
+      achieved: 'Réalisé',
+      completed_on: 'Terminé le',
 
       // Error messages
       failed_to_save_revenue: 'Échec de l\'enregistrement du revenu',
@@ -742,6 +746,8 @@ const resources = {
 
       // Success messages
       report_exported_successfully: 'تم تصدير التقرير بنجاح',
+      achieved: 'تم تحقيقه',
+      completed_on: 'اكتمل في',
 
       // Error messages
       failed_to_save_revenue: 'فشل في حفظ الإيراد',

@@ -10,6 +10,7 @@ export interface Goal {
   currency: string;
   createdAt: string;
   updatedAt?: string;
+  completedAt?: string;
   deadline?: string | null;
   category?: string;
   status: GoalStatus;

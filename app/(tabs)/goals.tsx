@@ -8,6 +8,7 @@ import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { GoalCard } from '@/components/GoalCard';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
+import { CreateGoalModal } from '@/components/CreateGoalModal';
 import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
 import { storageService } from '@/services/storage';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -21,6 +22,7 @@ export default function GoalsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [showAddSavingsModal, setShowAddSavingsModal] = useState(false);
+  const [showCreateGoalModal, setShowCreateGoalModal] = useState(false);
 
   const activeGoals = goals.filter(goal => goal.status === 'active');
   const completedGoals = goals.filter(goal => goal.status === 'completed');
@@ -35,7 +37,7 @@ export default function GoalsScreen() {
   };
 
   const handleAddGoal = () => {
-    router.push('/add-goal');
+    setShowCreateGoalModal(true);
   };
 
 
@@ -140,6 +142,11 @@ export default function GoalsScreen() {
           onSave={handleAddSavings}
         />
       )}
+      
+      <CreateGoalModal
+        visible={showCreateGoalModal}
+        onClose={() => setShowCreateGoalModal(false)}
+      />
     </LinearGradient>
   );
 }
