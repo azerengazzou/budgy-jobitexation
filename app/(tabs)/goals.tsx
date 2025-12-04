@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Target, Plus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { GoalCard } from '@/components/GoalCard';
+import { SwipeToDelete } from '@/components/SwipeToDelete';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
 import { CreateGoalModal } from '@/components/CreateGoalModal';
 import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
@@ -53,11 +54,43 @@ export default function GoalsScreen() {
     }
   };
 
+  const handleDeleteGoal = useCallback(async (goal: Goal, onCancel?: () => void) => {
+    Alert.alert(
+      t('delete_goal'),
+      t('are_you_sure_delete') + ' "' + goal.title + '"?',
+      [
+        { 
+          text: t('cancel'), 
+          style: 'cancel',
+          onPress: onCancel
+        },
+        {
+          text: t('delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await storageService.deleteGoal(goal.id);
+              await refreshData();
+            } catch (error) {
+              console.error('Error deleting goal:', error);
+              Alert.alert(t('error'), t('failed_to_delete'));
+              onCancel?.();
+            }
+          },
+        },
+      ]
+    );
+  }, [t, refreshData]);
+
   const renderGoalCard = ({ item }: { item: Goal }) => (
-    <GoalCard
-      goal={item}
-      onPress={() => handleGoalPress(item)}
-    />
+    <SwipeToDelete
+      onDelete={(onCancel) => handleDeleteGoal(item, onCancel)}
+    >
+      <GoalCard
+        goal={item}
+        onPress={() => handleGoalPress(item)}
+      />
+    </SwipeToDelete>
   );
 
   useEffect(() => {
