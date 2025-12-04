@@ -32,10 +32,15 @@ export default function RevenueCategoryDetails() {
     const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
     const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
     const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-    const [revenueFormData, setRevenueFormData] = useState({
+    const [revenueFormData, setRevenueFormData] = useState<{
+        name: string;
+        amount: string;
+        type: Revenue['type'];
+        date: Date;
+    }>({
         name: '',
         amount: '',
-        type: 'salary' as const,
+        type: 'salary',
         date: new Date(),
     });
     const [expenseFormData, setExpenseFormData] = useState({
@@ -127,9 +132,9 @@ export default function RevenueCategoryDetails() {
                 name: expense.name || '',
                 amount: expense.amount.toString(),
                 category: expense.category,
-                description: expense.description,
+                description: expense.description || '',
                 revenueSourceId: expense.revenueSourceId,
-                date: new Date(expense.date),
+                date: new Date(expense.date || expense.createdAt),
             });
             setExpenseModalVisible(true);
         }
@@ -198,7 +203,7 @@ export default function RevenueCategoryDetails() {
                         </View>
                         <View style={revenueCategoryStyles.transactionLeft}>
                             <Text style={revenueCategoryStyles.transactionName}>
-                                {isRevenueItem ? item.name : (item.description || 'Expense')}
+                                {isRevenueItem ? item.name : ((item as Expense).name || (item as Expense).description || 'Expense')}
                             </Text>
                             <View style={revenueCategoryStyles.transactionMeta}>
                                 <Text style={revenueCategoryStyles.transactionDate}>
@@ -211,35 +216,37 @@ export default function RevenueCategoryDetails() {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ alignItems: 'flex-end' }}>
                         <Text style={[
                             revenueCategoryStyles.transactionAmount,
                             isRevenueItem ? revenueCategoryStyles.revenueAmount : revenueCategoryStyles.expenseAmount,
-                            { marginRight: 12 }
+                            { marginBottom: 4 }
                         ]}>
                             {isRevenueItem ? '+' : '-'}{formatAmount(item.amount)}
                         </Text>
-                        <TouchableOpacity
-                            onPress={() => handleEditTransaction(item)}
-                            style={{
-                                padding: 8,
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                borderRadius: 6,
-                                marginRight: 8,
-                            }}
-                        >
-                            <Edit3 size={16} color="#3B82F6" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => handleDeleteTransaction(item)}
-                            style={{
-                                padding: 8,
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                borderRadius: 6,
-                            }}
-                        >
-                            <Trash2 size={16} color="#EF4444" />
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                onPress={() => handleEditTransaction(item)}
+                                style={{
+                                    padding: 4,
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderRadius: 4,
+                                    marginRight: 4,
+                                }}
+                            >
+                                <Edit3 size={12} color="#3B82F6" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => handleDeleteTransaction(item)}
+                                style={{
+                                    padding: 4,
+                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                    borderRadius: 4,
+                                }}
+                            >
+                                <Trash2 size={12} color="#EF4444" />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </View>

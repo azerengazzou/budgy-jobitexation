@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Receipt, Trash2 } from 'lucide-react-native';
+import { ArrowLeft, Receipt, Trash2, Edit3 } from 'lucide-react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '@/contexts/CurrencyContext';
@@ -11,15 +11,28 @@ import { Alert } from 'react-native';
 import { Expense } from '@/components/interfaces/expenses';
 import { CategoryIcon } from '@/components/CategoryIcons';
 import { DateFilter, DateFilterType, filterTransactionsByDate } from '@/components/DateFilter';
+import { ExpenseModal } from '@/components/ExpenseModal';
 import { expenseCategoryStyles } from '@/components/style/expense-category-details.styles';
 
 export default function ExpenseCategoryDetails() {
     const { t } = useTranslation();
     const { formatAmount } = useCurrency();
-    const { expenses, updateExpenses, updateRevenues } = useData();
+    const { expenses, revenues, updateExpenses, updateRevenues } = useData();
     const { categoryType } = useLocalSearchParams();
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
+    
+    // Modal states
+    const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
+    const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+    const [expenseFormData, setExpenseFormData] = useState({
+        name: '',
+        amount: '',
+        category: 'food',
+        description: '',
+        revenueSourceId: '',
+        date: new Date(),
+    });
 
     const categoryExpenses = expenses.filter(e => e.category === categoryType);
 
@@ -66,6 +79,19 @@ export default function ExpenseCategoryDetails() {
         );
     };
 
+    const handleEditTransaction = (item: Expense) => {
+        setEditingExpense(item);
+        setExpenseFormData({
+            name: item.name || '',
+            amount: item.amount.toString(),
+            category: item.category,
+            description: item.description,
+            revenueSourceId: item.revenueSourceId,
+            date: new Date(item.date),
+        });
+        setExpenseModalVisible(true);
+    };
+
     const renderTransaction = ({ item }: { item: Expense }) => {
         return (
             <View style={expenseCategoryStyles.transactionCard}>
@@ -101,20 +127,33 @@ export default function ExpenseCategoryDetails() {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={[expenseCategoryStyles.transactionAmount, { marginRight: 12 }]}>
+                    <View style={{ alignItems: 'flex-end' }}>
+                        <Text style={[expenseCategoryStyles.transactionAmount, { marginBottom: 4 }]}>
                             -{formatAmount(item.amount)}
                         </Text>
-                        <TouchableOpacity
-                            onPress={() => handleDeleteTransaction(item)}
-                            style={{
-                                padding: 8,
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                borderRadius: 6,
-                            }}
-                        >
-                            <Trash2 size={16} color="#EF4444" />
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                onPress={() => handleEditTransaction(item)}
+                                style={{
+                                    padding: 4,
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderRadius: 4,
+                                    marginRight: 4,
+                                }}
+                            >
+                                <Edit3 size={12} color="#3B82F6" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => handleDeleteTransaction(item)}
+                                style={{
+                                    padding: 4,
+                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                    borderRadius: 4,
+                                }}
+                            >
+                                <Trash2 size={12} color="#EF4444" />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -193,6 +232,24 @@ export default function ExpenseCategoryDetails() {
                     />
                 )}
             </View>
+
+            <ExpenseModal
+                visible={isExpenseModalVisible}
+                onClose={() => {
+                    setExpenseModalVisible(false);
+                    setEditingExpense(null);
+                }}
+                onSave={() => {}}
+                editingExpense={editingExpense}
+                categories={['rent', 'food', 'transport']}
+                revenues={revenues}
+                formData={expenseFormData}
+                setFormData={setExpenseFormData}
+                formatAmount={formatAmount}
+                t={t}
+                updateExpenses={updateExpenses}
+                updateRevenues={updateRevenues}
+            />
         </LinearGradient>
     );
 }
