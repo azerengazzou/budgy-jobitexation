@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Receipt } from 'lucide-react-native';
+import { ArrowLeft, Receipt, Trash2 } from 'lucide-react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useData } from '@/contexts/DataContext';
+import { storageService } from '@/services/storage';
+import { Alert } from 'react-native';
 import { Expense } from '@/components/interfaces/expenses';
 import { CategoryIcon } from '@/components/CategoryIcons';
 import { DateFilter, DateFilterType, filterTransactionsByDate } from '@/components/DateFilter';
@@ -14,7 +16,7 @@ import { expenseCategoryStyles } from '@/components/style/expense-category-detai
 export default function ExpenseCategoryDetails() {
     const { t } = useTranslation();
     const { formatAmount } = useCurrency();
-    const { expenses } = useData();
+    const { expenses, updateExpenses, updateRevenues } = useData();
     const { categoryType } = useLocalSearchParams();
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
@@ -37,6 +39,31 @@ export default function ExpenseCategoryDetails() {
             day: 'numeric',
             year: 'numeric'
         });
+    };
+
+    const handleDeleteTransaction = async (item: Expense) => {
+        Alert.alert(
+            t('delete') + ' ' + t('expense'),
+            t('are_you_sure_delete') + ' ' + t('expense').toLowerCase() + '?',
+            [
+                { text: t('cancel'), style: 'cancel' },
+                {
+                    text: t('delete'),
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await storageService.deleteExpense(item.id);
+                            await storageService.addToRevenue(item.revenueSourceId, item.amount);
+                            await updateExpenses();
+                            await updateRevenues();
+                        } catch (error) {
+                            console.error('Error deleting expense:', error);
+                            Alert.alert(t('error'), t('failed_to_delete'));
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     const renderTransaction = ({ item }: { item: Expense }) => {
@@ -74,9 +101,21 @@ export default function ExpenseCategoryDetails() {
                         </View>
                     </View>
 
-                    <Text style={expenseCategoryStyles.transactionAmount}>
-                        -{formatAmount(item.amount)}
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={[expenseCategoryStyles.transactionAmount, { marginRight: 12 }]}>
+                            -{formatAmount(item.amount)}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => handleDeleteTransaction(item)}
+                            style={{
+                                padding: 8,
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderRadius: 6,
+                            }}
+                        >
+                            <Trash2 size={16} color="#EF4444" />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         );

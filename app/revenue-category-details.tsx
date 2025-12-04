@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Receipt } from 'lucide-react-native';
+import { ArrowLeft, Receipt, Trash2 } from 'lucide-react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useData } from '@/contexts/DataContext';
+import { storageService } from '@/services/storage';
+import { Alert } from 'react-native';
 import { Revenue } from '@/components/interfaces/revenues';
 import { Expense } from '@/components/interfaces/expenses';
 import { revenueCategoryStyles } from '@/components/style/revenue-category-details.styles';
@@ -17,7 +19,7 @@ type CategoryEntry = Revenue | Expense;
 export default function RevenueCategoryDetails() {
     const { t } = useTranslation();
     const { formatAmount } = useCurrency();
-    const { revenues, expenses } = useData();
+    const { revenues, expenses, updateRevenues, updateExpenses } = useData();
     const { categoryType } = useLocalSearchParams();
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
@@ -48,6 +50,39 @@ export default function RevenueCategoryDetails() {
             day: 'numeric',
             year: 'numeric'
         });
+    };
+
+    const handleDeleteTransaction = async (item: CategoryEntry) => {
+        const isRevenueItem = isRevenue(item);
+        const itemType = isRevenueItem ? t('revenue') : t('expense');
+        
+        Alert.alert(
+            t('delete') + ' ' + itemType,
+            t('are_you_sure_delete') + ' ' + itemType.toLowerCase() + '?',
+            [
+                { text: t('cancel'), style: 'cancel' },
+                {
+                    text: t('delete'),
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            if (isRevenueItem) {
+                                await storageService.deleteRevenue(item.id);
+                                await updateRevenues();
+                            } else {
+                                await storageService.deleteExpense(item.id);
+                                await storageService.addToRevenue((item as Expense).revenueSourceId, item.amount);
+                                await updateExpenses();
+                                await updateRevenues();
+                            }
+                        } catch (error) {
+                            console.error('Error deleting transaction:', error);
+                            Alert.alert(t('error'), t('failed_to_delete'));
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     const renderTransaction = ({ item }: { item: CategoryEntry }) => {
@@ -86,12 +121,25 @@ export default function RevenueCategoryDetails() {
                         </View>
                     </View>
 
-                    <Text style={[
-                        revenueCategoryStyles.transactionAmount,
-                        isRevenueItem ? revenueCategoryStyles.revenueAmount : revenueCategoryStyles.expenseAmount
-                    ]}>
-                        {isRevenueItem ? '+' : '-'}{formatAmount(item.amount)}
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={[
+                            revenueCategoryStyles.transactionAmount,
+                            isRevenueItem ? revenueCategoryStyles.revenueAmount : revenueCategoryStyles.expenseAmount,
+                            { marginRight: 12 }
+                        ]}>
+                            {isRevenueItem ? '+' : '-'}{formatAmount(item.amount)}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => handleDeleteTransaction(item)}
+                            style={{
+                                padding: 8,
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderRadius: 6,
+                            }}
+                        >
+                            <Trash2 size={16} color="#EF4444" />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         );

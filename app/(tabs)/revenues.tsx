@@ -146,45 +146,91 @@ export default function RevenuesScreen() {
 
     const handleDeleteRevenue = useCallback(async (id: string, onCancel?: () => void) => {
         try {
-            const expenses = await storageService.getExpenses();
-            const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
-            const hasRelatedExpenses = relatedExpenses.length > 0;
-
-            Alert.alert(
-                t('delete_revenue_category'),
-                t('delete_revenue_category_message'),
-                [
-                    { 
-                        text: t('cancel'), 
-                        style: 'cancel',
-                        onPress: onCancel
-                    },
-                    {
-                        text: t('delete'),
-                        style: 'destructive',
-                        onPress: async () => {
-                            try {
-                                // Atomic operation: delete revenue and all related data
-                                await storageService.deleteRevenue(id);
-                                if (hasRelatedExpenses) {
-                                    await storageService.deleteExpensesByRevenueId(id);
-                                }
-                                // Update all contexts to recalculate totals
-                                await updateRevenues();
-                                await updateExpenses();
-                            } catch (error) {
-                                console.error('Error deleting revenue:', error);
-                                Alert.alert(t('error'), t('failed_to_delete_revenue'));
-                            }
+            // Check if this is a revenue type (grouped) or individual revenue ID
+            const isRevenueType = ['salary', 'freelance', 'business', 'investment', 'other'].includes(id);
+            
+            if (isRevenueType) {
+                // Delete all revenues of this type
+                const revenuesOfType = revenues.filter(rev => rev.type === id);
+                const expenses = await storageService.getExpenses();
+                const relatedExpenses = expenses.filter(exp => 
+                    revenuesOfType.some(rev => rev.id === exp.revenueSourceId)
+                );
+                
+                Alert.alert(
+                    t('delete_revenue_category'),
+                    t('delete_revenue_category_message'),
+                    [
+                        { 
+                            text: t('cancel'), 
+                            style: 'cancel',
+                            onPress: () => onCancel?.()
                         },
-                    },
-                ]
-            );
+                        {
+                            text: t('delete'),
+                            style: 'destructive',
+                            onPress: async () => {
+                                try {
+                                    for (const revenue of revenuesOfType) {
+                                        await storageService.deleteRevenue(revenue.id);
+                                    }
+                                    if (relatedExpenses.length > 0) {
+                                        for (const expense of relatedExpenses) {
+                                            await storageService.deleteExpense(expense.id);
+                                        }
+                                    }
+                                    await updateRevenues();
+                                    await updateExpenses();
+                                } catch (error) {
+                                    console.error('Error deleting revenue category:', error);
+                                    Alert.alert(t('error'), t('failed_to_delete_revenue'));
+                                    onCancel?.();
+                                }
+                            },
+                        },
+                    ]
+                );
+            } else {
+                // Delete individual revenue
+                const expenses = await storageService.getExpenses();
+                const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
+                
+                Alert.alert(
+                    t('delete_revenue_category'),
+                    t('delete_revenue_category_message'),
+                    [
+                        { 
+                            text: t('cancel'), 
+                            style: 'cancel',
+                            onPress: () => onCancel?.()
+                        },
+                        {
+                            text: t('delete'),
+                            style: 'destructive',
+                            onPress: async () => {
+                                try {
+                                    await storageService.deleteRevenue(id);
+                                    if (relatedExpenses.length > 0) {
+                                        await storageService.deleteExpensesByRevenueId(id);
+                                    }
+                                    await updateRevenues();
+                                    await updateExpenses();
+                                } catch (error) {
+                                    console.error('Error deleting revenue:', error);
+                                    Alert.alert(t('error'), t('failed_to_delete_revenue'));
+                                    onCancel?.();
+                                }
+                            },
+                        },
+                    ]
+                );
+            }
         } catch (error) {
             console.error('Error checking related expenses:', error);
             Alert.alert(t('error'), t('failed_to_delete_revenue'));
+            onCancel?.();
         }
-    }, [t, updateRevenues, updateExpenses]);
+    }, [t, updateRevenues, updateExpenses, revenues]);
 
 
     // Group revenues by type for display

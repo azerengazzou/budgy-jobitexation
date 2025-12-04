@@ -14,6 +14,20 @@ export const SwipeToDelete: React.FC<SwipeToDeleteProps> = ({
   const translateX = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
 
+  const resetPosition = () => {
+    Animated.parallel([
+      Animated.spring(translateX, {
+        toValue: 0,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, gestureState) => {
       return Math.abs(gestureState.dx) > 10 && Math.abs(gestureState.dy) < 50;
@@ -25,18 +39,9 @@ export const SwipeToDelete: React.FC<SwipeToDeleteProps> = ({
     },
     onPanResponderRelease: (_, gestureState) => {
       if (gestureState.dx < -80) {
-        const resetPosition = () => {
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-          }).start();
-        };
         onDelete(resetPosition);
       } else {
-        Animated.spring(translateX, {
-          toValue: 0,
-          useNativeDriver: true,
-        }).start();
+        resetPosition();
       }
     },
   });
