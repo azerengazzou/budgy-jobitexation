@@ -116,6 +116,12 @@ class StorageService extends RevenueStorageService {
   async getTransactionsByGoalId(goalId: string): Promise<SavingsTransaction[]> {
     return this.savingsStorage.getTransactionsByGoalId(goalId);
   }
+  async deleteSavingsTransaction(transactionId: string) {
+    const transactions = await this.getSavingsTransactions();
+    const updatedTransactions = transactions.filter(t => t.id !== transactionId);
+    await this.savingsStorage.setItem('savings_transactions', updatedTransactions);
+    await backupService.autoBackup();
+  }
 
 
 

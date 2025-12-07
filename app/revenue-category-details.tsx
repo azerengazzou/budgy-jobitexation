@@ -6,6 +6,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useData } from '@/contexts/DataContext';
+import { SavingsTransaction } from '@/components/interfaces/savings';
 import { storageService } from '@/services/storage';
 import { Alert } from 'react-native';
 import { Revenue } from '@/components/interfaces/revenues';
@@ -17,12 +18,12 @@ import { RevenueModal } from '@/components/RevenueModal';
 import { ExpenseModal } from '@/components/ExpenseModal';
 import { normalizeAmount } from '@/components/NumericInput';
 
-type CategoryEntry = Revenue | Expense;
+type CategoryEntry = Revenue | Expense | SavingsTransaction;
 
 export default function RevenueCategoryDetails() {
     const { t } = useTranslation();
     const { formatAmount } = useCurrency();
-    const { revenues, expenses, updateRevenues, updateExpenses } = useData();
+    const { revenues, expenses, savingsTransactions, goals, updateRevenues, updateExpenses } = useData();
     const { categoryType } = useLocalSearchParams();
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
@@ -56,20 +57,33 @@ export default function RevenueCategoryDetails() {
         return "remainingAmount" in item;
     };
 
+    const isSavingsTransaction = (item: CategoryEntry): item is SavingsTransaction => {
+        return "goalId" in item && "type" in item;
+    };
+
     const categoryRevenues = revenues.filter(r => r.type === categoryType);
     const revenueIdsForCategory = categoryRevenues.map(r => r.id);
     const categoryExpenses = expenses.filter(e =>
         revenueIdsForCategory.includes(e.revenueSourceId)
     );
+    const categorySavings = savingsTransactions.filter(s => 
+        s.revenueSourceId && revenueIdsForCategory.includes(s.revenueSourceId)
+    );
 
     const allEntries: CategoryEntry[] = useMemo(() => {
-        const entries = [...categoryRevenues, ...categoryExpenses]
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const entries = [...categoryRevenues, ...categoryExpenses, ...categorySavings]
+            .sort((a, b) => {
+                const aDate = 'createdAt' in a ? a.createdAt : a.date;
+                const bDate = 'createdAt' in b ? b.createdAt : b.date;
+                return new Date(bDate).getTime() - new Date(aDate).getTime();
+            });
         return filterTransactionsByDate(entries, dateFilter, customDateRange);
-    }, [categoryRevenues, categoryExpenses, dateFilter, customDateRange]);
+    }, [categoryRevenues, categoryExpenses, categorySavings, dateFilter, customDateRange]);
 
     const totalAmount = categoryRevenues.reduce((s, r) => s + r.amount, 0);
-    const totalRemaining = categoryRevenues.reduce((s, r) => s + r.remainingAmount, 0);
+    const totalExpenses = categoryExpenses.reduce((s, e) => s + e.amount, 0);
+    const totalSavings = categorySavings.reduce((s, st) => s + st.amount, 0);
+    const totalRemaining = totalAmount - totalExpenses - totalSavings;
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -96,6 +110,12 @@ export default function RevenueCategoryDetails() {
                         try {
                             if (isRevenueItem) {
                                 await storageService.deleteRevenue(item.id);
+                                await updateRevenues();
+                            } else if (isSavingsTransaction(item)) {
+                                await storageService.deleteSavingsTransaction(item.id);
+                                if (item.revenueSourceId) {
+                                    await storageService.addToRevenue(item.revenueSourceId, item.amount);
+                                }
                                 await updateRevenues();
                             } else {
                                 await storageService.deleteExpense(item.id);
@@ -182,14 +202,23 @@ export default function RevenueCategoryDetails() {
 
     const renderTransaction = ({ item }: { item: CategoryEntry }) => {
         const isRevenueItem = isRevenue(item);
-        const category = isRevenueItem ? (categoryType as string) : (item as Expense).category;
+        const isSavings = isSavingsTransaction(item);
+        const category = isRevenueItem 
+            ? (categoryType as string) 
+            : isSavings 
+                ? 'savings' 
+                : (item as Expense).category;
 
         return (
             <View style={revenueCategoryStyles.transactionCard}>
                 <View style={revenueCategoryStyles.transactionRow}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                         <View style={{
-                            backgroundColor: isRevenueItem ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                            backgroundColor: isRevenueItem 
+                                ? 'rgba(16, 185, 129, 0.1)' 
+                                : isSavings 
+                                    ? 'rgba(245, 158, 11, 0.1)'
+                                    : 'rgba(239, 68, 68, 0.1)',
                             borderRadius: 8,
                             padding: 8,
                             marginRight: 12,
@@ -198,19 +227,29 @@ export default function RevenueCategoryDetails() {
                                 category={category}
                                 type={isRevenueItem ? 'revenue' : 'expense'}
                                 size={18}
-                                color={isRevenueItem ? '#10B981' : '#EF4444'}
+                                color={isRevenueItem ? '#10B981' : isSavings ? '#F59E0B' : '#EF4444'}
                             />
                         </View>
                         <View style={revenueCategoryStyles.transactionLeft}>
                             <Text style={revenueCategoryStyles.transactionName}>
-                                {isRevenueItem ? item.name : ((item as Expense).name || (item as Expense).description || 'Expense')}
+                                {isRevenueItem 
+                                    ? item.name 
+                                    : isSavingsTransaction(item) 
+                                        ? goals.find(g => g.id === (item as SavingsTransaction).goalId)?.title || 'Savings'
+                                        : ((item as Expense).name || (item as Expense).description || 'Expense')
+                                }
                             </Text>
                             <View style={revenueCategoryStyles.transactionMeta}>
                                 <Text style={revenueCategoryStyles.transactionDate}>
-                                    {formatDate(item.createdAt)}
+                                    {formatDate('createdAt' in item ? item.createdAt : item.date)}
                                 </Text>
                                 <Text style={revenueCategoryStyles.transactionCategory}>
-                                    {isRevenueItem ? t(categoryType as string) : category}
+                                    {isRevenueItem 
+                                        ? t(categoryType as string) 
+                                        : isSavingsTransaction(item)
+                                            ? t('savings')
+                                            : category
+                                    }
                                 </Text>
                             </View>
                         </View>
@@ -219,7 +258,11 @@ export default function RevenueCategoryDetails() {
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={[
                             revenueCategoryStyles.transactionAmount,
-                            isRevenueItem ? revenueCategoryStyles.revenueAmount : revenueCategoryStyles.expenseAmount,
+                            isRevenueItem 
+                                ? revenueCategoryStyles.revenueAmount 
+                                : isSavingsTransaction(item)
+                                    ? { color: '#F59E0B' }
+                                    : revenueCategoryStyles.expenseAmount,
                             { marginBottom: 4 }
                         ]}>
                             {isRevenueItem ? '+' : '-'}{formatAmount(item.amount)}
