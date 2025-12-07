@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Calendar } from 'lucide-react-native';
+import { X, Calendar } from 'lucide-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
 import { Goal, DEFAULT_GOAL_CATEGORIES } from '@/components/interfaces/savings';
@@ -19,6 +19,7 @@ interface AddGoalModalProps {
 }
 
 export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
+    console.log('AddGoalModal rendered with visible:', visible);
     const { t } = useTranslation();
     const { refreshData } = useData();
     const { currency } = useCurrency();
@@ -76,113 +77,102 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
         <Modal
             isVisible={visible}
             onBackdropPress={onClose}
-            onBackButtonPress={onClose}
-            animationIn="slideInUp"
-            animationOut="slideOutDown"
-            style={{ margin: 0 }}
+            style={{ justifyContent: 'flex-end', margin: 0 }}
+            propagateSwipe
         >
-            <KeyboardDismissWrapper>
-                <LinearGradient colors={['#6B7280', '#9CA3AF']} style={{ flex: 1 }}>
-
-                    {/* Header */}
-                    <View style={{ paddingTop: 60, paddingHorizontal: 20, paddingBottom: 20 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <TouchableOpacity onPress={onClose} style={{ marginRight: 16 }}>
-                                <ArrowLeft size={24} color="white" />
-                            </TouchableOpacity>
-
-                            <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'white' }}>
-                                {t('create_goal')}
-                            </Text>
-                        </View>
+            <KeyboardDismissWrapper style={{ flex: 0 }}>
+                <View style={{
+                    backgroundColor: '#FFFFFF',
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                    maxHeight: '90%',
+                    paddingTop: 20
+                }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 25, marginBottom: 20 }}>
+                        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1F2937' }}>
+                            {t('create_goal')}
+                        </Text>
+                        <TouchableOpacity onPress={onClose}>
+                            <X size={24} color="#6B7280" />
+                        </TouchableOpacity>
                     </View>
 
-                    {/* Content */}
-                    <View
-                        style={{
-                            flex: 1,
-                            backgroundColor: 'white',
-                            borderTopLeftRadius: 24,
-                            borderTopRightRadius: 24,
-                            paddingTop: 20,
-                        }}
-                    >
-                        <ScrollView style={{ paddingHorizontal: 20 }} showsVerticalScrollIndicator={false}>
+                    <ScrollView style={{ paddingHorizontal: 25 }} showsVerticalScrollIndicator={false}>
 
-                            <RequiredFieldIndicator label={t('goal_title')} required />
+                            <RequiredFieldIndicator label={t('goal_title')} required={true} />
                             <TextInput
+                                style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16 }}
+                                placeholder={t('enter_goal_title')}
                                 value={title}
                                 onChangeText={setTitle}
-                                placeholder={t('enter_goal_title')}
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: '#D1D5DB',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 16,
-                                    paddingVertical: 12,
-                                    fontSize: 16,
-                                    marginBottom: 20,
-                                }}
+                                autoFocus
                             />
 
-                            {/* Category buttons */}
-                            <Text style={{ fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 12 }}>
-                                {t('category')}
-                            </Text>
-
-                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-                                {DEFAULT_GOAL_CATEGORIES.map((category) => (
-                                    <TouchableOpacity
-                                        key={category.id}
-                                        onPress={() => setSelectedCategory(category)}
-                                        style={{
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            paddingHorizontal: 16,
-                                            paddingVertical: 10,
-                                            borderRadius: 20,
-                                            backgroundColor:
-                                                selectedCategory.id === category.id ? category.color : '#F3F4F6',
-                                            borderWidth: 1,
-                                            borderColor:
-                                                selectedCategory.id === category.id ? category.color : '#E5E7EB',
-                                        }}
-                                    >
-                                        <Text style={{ fontSize: 16, marginRight: 6 }}>{category.emoji}</Text>
-                                        <Text
-                                            style={{
-                                                color: selectedCategory.id === category.id ? 'white' : '#1F2937',
-                                                fontWeight: selectedCategory.id === category.id ? '600' : '400',
-                                            }}
-                                        >
-                                            {t(category.name)}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
+                            <RequiredFieldIndicator label={t('category')} required={true} />
+                            <View style={{ marginBottom: 15 }}>
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                                    {DEFAULT_GOAL_CATEGORIES.map((category) => {
+                                        const isSelected = selectedCategory.id === category.id;
+                                        return (
+                                            <TouchableOpacity
+                                                key={category.id}
+                                                style={{
+                                                    flexDirection: 'row',
+                                                    alignItems: 'center',
+                                                    backgroundColor: isSelected ? '#3B82F6' : '#F3F4F6',
+                                                    paddingHorizontal: 12,
+                                                    paddingVertical: 8,
+                                                    borderRadius: 20,
+                                                    gap: 6,
+                                                }}
+                                                onPress={() => setSelectedCategory(category)}
+                                            >
+                                                <Text style={{ fontSize: 16 }}>{category.emoji}</Text>
+                                                <Text style={{
+                                                    color: isSelected ? 'white' : '#374151',
+                                                    fontSize: 14,
+                                                    fontWeight: '500'
+                                                }}>{t(category.name)}</Text>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                </View>
                             </View>
 
-                            {/* Amount */}
-                            <RequiredFieldIndicator label={t('target_amount')} required />
+                            <RequiredFieldIndicator label={t('target_amount')} required={true} />
                             <NumericInput
+                                style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 10, fontSize: 16 }}
+                                placeholder={t('enter_target_amount')}
                                 value={targetAmount}
                                 onChangeText={setTargetAmount}
-                                placeholder={t('enter_target_amount')}
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: '#D1D5DB',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 16,
-                                    paddingVertical: 12,
-                                    fontSize: 16,
-                                    marginBottom: 20,
-                                }}
                             />
+                            
+                            {/* Quick Amount Buttons */}
+                            <View style={{ marginBottom: 15 }}>
+                                <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{t('quick_amounts')}</Text>
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                                    {[1000, 5000, 10000, 20000, 50000].map((amount) => (
+                                        <TouchableOpacity
+                                            key={amount}
+                                            style={{
+                                                backgroundColor: targetAmount === amount.toString() ? '#3B82F6' : '#F3F4F6',
+                                                paddingHorizontal: 16,
+                                                paddingVertical: 8,
+                                                borderRadius: 20,
+                                            }}
+                                            onPress={() => setTargetAmount(amount.toString())}
+                                        >
+                                            <Text style={{
+                                                color: targetAmount === amount.toString() ? 'white' : '#374151',
+                                                fontSize: 14,
+                                                fontWeight: '500'
+                                            }}>{amount}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
 
-                            {/* Deadline */}
-                            <Text style={{ fontSize: 16, fontWeight: '600', color: '#1F2937', marginBottom: 8 }}>
-                                {t('deadline')} ({t('optional')})
-                            </Text>
-
+                            <RequiredFieldIndicator label={`${t('deadline')} (${t('optional')})`} required={false} />
                             <TouchableOpacity
                                 onPress={() => setShowDatePicker(true)}
                                 style={{
@@ -191,9 +181,8 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
                                     borderWidth: 1,
                                     borderColor: '#D1D5DB',
                                     borderRadius: 12,
-                                    paddingHorizontal: 16,
-                                    paddingVertical: 12,
-                                    marginBottom: 20,
+                                    padding: 15,
+                                    marginBottom: 15,
                                 }}
                             >
                                 <Calendar size={20} color="#6B7280" style={{ marginRight: 12 }} />
@@ -215,48 +204,49 @@ export default function AddGoalModal({ visible, onClose }: AddGoalModalProps) {
                                 />
                             )}
 
-                            {/* Description */}
-                            <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} />
+                            <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
                             <TextInput
+                                style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 20, fontSize: 16, textAlignVertical: 'top' }}
+                                placeholder={t('enter_description')}
                                 value={description}
                                 onChangeText={setDescription}
-                                placeholder={t('enter_description')}
                                 multiline
-                                numberOfLines={3}
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: '#D1D5DB',
-                                    borderRadius: 12,
-                                    paddingHorizontal: 16,
-                                    paddingVertical: 12,
-                                    fontSize: 16,
-                                    marginBottom: 40,
-                                    textAlignVertical: 'top',
-                                }}
+                                numberOfLines={2}
                             />
-
-                            {/* Save button */}
-                            <TouchableOpacity onPress={handleSave} disabled={isLoading}>
-                                <LinearGradient
-                                    colors={['#3B82F6', '#1D4ED8']}
-                                    style={{
-                                        borderRadius: 12,
-                                        paddingVertical: 16,
-                                        alignItems: 'center',
-                                        opacity: isLoading ? 0.7 : 1,
-                                    }}
-                                >
-                                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-                                        {isLoading ? t('creating') : t('create_goal')}
-                                    </Text>
-                                </LinearGradient>
-                            </TouchableOpacity>
-
-                            <View style={{ height: 40 }} />
                         </ScrollView>
+
+                        <View style={{
+                            flexDirection: 'row',
+                            padding: 25,
+                            paddingTop: 15,
+                            borderTopWidth: 1,
+                            borderTopColor: '#F3F4F6',
+                            gap: 12
+                        }}>
+                            <TouchableOpacity
+                                style={{ flex: 1, backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16 }}
+                                onPress={onClose}
+                            >
+                                <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#6B7280' }}>{t('cancel')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{
+                                    flex: 2,
+                                    backgroundColor: '#3B82F6',
+                                    borderRadius: 12,
+                                    padding: 16,
+                                    opacity: (!title.trim() || !targetAmount || isLoading) ? 0.5 : 1
+                                }}
+                                onPress={handleSave}
+                                disabled={!title.trim() || !targetAmount || isLoading}
+                            >
+                                <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>
+                                    {isLoading ? t('creating') : t('create_goal')}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </LinearGradient>
-            </KeyboardDismissWrapper>
-        </Modal>
+                </KeyboardDismissWrapper>
+            </Modal>
     );
 }

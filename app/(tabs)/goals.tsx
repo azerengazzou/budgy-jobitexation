@@ -9,7 +9,7 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { GoalCard } from '@/components/GoalCard';
 import { SwipeToDelete } from '@/components/SwipeToDelete';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
-import { CreateGoalModal } from '@/components/CreateGoalModal';
+import AddGoalModal from '../addGoalModal';
 import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
 import { storageService } from '@/services/storage';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -38,7 +38,9 @@ export default function GoalsScreen() {
   };
 
   const handleAddGoal = () => {
+    console.log('Create goal button pressed');
     setShowCreateGoalModal(true);
+    console.log('Modal state set to true');
   };
 
 
@@ -105,35 +107,46 @@ export default function GoalsScreen() {
 
   if (allVisibleGoals.length === 0) {
     return (
-      <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
-        <View style={genStyles.header}>
-          <Text style={genStyles.headerTitle}>{t('savings_goals')}</Text>
-          <Text style={genStyles.headerSubtitle}>{t('track_your_financial_goals')}</Text>
-        </View>
-
-        <View style={genStyles.totalSavingsCard}>
-          <Text style={genStyles.totalAmount}>{formatAmount(totalSavings)}</Text>
-          <Text style={genStyles.totalLabel}>{t('total_savings')}</Text>
-        </View>
-
-        <View style={genStyles.contentSection}>
-          <View style={genStyles.emptyState}>
-            <Target size={64} color="#D1D5DB" style={genStyles.emptyStateIcon} />
-            <Text style={genStyles.emptyStateTitle}>{t('no_goals_yet')}</Text>
-            <Text style={genStyles.emptyStateText}>
-              {t('create_your_first_savings_goal_to_start_tracking_progress')}
-            </Text>
-            <TouchableOpacity onPress={handleAddGoal} style={[genStyles.addButton, { marginTop: 20 }]}>
-              <Text style={genStyles.addButtonText}>{t('create_goal')}</Text>
-            </TouchableOpacity>
+      <>
+        <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+          <View style={genStyles.header}>
+            <Text style={genStyles.headerTitle}>{t('savings_goals')}</Text>
+            <Text style={genStyles.headerSubtitle}>{t('track_your_financial_goals')}</Text>
           </View>
-        </View>
-      </LinearGradient>
+
+          <View style={genStyles.totalSavingsCard}>
+            <Text style={genStyles.totalAmount}>{formatAmount(totalSavings)}</Text>
+            <Text style={genStyles.totalLabel}>{t('total_savings')}</Text>
+          </View>
+
+          <View style={genStyles.contentSection}>
+            <View style={genStyles.emptyState}>
+              <Target size={64} color="#D1D5DB" style={genStyles.emptyStateIcon} />
+              <Text style={genStyles.emptyStateTitle}>{t('no_goals_yet')}</Text>
+              <Text style={genStyles.emptyStateText}>
+                {t('create_your_first_savings_goal_to_start_tracking_progress')}
+              </Text>
+              <TouchableOpacity onPress={handleAddGoal} style={[genStyles.addButton, { marginTop: 20 }]} activeOpacity={0.7}>
+                <Text style={genStyles.addButtonText}>{t('create_goal')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </LinearGradient>
+        
+        <AddGoalModal
+          visible={showCreateGoalModal}
+          onClose={() => {
+            console.log('Closing modal');
+            setShowCreateGoalModal(false);
+          }}
+        />
+      </>
     );
   }
 
   return (
-    <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
+    <>
+      <LinearGradient colors={['#0A2540', '#4A90E2']} style={genStyles.container}>
       <View style={genStyles.header}>
         <Text style={genStyles.headerTitle}>{t('savings_goals')}</Text>
         <Text style={genStyles.headerSubtitle}>
@@ -176,10 +189,15 @@ export default function GoalsScreen() {
         />
       )}
       
-      <CreateGoalModal
+      </LinearGradient>
+      
+      <AddGoalModal
         visible={showCreateGoalModal}
-        onClose={() => setShowCreateGoalModal(false)}
+        onClose={() => {
+          console.log('Closing modal');
+          setShowCreateGoalModal(false);
+        }}
       />
-    </LinearGradient>
+    </>
   );
 }

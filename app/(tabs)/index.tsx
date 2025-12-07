@@ -32,7 +32,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   const { t, i18n } = useTranslation();
-  const { revenues, expenses, savings, refreshData } = useData();
+  const { revenues, expenses, goals, refreshData } = useData();
   const { formatAmount } = useCurrency();
   const [data, setData] = useState<{
     totalRevenues: number;
@@ -57,8 +57,7 @@ export default function Dashboard() {
   const calculateData = () => {
     const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
     const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const savingsFromExpenses = expenses.filter(exp => exp.category === 'savings').reduce((sum, exp) => sum + exp.amount, 0);
-    const totalSavings = savings.reduce((sum, sav) => sum + sav.amount, 0) + savingsFromExpenses;
+    const totalSavings = goals.reduce((sum, goal) => sum + goal.currentAmount, 0);
 
     const expensesByCategory = expenses.reduce<{ name: string; amount: number; }[]>((acc, expense) => {
       const existing = acc.find(item => item.name === expense.category);
@@ -89,7 +88,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     calculateData();
-  }, [revenues, expenses, savings]);
+  }, [revenues, expenses, goals]);
 
   const openProfileModal = async () => {
     try {
@@ -131,7 +130,7 @@ export default function Dashboard() {
     legendFontSize: 12,
   }));
 
-  const remainingBalance = data.totalRevenues - data.totalExpenses;
+  const remainingBalance = data.totalRevenues - data.totalExpenses - data.totalSavings;
 
   const formatDate = () => {
     const now = new Date();
