@@ -72,6 +72,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="profile" />
           <Stack.Screen name="revenue-category-details" />
           <Stack.Screen name="+not-found" />
         </Stack>

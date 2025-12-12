@@ -183,7 +183,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <LinearGradient colors={['#6B7280', '#4B5563']} style={styles.container}>
+    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('settings')}</Text>
         <Text style={styles.headerSubtitle}>{t('customize_your_experience')}</Text>
