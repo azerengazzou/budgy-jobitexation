@@ -6,18 +6,27 @@ export const styles = StyleSheet.create({
     },
     header: {
         paddingTop: 60,
-        paddingHorizontal: 20,
-        paddingBottom: 30,
+        paddingHorizontal: 24,
+        paddingBottom: 20,
+    },
+    headerTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    headerTextContainer: {
+        flex: 1,
     },
     headerTitle: {
-        fontSize: 32,
-        fontWeight: 'bold',
+        fontSize: 20,
+        fontWeight: '700',
         color: '#FFFFFF',
-        marginBottom: 5,
+        letterSpacing: -0.5,
     },
     headerSubtitle: {
-        fontSize: 16,
-        color: '#D1D5DB',
+        fontSize: 15,
+        fontWeight: '500',
+        color: 'rgba(255, 255, 255, 0.8)',
+        marginLeft: 13,
     },
     scrollContainer: {
         flex: 1,
@@ -29,7 +38,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     section: {
-        marginBottom: 30,
+        marginBottom: 12,
     },
     sectionTitle: {
         fontSize: 20,
@@ -40,8 +49,8 @@ export const styles = StyleSheet.create({
     settingCard: {
         backgroundColor: '#FFFFFF',
         borderRadius: 16,
-        padding: 20,
-        marginBottom: 10,
+        padding: 16,
+        marginBottom: 8,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -49,7 +58,9 @@ export const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
-        elevation: 3,
+        elevation: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     settingLeft: {
         flexDirection: 'row',
@@ -57,21 +68,42 @@ export const styles = StyleSheet.create({
         flex: 1,
     },
     settingText: {
-        marginLeft: 15,
+        marginLeft: 12,
         flex: 1,
     },
     settingTitle: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '600',
         color: '#1F2937',
+        marginBottom: 2,
     },
     settingSubtitle: {
-        fontSize: 14,
+        fontSize: 13,
         color: '#6B7280',
-        marginTop: 2,
+        lineHeight: 16,
+    },
+    iconContainer: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: -4,
+    },
+    notificationCard: {
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        borderColor: 'rgba(16, 185, 129, 0.2)',
+    },
+    backupCard: {
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        borderColor: 'rgba(16, 185, 129, 0.2)',
+    },
+    dangerCard: {
+        backgroundColor: 'rgba(239, 68, 68, 0.05)',
+        borderColor: 'rgba(239, 68, 68, 0.2)',
     },
     picker: {
-        width: 120,
+        width: 140,
     },
     adjustButton: {
         backgroundColor: '#3B82F6',
@@ -119,9 +151,11 @@ export const styles = StyleSheet.create({
         marginTop: 10,
     },
     backButton: {
-  marginRight: 16,
-  padding: 8,
-},
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 
     cancelButton: {
         flex: 1,

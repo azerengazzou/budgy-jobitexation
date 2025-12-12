@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
-import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3, Trash2 } from 'lucide-react-native';
+import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3, Trash2, ArrowLeft } from 'lucide-react-native';
 import { storageService } from '../../services/storage';
 import { notificationService } from '../../services/notifications';
 import { useTranslation } from 'react-i18next';
@@ -185,8 +185,18 @@ export default function SettingsScreen() {
   return (
     <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('settings')}</Text>
-        <Text style={styles.headerSubtitle}>{t('customize_your_experience')}</Text>
+        <View style={styles.headerTop}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => require('expo-router').router.back()}
+          >
+            <ArrowLeft size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>{t('settings')}</Text>
+            <Text style={styles.headerSubtitle}>{t('customize_your_experience')}</Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView
@@ -204,7 +214,7 @@ export default function SettingsScreen() {
 
           <View style={styles.settingCard}>
             <View style={styles.settingLeft}>
-              <Globe size={24} color="#8B5CF6" />
+              <Globe size={20} color="#8B5CF6" />
               <View style={styles.settingText}>
                 <Text style={styles.settingTitle}>{t('language')}</Text>
                 <Text style={styles.settingSubtitle}>{t(`language_${language}`)}</Text>
@@ -223,7 +233,7 @@ export default function SettingsScreen() {
 
           <View style={styles.settingCard}>
             <View style={styles.settingLeft}>
-              <DollarSign size={24} color="#F59E0B" />
+              <DollarSign size={20} color="#F59E0B" />
               <View style={styles.settingText}>
                 <Text style={styles.settingTitle}>{t('currency')}</Text>
                 <Text style={styles.settingSubtitle}>{currency}</Text>
@@ -246,7 +256,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{t('notifications')}</Text>
           <View style={styles.settingCard}>
             <View style={styles.settingLeft}>
-              <Bell size={24} color="#EF4444" />
+              <Bell size={20} color="#EF4444" />
               <View style={styles.settingText}>
                 <Text style={styles.settingTitle}>{t('enable_notifications')}</Text>
                 <Text style={styles.settingSubtitle}>{t('daily_reminders')}</Text>
@@ -281,7 +291,7 @@ export default function SettingsScreen() {
               }
             }}>
             <View style={styles.settingLeft}>
-              <FileText size={24} color="#10B981" />
+              <FileText size={20} color="#10B981" />
               <View style={styles.settingText}>
                 <Text style={styles.settingTitle}>Manual Backup</Text>
                 <Text style={styles.settingSubtitle}>
@@ -295,36 +305,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Export */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('export')}</Text>
-          <View style={[styles.settingCard, { opacity: 0.5, position: 'relative' }]}>
-            <View style={styles.settingLeft}>
-              <FileText size={24} color="#6366F1" />
-              <View style={styles.settingText}>
-                <Text style={[styles.settingTitle, { color: '#6366F1' }]}>{t('export_report')}</Text>
-                <Text style={[styles.settingSubtitle, { color: '#6366F1' }]}>{t('generate_monthly_pdf')}</Text>
-              </View>
-            </View>
-            <View style={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              backgroundColor: '#F59E0B',
-              borderRadius: 6,
-              paddingHorizontal: 4,
-              paddingVertical: 1,
-              minWidth: 24,
-            }}>
-              <Text style={{
-                color: '#FFFFFF',
-                fontSize: 12,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>{t('soon')}</Text>
-            </View>
-          </View>
-        </View>
+
 
         {/* Data Management */}
         <View style={styles.section}>
@@ -335,7 +316,7 @@ export default function SettingsScreen() {
             activeOpacity={0.7}
           >
             <View style={styles.settingLeft}>
-              <Trash2 size={24} color="#EF4444" />
+              <Trash2 size={20} color="#EF4444" />
               <View style={styles.settingText}>
                 <Text style={[styles.settingTitle, { color: '#EF4444' }]}>{t('delete_all_data')}</Text>
                 <Text style={styles.settingSubtitle}>{t('permanently_delete_all_data')}</Text>
