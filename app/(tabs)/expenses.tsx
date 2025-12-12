@@ -104,6 +104,35 @@ export default function ExpensesScreen() {
     }
   }, [expenses]);
 
+  const handleDeleteExpense = useCallback((expense: Expense, onCancel?: () => void) => {
+    Alert.alert(
+      t('delete_expense'),
+      t('delete_expense_confirm'),
+      [
+        { 
+          text: t('cancel'), 
+          style: 'cancel',
+          onPress: onCancel
+        },
+        {
+          text: t('delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await storageService.deleteExpense(expense.id);
+              await storageService.addToRevenue(expense.revenueSourceId, expense.amount);
+              await updateExpenses();
+              await updateRevenues();
+            } catch (error) {
+              console.error('Delete error:', error);
+              Alert.alert(t('error'), t('failed_to_delete_expense'));
+            }
+          },
+        },
+      ]
+    );
+  }, [t, updateExpenses, updateRevenues]);
+
   const renderExpenseCard = useCallback(({ item }: { item: Expense }) => (
     <ExpenseCard
       item={item}
@@ -135,35 +164,6 @@ export default function ExpensesScreen() {
     });
     setModalVisible(true);
   }, []);
-
-  const handleDeleteExpense = useCallback((expense: Expense, onCancel?: () => void) => {
-    Alert.alert(
-      t('delete_expense'),
-      t('delete_expense_confirm'),
-      [
-        { 
-          text: t('cancel'), 
-          style: 'cancel',
-          onPress: onCancel
-        },
-        {
-          text: t('delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await storageService.deleteExpense(expense.id);
-              await storageService.addToRevenue(expense.revenueSourceId, expense.amount);
-              await updateExpenses();
-              await updateRevenues();
-            } catch (error) {
-              console.error('Delete error:', error);
-              Alert.alert(t('error'), t('failed_to_delete_expense'));
-            }
-          },
-        },
-      ]
-    );
-  }, [t, updateExpenses, updateRevenues]);
 
   if (isLoading) {
     return <LoadingScreen />;

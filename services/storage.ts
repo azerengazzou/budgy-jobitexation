@@ -119,7 +119,7 @@ class StorageService extends RevenueStorageService {
   async deleteSavingsTransaction(transactionId: string) {
     const transactions = await this.getSavingsTransactions();
     const updatedTransactions = transactions.filter(t => t.id !== transactionId);
-    await this.savingsStorage.setItem('savings_transactions', updatedTransactions);
+    await this.setItem('savings_transactions', updatedTransactions);
     await backupService.autoBackup();
   }
 
