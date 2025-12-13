@@ -21,4 +21,5 @@ export const STORAGE_KEYS = {
   GOALS: 'goals',
   CATEGORIES: 'categories',
   SETTINGS: 'settings',
+  REVENUE_TRANSACTIONS: 'revenue_transactions',
 } as const;

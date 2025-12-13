@@ -1,4 +1,4 @@
-import { Revenue } from '@/components/interfaces/revenues';
+import { Revenue, RevenueTransaction } from '@/components/interfaces/revenues';
 import { BaseStorageService } from './storage-base';
 import { STORAGE_KEYS } from './storage-types';
 import { normalizeAmount } from '@/components/NumericInput';
@@ -53,5 +53,47 @@ export class RevenueStorageService extends BaseStorageService {
 
   async addToRevenue(revenueId: string, amount: number): Promise<void> {
     await this.updateRevenueAmount(revenueId, amount);
+  }
+
+  async getRevenueTransactions(): Promise<RevenueTransaction[]> {
+    return (await this.getItem<RevenueTransaction[]>(STORAGE_KEYS.REVENUE_TRANSACTIONS)) || [];
+  }
+
+  async addRevenueTransaction(transaction: RevenueTransaction): Promise<void> {
+    const transactions = await this.getRevenueTransactions();
+    transactions.push({
+      ...transaction,
+      amount: normalizeAmount(transaction.amount)
+    });
+    await this.setItem(STORAGE_KEYS.REVENUE_TRANSACTIONS, transactions);
+  }
+
+  async getRevenueTransactionsByType(revenueTypeId: string): Promise<RevenueTransaction[]> {
+    const transactions = await this.getRevenueTransactions();
+    return transactions.filter(t => t.revenueTypeId === revenueTypeId);
+  }
+
+  async deleteRevenueTransactionsByType(revenueTypeId: string): Promise<void> {
+    const transactions = await this.getRevenueTransactions();
+    const filtered = transactions.filter(t => t.revenueTypeId !== revenueTypeId);
+    await this.setItem(STORAGE_KEYS.REVENUE_TRANSACTIONS, filtered);
+  }
+
+  async deleteRevenueTransaction(transactionId: string): Promise<void> {
+    const transactions = await this.getRevenueTransactions();
+    const filtered = transactions.filter(t => t.id !== transactionId);
+    await this.setItem(STORAGE_KEYS.REVENUE_TRANSACTIONS, filtered);
+  }
+
+  async updateRevenueTransaction(updatedTransaction: RevenueTransaction): Promise<void> {
+    const transactions = await this.getRevenueTransactions();
+    const index = transactions.findIndex(t => t.id === updatedTransaction.id);
+    if (index !== -1) {
+      transactions[index] = {
+        ...updatedTransaction,
+        amount: normalizeAmount(updatedTransaction.amount)
+      };
+      await this.setItem(STORAGE_KEYS.REVENUE_TRANSACTIONS, transactions);
+    }
   }
 }

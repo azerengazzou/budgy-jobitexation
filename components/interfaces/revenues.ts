@@ -7,6 +7,15 @@ export interface Revenue {
     createdAt: string;
 }
 
+export interface RevenueTransaction {
+    id: string;
+    revenueTypeId: string;
+    name: string;
+    amount: number;
+    date: string;
+    createdAt: string;
+}
+
 export type RevenueForm = {
     name: string;
     amount: string;

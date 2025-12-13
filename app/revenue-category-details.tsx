@@ -9,7 +9,7 @@ import { useData } from '@/contexts/DataContext';
 import { SavingsTransaction } from '@/components/interfaces/savings';
 import { storageService } from '@/services/storage';
 import { Alert } from 'react-native';
-import { Revenue } from '@/components/interfaces/revenues';
+import { Revenue, RevenueTransaction } from '@/components/interfaces/revenues';
 import { Expense } from '@/components/interfaces/expenses';
 import { revenueCategoryStyles } from '@/components/style/revenue-category-details.styles';
 import { CategoryIcon } from '@/components/CategoryIcons';
@@ -18,7 +18,7 @@ import { RevenueModal } from '@/components/RevenueModal';
 import { ExpenseModal } from '@/components/ExpenseModal';
 import { normalizeAmount } from '@/components/NumericInput';
 
-type CategoryEntry = Revenue | Expense | SavingsTransaction;
+type CategoryEntry = RevenueTransaction | Expense | SavingsTransaction;
 
 export default function RevenueCategoryDetails() {
     const { t } = useTranslation();
@@ -27,12 +27,14 @@ export default function RevenueCategoryDetails() {
     const { categoryType } = useLocalSearchParams();
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
+    const [revenueTransactions, setRevenueTransactions] = useState<RevenueTransaction[]>([]);
     
     // Modal states
     const [isRevenueModalVisible, setRevenueModalVisible] = useState(false);
     const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
     const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
     const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+    const [editingRevenueTransaction, setEditingRevenueTransaction] = useState<RevenueTransaction | null>(null);
     const [revenueFormData, setRevenueFormData] = useState<{
         name: string;
         amount: string;
@@ -53,13 +55,22 @@ export default function RevenueCategoryDetails() {
         date: new Date(),
     });
 
-    const isRevenue = (item: CategoryEntry): item is Revenue => {
-        return "remainingAmount" in item;
+    const isRevenueTransaction = (item: CategoryEntry): item is RevenueTransaction => {
+        return "revenueTypeId" in item;
     };
 
     const isSavingsTransaction = (item: CategoryEntry): item is SavingsTransaction => {
         return "goalId" in item && "type" in item;
     };
+
+    // Load revenue transactions on mount
+    React.useEffect(() => {
+        const loadTransactions = async () => {
+            const transactions = await storageService.getRevenueTransactionsByType(categoryType as string);
+            setRevenueTransactions(transactions);
+        };
+        loadTransactions();
+    }, [categoryType]);
 
     const categoryRevenues = revenues.filter(r => r.type === categoryType);
     const revenueIdsForCategory = categoryRevenues.map(r => r.id);
@@ -71,16 +82,16 @@ export default function RevenueCategoryDetails() {
     );
 
     const allEntries: CategoryEntry[] = useMemo(() => {
-        const entries = [...categoryRevenues, ...categoryExpenses, ...categorySavings]
+        const entries = [...revenueTransactions, ...categoryExpenses, ...categorySavings]
             .sort((a, b) => {
                 const aDate = 'createdAt' in a ? a.createdAt : a.date;
                 const bDate = 'createdAt' in b ? b.createdAt : b.date;
                 return new Date(bDate).getTime() - new Date(aDate).getTime();
             });
         return filterTransactionsByDate(entries, dateFilter, customDateRange);
-    }, [categoryRevenues, categoryExpenses, categorySavings, dateFilter, customDateRange]);
+    }, [revenueTransactions, categoryExpenses, categorySavings, dateFilter, customDateRange]);
 
-    const totalAmount = categoryRevenues.reduce((s, r) => s + r.amount, 0);
+    const totalAmount = revenueTransactions.reduce((s, r) => s + r.amount, 0);
     const totalExpenses = categoryExpenses.reduce((s, e) => s + e.amount, 0);
     const totalSavings = categorySavings.reduce((s, st) => s + st.amount, 0);
     const totalRemaining = totalAmount - totalExpenses - totalSavings;
@@ -95,8 +106,7 @@ export default function RevenueCategoryDetails() {
     };
 
     const handleDeleteTransaction = async (item: CategoryEntry) => {
-        const isRevenueItem = isRevenue(item);
-        const itemType = isRevenueItem ? t('revenue') : t('expense');
+        const itemType = isRevenueTransaction(item) ? t('revenue') : isSavingsTransaction(item) ? t('savings') : t('expense');
         
         Alert.alert(
             t('delete') + ' ' + itemType,
@@ -108,9 +118,22 @@ export default function RevenueCategoryDetails() {
                     style: 'destructive',
                     onPress: async () => {
                         try {
-                            if (isRevenueItem) {
-                                await storageService.deleteRevenue(item.id);
+                            if (isRevenueTransaction(item)) {
+                                // Delete revenue transaction and update revenue totals
+                                const categoryRevenue = revenues.find(r => r.type === item.revenueTypeId);
+                                if (categoryRevenue) {
+                                    const updatedRevenue = {
+                                        ...categoryRevenue,
+                                        amount: categoryRevenue.amount - item.amount,
+                                        remainingAmount: categoryRevenue.remainingAmount - item.amount
+                                    };
+                                    await storageService.updateRevenue(updatedRevenue);
+                                }
+                                await storageService.deleteRevenueTransaction(item.id);
                                 await updateRevenues();
+                                // Reload transactions
+                                const transactions = await storageService.getRevenueTransactionsByType(categoryType as string);
+                                setRevenueTransactions(transactions);
                             } else if (isSavingsTransaction(item)) {
                                 await storageService.deleteSavingsTransaction(item.id);
                                 if (item.revenueSourceId) {
@@ -134,18 +157,17 @@ export default function RevenueCategoryDetails() {
     };
 
     const handleEditTransaction = (item: CategoryEntry) => {
-        const isRevenueItem = isRevenue(item);
-        
-        if (isRevenueItem) {
-            setEditingRevenue(item);
+        if (isRevenueTransaction(item)) {
+            // Edit revenue transaction
+            setEditingRevenueTransaction(item);
             setRevenueFormData({
                 name: item.name,
                 amount: item.amount.toString(),
-                type: item.type,
-                date: new Date(item.createdAt),
+                type: item.revenueTypeId as Revenue['type'],
+                date: new Date(item.date),
             });
             setRevenueModalVisible(true);
-        } else {
+        } else if (!isSavingsTransaction(item)) {
             const expense = item as Expense;
             setEditingExpense(expense);
             setExpenseFormData({
@@ -168,32 +190,37 @@ export default function RevenueCategoryDetails() {
 
         try {
             const normalizedAmount = normalizeAmount(revenueFormData.amount);
-            let remainingAmount = normalizedAmount;
             
-            if (editingRevenue) {
-                const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === editingRevenue.id);
-                const totalExpenses = relatedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-                remainingAmount = normalizeAmount(normalizedAmount - totalExpenses);
-            }
-
-            const revenue: Revenue = {
-                id: editingRevenue?.id || Date.now().toString(),
-                name: revenueFormData.name,
-                amount: normalizedAmount,
-                type: revenueFormData.type,
-                remainingAmount: normalizeAmount(remainingAmount),
-                createdAt: editingRevenue?.createdAt || revenueFormData.date.toISOString(),
-            };
-
-            if (editingRevenue) {
-                await storageService.updateRevenue(revenue);
-            } else {
-                await storageService.addRevenue(revenue);
+            if (editingRevenueTransaction) {
+                // Update revenue transaction and adjust revenue totals
+                const categoryRevenue = revenues.find(r => r.type === editingRevenueTransaction.revenueTypeId);
+                if (categoryRevenue) {
+                    const amountDifference = normalizedAmount - editingRevenueTransaction.amount;
+                    const updatedRevenue = {
+                        ...categoryRevenue,
+                        amount: categoryRevenue.amount + amountDifference,
+                        remainingAmount: categoryRevenue.remainingAmount + amountDifference
+                    };
+                    await storageService.updateRevenue(updatedRevenue);
+                }
+                
+                // Update transaction (implement this method)
+                const updatedTransaction = {
+                    ...editingRevenueTransaction,
+                    name: revenueFormData.name,
+                    amount: normalizedAmount,
+                    date: revenueFormData.date.toISOString(),
+                };
+                await storageService.updateRevenueTransaction(updatedTransaction);
+                
+                // Reload transactions
+                const transactions = await storageService.getRevenueTransactionsByType(categoryType as string);
+                setRevenueTransactions(transactions);
             }
 
             await updateRevenues();
             setRevenueModalVisible(false);
-            setEditingRevenue(null);
+            setEditingRevenueTransaction(null);
         } catch (error) {
             console.error('Error saving revenue:', error);
             Alert.alert(t('error'), t('failed_to_save_revenue'));
@@ -201,7 +228,7 @@ export default function RevenueCategoryDetails() {
     };
 
     const renderTransaction = ({ item }: { item: CategoryEntry }) => {
-        const isRevenueItem = isRevenue(item);
+        const isRevenueItem = isRevenueTransaction(item);
         const isSavings = isSavingsTransaction(item);
         const category = isRevenueItem 
             ? (categoryType as string) 
@@ -269,7 +296,10 @@ export default function RevenueCategoryDetails() {
                         </Text>
                         <View style={{ flexDirection: 'row' }}>
                             <TouchableOpacity
-                                onPress={() => handleEditTransaction(item)}
+                                onPress={(e) => {
+                                    e.stopPropagation();
+                                    handleEditTransaction(item);
+                                }}
                                 style={{
                                     padding: 4,
                                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -280,7 +310,10 @@ export default function RevenueCategoryDetails() {
                                 <Edit3 size={12} color="#3B82F6" />
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={() => handleDeleteTransaction(item)}
+                                onPress={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteTransaction(item);
+                                }}
                                 style={{
                                     padding: 4,
                                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -409,11 +442,12 @@ export default function RevenueCategoryDetails() {
                 onClose={() => {
                     setRevenueModalVisible(false);
                     setEditingRevenue(null);
+                    setEditingRevenueTransaction(null);
                 }}
                 onSave={handleSaveRevenue}
                 formData={revenueFormData}
                 setFormData={setRevenueFormData}
-                editingRevenue={editingRevenue}
+                editingRevenue={editingRevenueTransaction ? null : editingRevenue}
                 hasSalarySet={false}
                 t={t}
             />

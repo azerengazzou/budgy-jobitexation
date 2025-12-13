@@ -41,7 +41,7 @@ export default function RevenuesScreen() {
     });
 
     const hasSalarySet = revenues.some(
-        (rev) => rev.type === 'salary' && rev.amount > 0
+        (rev) => rev.type === 'salary'
     );
 
     const openModalSmooth = () => {
@@ -112,26 +112,71 @@ export default function RevenuesScreen() {
 
         try {
             const normalizedAmount = normalizeAmount(formData.amount);
-            let remainingAmount = normalizedAmount;
+
             if (editingRevenue) {
+                // Update existing revenue
                 const expenses = await storageService.getExpenses();
                 const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === editingRevenue.id);
                 const totalExpenses = relatedExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-                remainingAmount = normalizeAmount(normalizedAmount - totalExpenses);
+                const remainingAmount = normalizeAmount(normalizedAmount - totalExpenses);
+
+                const revenue: Revenue = {
+                    id: editingRevenue.id,
+                    name: formData.name,
+                    amount: normalizedAmount,
+                    type: formData.type,
+                    remainingAmount: normalizeAmount(remainingAmount),
+                    createdAt: editingRevenue.createdAt,
+                };
+
+                await storageService.updateRevenue(revenue);
+            } else {
+                // Check if revenue type already exists
+                const existingRevenue = revenues.find(rev => rev.type === formData.type);
+
+                if (existingRevenue) {
+                    // Add to existing revenue type
+                    const updatedRevenue: Revenue = {
+                        ...existingRevenue,
+                        amount: normalizeAmount(existingRevenue.amount + normalizedAmount),
+                        remainingAmount: normalizeAmount(existingRevenue.remainingAmount + normalizedAmount),
+                    };
+                    await storageService.updateRevenue(updatedRevenue);
+
+                    // Create transaction record
+                    const transaction = {
+                        id: Date.now().toString(),
+                        revenueTypeId: existingRevenue.type,
+                        name: formData.name,
+                        amount: normalizedAmount,
+                        date: formData.date.toISOString(),
+                        createdAt: new Date().toISOString(),
+                    };
+                    await storageService.addRevenueTransaction(transaction);
+                } else {
+                    // Create new revenue type
+                    const revenue: Revenue = {
+                        id: Date.now().toString(),
+                        name: formData.name,
+                        amount: normalizedAmount,
+                        type: formData.type,
+                        remainingAmount: normalizedAmount,
+                        createdAt: formData.date.toISOString(),
+                    };
+                    await storageService.addRevenue(revenue);
+
+                    // Create initial transaction record
+                    const transaction = {
+                        id: Date.now().toString() + '_init',
+                        revenueTypeId: formData.type,
+                        name: formData.name,
+                        amount: normalizedAmount,
+                        date: formData.date.toISOString(),
+                        createdAt: new Date().toISOString(),
+                    };
+                    await storageService.addRevenueTransaction(transaction);
+                }
             }
-
-            const revenue: Revenue = {
-                id: editingRevenue?.id || Date.now().toString(),
-                name: formData.name,
-                amount: normalizedAmount,
-                type: formData.type,
-                remainingAmount: normalizeAmount(remainingAmount),
-                createdAt: editingRevenue?.createdAt || formData.date.toISOString(),
-            };
-
-            editingRevenue
-                ? await storageService.updateRevenue(revenue)
-                : await storageService.addRevenue(revenue);
 
             await updateRevenues();
             handleCloseModal();
@@ -143,85 +188,48 @@ export default function RevenuesScreen() {
 
     const handleDeleteRevenue = useCallback(async (id: string, onCancel?: () => void) => {
         try {
-            // Check if this is a revenue type (grouped) or individual revenue ID
-            const isRevenueType = ['salary', 'freelance', 'business', 'investment', 'other'].includes(id);
+            // Delete all revenues of this type
+            const revenuesOfType = revenues.filter(rev => rev.type === id);
+            const expenses = await storageService.getExpenses();
+            const relatedExpenses = expenses.filter(exp =>
+                revenuesOfType.some(rev => rev.id === exp.revenueSourceId)
+            );
 
-            if (isRevenueType) {
-                // Delete all revenues of this type
-                const revenuesOfType = revenues.filter(rev => rev.type === id);
-                const expenses = await storageService.getExpenses();
-                const relatedExpenses = expenses.filter(exp =>
-                    revenuesOfType.some(rev => rev.id === exp.revenueSourceId)
-                );
-
-                Alert.alert(
-                    t('delete_revenue_category'),
-                    t('delete_revenue_category_message'),
-                    [
-                        {
-                            text: t('cancel'),
-                            style: 'cancel',
-                            onPress: () => onCancel?.()
-                        },
-                        {
-                            text: t('delete'),
-                            style: 'destructive',
-                            onPress: async () => {
-                                try {
-                                    for (const revenue of revenuesOfType) {
-                                        await storageService.deleteRevenue(revenue.id);
-                                    }
-                                    if (relatedExpenses.length > 0) {
-                                        for (const expense of relatedExpenses) {
-                                            await storageService.deleteExpense(expense.id);
-                                        }
-                                    }
-                                    await updateRevenues();
-                                    await updateExpenses();
-                                } catch (error) {
-                                    console.error('Error deleting revenue category:', error);
-                                    Alert.alert(t('error'), t('failed_to_delete_revenue'));
-                                    onCancel?.();
+            Alert.alert(
+                t('delete_revenue_category'),
+                t('delete_revenue_category_message'),
+                [
+                    {
+                        text: t('cancel'),
+                        style: 'cancel',
+                        onPress: () => onCancel?.()
+                    },
+                    {
+                        text: t('delete'),
+                        style: 'destructive',
+                        onPress: async () => {
+                            try {
+                                for (const revenue of revenuesOfType) {
+                                    await storageService.deleteRevenue(revenue.id);
                                 }
-                            },
-                        },
-                    ]
-                );
-            } else {
-                // Delete individual revenue
-                const expenses = await storageService.getExpenses();
-                const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
-
-                Alert.alert(
-                    t('delete_revenue_category'),
-                    t('delete_revenue_category_message'),
-                    [
-                        {
-                            text: t('cancel'),
-                            style: 'cancel',
-                            onPress: () => onCancel?.()
-                        },
-                        {
-                            text: t('delete'),
-                            style: 'destructive',
-                            onPress: async () => {
-                                try {
-                                    await storageService.deleteRevenue(id);
-                                    if (relatedExpenses.length > 0) {
-                                        await storageService.deleteExpensesByRevenueId(id);
+                                // Delete revenue transactions
+                                await storageService.deleteRevenueTransactionsByType(id);
+                                if (relatedExpenses.length > 0) {
+                                    for (const expense of relatedExpenses) {
+                                        await storageService.deleteExpense(expense.id);
                                     }
-                                    await updateRevenues();
-                                    await updateExpenses();
-                                } catch (error) {
-                                    console.error('Error deleting revenue:', error);
-                                    Alert.alert(t('error'), t('failed_to_delete_revenue'));
-                                    onCancel?.();
                                 }
-                            },
+                                await updateRevenues();
+                                await updateExpenses();
+                            } catch (error) {
+                                console.error('Error deleting revenue category:', error);
+                                Alert.alert(t('error'), t('failed_to_delete_revenue'));
+                                onCancel?.();
+                            }
                         },
-                    ]
-                );
-            }
+                    },
+                ]
+            );
         } catch (error) {
             console.error('Error checking related expenses:', error);
             Alert.alert(t('error'), t('failed_to_delete_revenue'));
@@ -291,6 +299,7 @@ export default function RevenuesScreen() {
                             borderRadius: 10,
                             padding: 10,
                             marginRight: 12,
+                            marginBottom: 4,
                         }}>
                             <CategoryIcon
                                 category={item.type}
@@ -300,15 +309,16 @@ export default function RevenuesScreen() {
                             />
                         </View>
                         <View style={genStyles.goalInfo}>
-                            <Text style={genStyles.goalTitle}>{item.name}</Text>
-                            <Text style={genStyles.goalCategory}>
+                            <Text style={genStyles.goalTitle}>
                                 {t(item.type)}
+                            </Text>
+                            <Text style={genStyles.goalCategory}>
+                                {usagePercentage.toFixed(0)}% {t('used')}
                             </Text>
                         </View>
                         <Text style={genStyles.progressPercentage}>
                             {formatAmount(item.amount)}
                         </Text>
-
                     </View>
 
                     <View style={genStyles.goalProgress}>
@@ -330,7 +340,7 @@ export default function RevenuesScreen() {
                             {formatAmount(item.remainingAmount)}
                         </Text>
                         <Text style={genStyles.targetAmount}>
-                            {t('of')} {formatAmount(item.amount)}
+                            {t('remaining')}
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -354,9 +364,7 @@ export default function RevenuesScreen() {
                     </View>
 
                     {/* Summary Cards */}
-                    <View style={{ flexDirection: 'row', paddingHorizontal: 20 
-                        
-                    }}>
+                    <View style={{ flexDirection: 'row', paddingHorizontal: 20 }}>
                         <View style={[genStyles.totalSavingsCard, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
                             <Text style={[genStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRevenues)}</Text>
                             <Text style={genStyles.totalLabel}>{t('total_income')}</Text>
