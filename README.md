@@ -483,7 +483,7 @@ App Launch
 
 ## Notification System
 
-### Implemented Notifications
+### Implemented Notifications 
 - **Daily Expense Reminder**: 8:41 PM daily with calendar trigger
 - **Weekly Savings Reminder**: Every 7 days with time interval trigger
 - **Hourly Expense Reminder**: Every hour for active tracking

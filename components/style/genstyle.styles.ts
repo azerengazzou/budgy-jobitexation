@@ -97,7 +97,6 @@ export const genStyles = StyleSheet.create({
     goalHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
     },
     goalEmoji: {
         fontSize: 24,

@@ -145,21 +145,21 @@ export default function RevenuesScreen() {
         try {
             // Check if this is a revenue type (grouped) or individual revenue ID
             const isRevenueType = ['salary', 'freelance', 'business', 'investment', 'other'].includes(id);
-            
+
             if (isRevenueType) {
                 // Delete all revenues of this type
                 const revenuesOfType = revenues.filter(rev => rev.type === id);
                 const expenses = await storageService.getExpenses();
-                const relatedExpenses = expenses.filter(exp => 
+                const relatedExpenses = expenses.filter(exp =>
                     revenuesOfType.some(rev => rev.id === exp.revenueSourceId)
                 );
-                
+
                 Alert.alert(
                     t('delete_revenue_category'),
                     t('delete_revenue_category_message'),
                     [
-                        { 
-                            text: t('cancel'), 
+                        {
+                            text: t('cancel'),
                             style: 'cancel',
                             onPress: () => onCancel?.()
                         },
@@ -191,13 +191,13 @@ export default function RevenuesScreen() {
                 // Delete individual revenue
                 const expenses = await storageService.getExpenses();
                 const relatedExpenses = expenses.filter(exp => exp.revenueSourceId === id);
-                
+
                 Alert.alert(
                     t('delete_revenue_category'),
                     t('delete_revenue_category_message'),
                     [
-                        { 
-                            text: t('cancel'), 
+                        {
+                            text: t('cancel'),
                             style: 'cancel',
                             onPress: () => onCancel?.()
                         },
@@ -271,7 +271,7 @@ export default function RevenuesScreen() {
             return '#10B981';
         };
         return (
-            <SwipeToDelete 
+            <SwipeToDelete
                 onDelete={(onCancel) => handleDeleteRevenue(item.id, onCancel)}
             >
                 <TouchableOpacity
@@ -354,7 +354,9 @@ export default function RevenuesScreen() {
                     </View>
 
                     {/* Summary Cards */}
-                    <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 20 }}>
+                    <View style={{ flexDirection: 'row', paddingHorizontal: 20 
+                        
+                    }}>
                         <View style={[genStyles.totalSavingsCard, { flex: 1, marginRight: 10, marginHorizontal: 0 }]}>
                             <Text style={[genStyles.totalAmount, { fontSize: 14 }]}>{formatAmount(totalRevenues)}</Text>
                             <Text style={genStyles.totalLabel}>{t('total_income')}</Text>

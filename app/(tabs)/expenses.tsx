@@ -152,19 +152,6 @@ export default function ExpensesScreen() {
 
   const keyExtractor = useCallback((item: Expense) => item.id, []);
 
-  const openEditModal = useCallback((expense: Expense) => {
-    setEditingExpense(expense);
-    setFormData({
-      name: expense.name || '',
-      amount: expense.amount.toString(),
-      category: expense.category,
-      description: expense.description,
-      revenueSourceId: expense.revenueSourceId,
-      date: new Date(expense.date),
-    });
-    setModalVisible(true);
-  }, []);
-
   if (isLoading) {
     return <LoadingScreen />;
   }
