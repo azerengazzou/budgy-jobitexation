@@ -44,8 +44,6 @@ export default function RevenuesScreen() {
         (rev) => rev.type === 'salary' && rev.amount > 0
     );
 
-
-
     const openModalSmooth = () => {
         resetForm();
         setShowAnimatedModal(true);
@@ -82,7 +80,6 @@ export default function RevenuesScreen() {
     };
 
     const openModalForNew = () => openModalSmooth();
-
 
     const openModalForEdit = useCallback((revenue: Revenue) => {
         setEditingRevenue(revenue);
@@ -231,7 +228,6 @@ export default function RevenuesScreen() {
             onCancel?.();
         }
     }, [t, updateRevenues, updateExpenses, revenues]);
-
 
     // Group revenues by type for display
     const groupedRevenues = useMemo(() => {

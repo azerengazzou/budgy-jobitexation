@@ -5,17 +5,77 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  ScrollView,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, User } from 'lucide-react-native';
+import { ArrowLeft, User, UserCheck, Save, Edit3 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
 import { useData } from '../contexts/DataContext';
 import { UserProfile } from '../components/interfaces/settings';
 import { styles } from '../components/style/settings.styles';
-import { RequiredFieldIndicator } from '../components/RequiredFieldIndicator';
+import { expenseCategoryStyles } from '@/components/style/expense-category-details.styles';
+
 import { KeyboardDismissWrapper } from '../components/KeyboardDismissWrapper';
+import { LoadingScreen } from '../components/LoadingScreen';
+
+const InputField = ({
+  icon,
+  iconColor,
+  label,
+  value,
+  placeholder,
+  onChangeText,
+  required = false,
+  isEditing,
+  t
+}: {
+  icon: React.ReactNode;
+  iconColor: string;
+  label: string;
+  value: string;
+  placeholder: string;
+  onChangeText: (text: string) => void;
+  required?: boolean;
+  isEditing: boolean;
+  t: (key: string) => string;
+}) => (
+  <View style={profileStyles.inputContainer}>
+    <View style={profileStyles.inputHeader}>
+      <View style={profileStyles.inputLabelContainer}>
+        <View style={[profileStyles.inputIconContainer, { backgroundColor: `${iconColor}15` }]}>
+          {icon}
+        </View>
+        <Text style={profileStyles.inputLabel}>
+          {label}
+          {required && <Text style={profileStyles.requiredStar}> *</Text>}
+        </Text>
+      </View>
+    </View>
+
+    {isEditing ? (
+      <TextInput
+        style={[
+          profileStyles.textInput,
+          !value && required && profileStyles.textInputError
+        ]}
+        placeholder={placeholder}
+        value={value}
+        onChangeText={onChangeText}
+        autoCapitalize="words"
+        placeholderTextColor="#9CA3AF"
+      />
+    ) : (
+      <View style={profileStyles.displayValue}>
+        <Text style={profileStyles.displayValueText}>
+          {value || (required ? t('not_set') : t('optional'))}
+        </Text>
+      </View>
+    )}
+  </View>
+);
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -24,83 +84,280 @@ export default function ProfileScreen() {
     firstName: '',
     lastName: '',
   });
+  const [originalProfile, setOriginalProfile] = useState({
+    firstName: '',
+    lastName: '',
+  });
+  const [isEditing, setIsEditing] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const fadeAnim = new Animated.Value(0);
 
   useEffect(() => {
     loadProfile();
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
   const loadProfile = async () => {
     try {
       const profile = await storageService.getUserProfile();
       if (profile) {
-        setProfileForm({
+        const profileData = {
           firstName: profile.firstName,
           lastName: profile.lastName,
-        });
+        };
+        setProfileForm(profileData);
+        setOriginalProfile(profileData);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
     }
   };
 
+  useEffect(() => {
+    if (profileForm.firstName.length >= 0) {
+      setIsLoading(false);
+    }
+  }, [profileForm]);
+
   const handleSaveProfile = async () => {
-    if (!profileForm.firstName) {
+    if (!profileForm.firstName.trim()) {
       Alert.alert(t('error'), t('name_required'));
       return;
     }
 
-    const profile: UserProfile = {
-      firstName: profileForm.firstName,
-      lastName: profileForm.lastName,
-    };
+    setIsSaving(true);
+    try {
+      const profile: UserProfile = {
+        firstName: profileForm.firstName.trim(),
+        lastName: profileForm.lastName.trim(),
+      };
 
-    await storageService.saveUserProfile(profile);
-    await refreshData();
-    Alert.alert(t('success'), t('profile_updated'), [
-      { text: t('ok'), onPress: () => router.back() }
-    ]);
+      await storageService.saveUserProfile(profile);
+      await refreshData();
+      setOriginalProfile({
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      });
+      Alert.alert(t('success'), t('profile_updated'));
+    } catch (error) {
+      Alert.alert(t('error'), t('failed_to_save_profile'));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const hasChanges = () => {
+    return profileForm.firstName.trim() !== originalProfile.firstName.trim() ||
+      profileForm.lastName.trim() !== originalProfile.lastName.trim();
+  };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
-    <KeyboardDismissWrapper>
-      <LinearGradient colors={['#6B7280', '#4B5563']} style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <ArrowLeft size={24} color="#FFFFFF" />
+    <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
+      <View style={expenseCategoryStyles.headerContainer}>
+        <View style={expenseCategoryStyles.headerRow}>
+          <TouchableOpacity
+            style={expenseCategoryStyles.backButton}
+            onPress={() => router.back()}
+            activeOpacity={0.7}
+          >
+            <ArrowLeft size={20} color="white" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('profile')}</Text>
         </View>
+        <Text style={expenseCategoryStyles.headerSubtitle}>
+          {t('manage_your_personal_information')}
+        </Text>
+      </View>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={[styles.section]}>
+          <Text style={styles.sectionTitle}>{t('personal_information')}</Text>
+          {isLoading ? null : (
+            <View style={profileStyles.profileCard}>
+              <InputField
+                icon={<User size={20} color="#fcfcfcff" />}
+                iconColor="#fcfcfcff"
+                label={t('first_name')}
+                value={profileForm.firstName}
+                placeholder={t('enter_first_name')}
+                onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
+                required
+                isEditing={isEditing}
+                t={t}
+              />
 
-        <View style={styles.content}>
-          <View style={styles.section}>
-            <View style={styles.settingCard}>
-              <View style={styles.settingLeft}>
-                <User size={24} color="#3B82F6" />
-                <Text style={styles.settingTitle}>{t('personal_information')}</Text>
-              </View>
+              <InputField
+                icon={<User size={20} color="#fcfcfcff" />}
+                iconColor="#fcfcfcff"
+                label={t('last_name')}
+                value={profileForm.lastName}
+                placeholder={t('enter_last_name')}
+                onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
+                isEditing={isEditing}
+                t={t}
+              />
             </View>
-            <RequiredFieldIndicator label={t('first_name')} required={true} />
-            <TextInput
-              style={styles.input}
-              placeholder={t('first_name')}
-              value={profileForm.firstName}
-              onChangeText={(text) => setProfileForm({ ...profileForm, firstName: text })}
-            />
+          )}
+          {isEditing && (
+            <View style={profileStyles.actionButtons}>
+              <TouchableOpacity
+                style={profileStyles.cancelButton}
+                onPress={() => {
+                  setProfileForm({
+                    firstName: originalProfile.firstName,
+                    lastName: originalProfile.lastName,
+                  });
+                }}
+              >
+                <Text style={profileStyles.cancelButtonText}>{t('cancel')}</Text>
+              </TouchableOpacity>
 
-            <RequiredFieldIndicator label={t('last_name')} required={false} />
-            <TextInput
-              style={styles.input}
-              placeholder={t('last_name')}
-              value={profileForm.lastName}
-              onChangeText={(text) => setProfileForm({ ...profileForm, lastName: text })}
-            />
+              <TouchableOpacity
+                style={[
+                  profileStyles.saveButton,
+                  (isSaving || !hasChanges()) && profileStyles.saveButtonDisabled
+                ]}
+                onPress={handleSaveProfile}
+                disabled={isSaving || !hasChanges()}
+              >
+                <Text style={profileStyles.saveButtonText}>
+                  {isSaving ? t('saving') : t('save_changes')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSaveProfile}>
-              <Text style={styles.saveButtonText}>{t('save')}</Text>
-            </TouchableOpacity>
-          </View>
         </View>
-      </LinearGradient>
-    </KeyboardDismissWrapper>
+      </ScrollView>
+    </LinearGradient>
   );
 }
+
+const profileStyles = {
+  profileCard: {
+    marginBottom: 16
+  },
+  inputContainer: {
+    marginBottom: 12,
+  },
+  inputHeader: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    marginBottom: 8,
+  },
+  inputLabelContainer: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+  },
+  inputIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    marginRight: 12,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#FFFFFF',
+  },
+  requiredStar: {
+    color: '#EF4444',
+  },
+  editButton: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    backgroundColor: '#F0F9FF',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#3B82F6',
+  },
+  editButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#3B82F6',
+    marginLeft: 8,
+  },
+  textInput: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    color: '#1F2937',
+  },
+  textInputError: {
+    borderColor: '#EF4444',
+  },
+  displayValue: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  displayValueText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  headerEditButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  actionButtons: {
+    flexDirection: 'row' as const,
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center' as const,
+  },
+  cancelButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#6B7280',
+  },
+  saveButton: {
+    flex: 1,
+    backgroundColor: '#3B82F6',
+    borderRadius: 8,
+    padding: 12,
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+  },
+  saveButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#FFFFFF',
+  },
+};
