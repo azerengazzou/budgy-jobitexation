@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,13 @@ import {
   Dimensions,
   RefreshControl,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { PieChart } from 'react-native-chart-kit';
+import { PieChart, BarChart } from 'react-native-chart-kit';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
-import { DollarSign, TrendingUp, PiggyBank, Settings, User } from 'lucide-react-native';
+import { DollarSign, TrendingUp, PiggyBank, Settings, User, AlertCircle, TrendingDown, CheckCircle, Info } from 'lucide-react-native';
 import { BackupStatusIndicator } from '../../components/BackupStatusIndicator';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
@@ -21,8 +22,18 @@ import { LoadingScreen } from '../../components/LoadingScreen';
 
 const screenWidth = Dimensions.get('window').width;
 
+type ChartType = 'expenses' | 'comparison' | 'savings' | 'health';
+
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
+  const [activeChart, setActiveChart] = useState<ChartType>('expenses');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showInsight, setShowInsight] = useState<string | null>(null);
+  const [showChartInsight, setShowChartInsight] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const insightAnim = useRef(new Animated.Value(0)).current;
+  const insightScale = useRef(new Animated.Value(0.8)).current;
 
   const { t, i18n } = useTranslation();
   const { revenues, expenses, goals, refreshData } = useData();
@@ -43,7 +54,7 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
 
 
-  const calculateData = () => {
+  const calculateData = React.useCallback(() => {
     const totalRevenues = revenues.reduce((sum, rev) => sum + rev.amount, 0);
     const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
     const totalSavings = goals.reduce((sum, goal) => sum + goal.currentAmount, 0);
@@ -67,7 +78,7 @@ export default function Dashboard() {
     });
     
     setIsLoading(false);
-  };
+  }, [revenues, expenses, goals]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -77,17 +88,492 @@ export default function Dashboard() {
 
   useEffect(() => {
     calculateData();
-  }, [revenues, expenses, goals]);
+  }, [calculateData]);
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [activeChart]);
+
+  const resetAnimation = () => {
+    fadeAnim.setValue(0);
+    slideAnim.setValue(30);
+  };
+
+  useEffect(() => {
+    if (showInsight) {
+      Animated.parallel([
+        Animated.spring(insightAnim, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 100,
+          friction: 8,
+        }),
+        Animated.spring(insightScale, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 100,
+          friction: 8,
+        }),
+      ]).start();
+
+      const timer = setTimeout(() => {
+        closeInsight();
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showInsight]);
+
+  const closeInsight = () => {
+    Animated.parallel([
+      Animated.timing(insightAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(insightScale, {
+        toValue: 0.8,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowInsight(null);
+      setShowChartInsight(false);
+      insightAnim.setValue(0);
+      insightScale.setValue(0.8);
+    });
+  };
+
+  useEffect(() => {
+    if (showChartInsight) {
+      Animated.parallel([
+        Animated.spring(insightAnim, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 100,
+          friction: 8,
+        }),
+        Animated.spring(insightScale, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 100,
+          friction: 8,
+        }),
+      ]).start();
+
+      const timer = setTimeout(() => {
+        closeInsight();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showChartInsight]);
+
+  const getChartInsight = () => {
+    const expenseRate = data.totalRevenues > 0 ? (data.totalExpenses / data.totalRevenues) * 100 : 0;
+    const savingsRate = data.totalRevenues > 0 ? (data.totalSavings / data.totalRevenues) * 100 : 0;
+    const topCategory = getTopSpendingCategory();
+    
+    switch(activeChart) {
+      case 'expenses':
+        if (!topCategory) return t('expense_chart_insight_empty');
+        return expenseRate > 70 
+          ? t('expense_chart_insight_high').replace('{category}', topCategory.name).replace('{percent}', topCategory.percentage)
+          : t('expense_chart_insight_normal').replace('{category}', topCategory.name);
+      
+      case 'comparison':
+        if (expenseRate > 80) return t('comparison_chart_insight_critical');
+        if (savingsRate < 10) return t('comparison_chart_insight_low_savings');
+        if (remainingBalance < 0) return t('comparison_chart_insight_deficit');
+        return t('comparison_chart_insight_healthy');
+      
+      case 'savings':
+        const lowestGoal = getLowestProgressGoal();
+        if (!lowestGoal) return t('savings_chart_insight_empty');
+        if (lowestGoal.progress < 25) return t('savings_chart_insight_low').replace('{goal}', lowestGoal.title);
+        if (savingsGoalsData.every(g => g.progress > 50)) return t('savings_chart_insight_excellent');
+        return t('savings_chart_insight_normal');
+      
+      case 'health':
+        if (healthScore > 70) return t('health_chart_insight_excellent');
+        if (healthScore > 50) return t('health_chart_insight_good');
+        if (healthScore > 30) return t('health_chart_insight_fair');
+        return t('health_chart_insight_poor');
+      
+      default:
+        return '';
+    }
+  };
 
 
 
-  const pieChartData = data.expensesByCategory.map((item, index) => ({
-    name: item.name,
-    amount: item.amount,
-    color: `hsl(${index * 45}, 70%, 60%)`,
-    legendFontColor: '#374151',
-    legendFontSize: 12,
-  }));
+  const pieChartData = React.useMemo(() => {
+    const sorted = [...data.expensesByCategory].sort((a, b) => b.amount - a.amount);
+    const top6 = sorted.slice(0, 6);
+    const others = sorted.slice(6);
+    
+    const categories = others.length > 0 
+      ? [...top6, { name: t('other'), amount: others.reduce((sum, item) => sum + item.amount, 0) }]
+      : top6;
+
+    const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#6B7280'];
+    
+    return categories.map((item, index) => ({
+      name: item.name,
+      amount: item.amount,
+      percentage: ((item.amount / data.totalExpenses) * 100).toFixed(1),
+      color: colors[index % colors.length],
+      legendFontColor: '#374151',
+      legendFontSize: 12,
+    }));
+  }, [data.expensesByCategory, data.totalExpenses, t]);
+
+  const comparisonData = React.useMemo(() => {
+    const balance = data.totalRevenues - data.totalExpenses - data.totalSavings;
+    return {
+      revenues: data.totalRevenues,
+      expenses: data.totalExpenses,
+      savings: data.totalSavings,
+      balance,
+      maxValue: Math.max(data.totalRevenues, data.totalExpenses, data.totalSavings, 1)
+    };
+  }, [data]);
+
+  const savingsGoalsData = React.useMemo(() => {
+    const activeGoals = goals
+      .filter(g => g.status === 'active')
+      .map(g => ({
+        ...g,
+        progress: (g.currentAmount / g.targetAmount) * 100
+      }))
+      .sort((a, b) => b.progress - a.progress)
+      .slice(0, 5);
+    
+    return activeGoals;
+  }, [goals]);
+
+  const healthScore = React.useMemo(() => {
+    if (data.totalRevenues === 0) return 0;
+    const savingsRate = (data.totalSavings / data.totalRevenues) * 100;
+    const expenseRate = (data.totalExpenses / data.totalRevenues) * 100;
+    return Math.max(0, Math.min(100, 100 - expenseRate + savingsRate));
+  }, [data]);
+
+  const getHealthMessage = (score: number) => {
+    if (score > 70) return t('excellent_health');
+    if (score > 50) return t('good_health');
+    if (score > 30) return t('fair_health');
+    return t('poor_health');
+  };
+
+  const getFinancialInsight = () => {
+    const expenseRate = data.totalRevenues > 0 ? (data.totalExpenses / data.totalRevenues) * 100 : 0;
+    const savingsRate = data.totalRevenues > 0 ? (data.totalSavings / data.totalRevenues) * 100 : 0;
+    
+    if (expenseRate > 80) return { message: t('reduce_expenses'), icon: AlertCircle, color: '#EF4444' };
+    if (savingsRate < 10 && data.totalRevenues > 0) return { message: t('increase_savings'), icon: TrendingUp, color: '#F59E0B' };
+    if (healthScore > 70) return { message: t('maintain_balance'), icon: CheckCircle, color: '#10B981' };
+    return { message: t('on_track'), icon: CheckCircle, color: '#3B82F6' };
+  };
+
+  const getTopSpendingCategory = () => {
+    if (pieChartData.length === 0) return null;
+    return pieChartData[0];
+  };
+
+  const getLowestProgressGoal = () => {
+    if (savingsGoalsData.length === 0) return null;
+    return savingsGoalsData[savingsGoalsData.length - 1];
+  };
+
+  const getMetricInsight = (type: string) => {
+    const expenseRate = data.totalRevenues > 0 ? (data.totalExpenses / data.totalRevenues) * 100 : 0;
+    const savingsRate = data.totalRevenues > 0 ? (data.totalSavings / data.totalRevenues) * 100 : 0;
+    
+    switch(type) {
+      case 'revenue':
+        return data.totalRevenues === 0 ? t('revenue_info') : 
+          `${t('revenue_info')}. ${revenues.length} ${t('income_sources').toLowerCase()}.`;
+      case 'expense':
+        return expenseRate > 80 ? `${t('expense_info')}. ⚠️ ${expenseRate.toFixed(0)}% ${t('of')} ${t('revenues').toLowerCase()}!` :
+          `${t('expense_info')}. ${expenseRate.toFixed(0)}% ${t('of')} ${t('revenues').toLowerCase()}.`;
+      case 'savings':
+        return savingsRate < 10 ? `${t('savings_info')}. 💡 ${t('increase_savings')}.` :
+          `${t('savings_info')}. ✓ ${savingsRate.toFixed(0)}% ${t('of')} ${t('revenues').toLowerCase()}.`;
+      case 'balance':
+        return remainingBalance >= 0 ? `${t('balance_info')}. ✓ ${t('surplus')}: ${formatAmount(remainingBalance)}` :
+          `${t('balance_info')}. ⚠️ ${t('deficit')}: ${formatAmount(Math.abs(remainingBalance))}`;
+      default:
+        return '';
+    }
+  };
+
+  const renderChart = () => {
+    const chartContent = (() => {
+      switch (activeChart) {
+      case 'expenses':
+        const topCategory = getTopSpendingCategory();
+        return pieChartData.length > 0 ? (
+          <View>
+            <PieChart
+              data={pieChartData}
+              width={screenWidth - 60}
+              height={200}
+              chartConfig={{
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+              accessor="amount"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+              hasLegend={false}
+            />
+            {topCategory && (
+              <View style={[styles.insightBadge, { backgroundColor: '#F59E0B' }]}>
+                <AlertCircle size={16} color="#FFFFFF" />
+                <Text style={styles.insightBadgeText}>
+                  {t('highest_spending')}: {topCategory.name} ({topCategory.percentage}%)
+                </Text>
+              </View>
+            )}
+            <View style={styles.chartLegend}>
+              {pieChartData.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.interactiveLegendItem,
+                    index === 0 && styles.highlightedItem
+                  ]}
+                  onPress={() => {
+                    setSelectedCategory(item.name);
+                    router.push('/(tabs)/expenses');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.legendLeft}>
+                    <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+                    <Text style={styles.legendText} numberOfLines={1}>{item.name}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.legendValue}>{formatAmount(item.amount)}</Text>
+                    <Text style={styles.legendPercent}>({item.percentage}%)</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <View style={styles.emptyChart}>
+            <Text style={styles.emptyChartText}>{t('no_expenses_yet')}</Text>
+          </View>
+        );
+
+      case 'comparison':
+        const { revenues, expenses, savings, balance, maxValue } = comparisonData;
+        const comparisonExpenseRate = revenues > 0 ? (expenses / revenues) * 100 : 0;
+        const insight = getFinancialInsight();
+        const InsightIcon = insight.icon;
+        
+        return (
+          <View>
+            <TouchableOpacity
+              style={styles.comparisonBar}
+              onPress={() => router.push('/(tabs)/revenues')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.comparisonLabel}>{t('revenues')}</Text>
+              <View style={styles.comparisonBarContainer}>
+                <View style={[styles.comparisonBarFill, { 
+                  width: `${(revenues / maxValue) * 100}%`,
+                  backgroundColor: '#10B981'
+                }]}>
+                  <Text style={styles.comparisonValue}>{((revenues / maxValue) * 100).toFixed(0)}%</Text>
+                </View>
+              </View>
+              <Text style={styles.comparisonAmount}>{formatAmount(revenues)}</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.comparisonBar}
+              onPress={() => router.push('/(tabs)/expenses')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.comparisonLabel}>{t('expenses')}</Text>
+              <View style={styles.comparisonBarContainer}>
+                <View style={[styles.comparisonBarFill, { 
+                  width: `${(expenses / maxValue) * 100}%`,
+                  backgroundColor: comparisonExpenseRate > 80 ? '#EF4444' : '#F59E0B'
+                }]}>
+                  <Text style={styles.comparisonValue}>{((expenses / maxValue) * 100).toFixed(0)}%</Text>
+                </View>
+              </View>
+              <Text style={styles.comparisonAmount}>{formatAmount(expenses)}</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.comparisonBar}
+              onPress={() => router.push('/(tabs)/goals')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.comparisonLabel}>{t('savings')}</Text>
+              <View style={styles.comparisonBarContainer}>
+                <View style={[styles.comparisonBarFill, { 
+                  width: `${(savings / maxValue) * 100}%`,
+                  backgroundColor: '#F59E0B'
+                }]}>
+                  <Text style={styles.comparisonValue}>{((savings / maxValue) * 100).toFixed(0)}%</Text>
+                </View>
+              </View>
+              <Text style={styles.comparisonAmount}>{formatAmount(savings)}</Text>
+            </TouchableOpacity>
+
+            <View style={[styles.balanceIndicator, { 
+              backgroundColor: balance >= 0 ? '#10B981' : '#EF4444'
+            }]}>
+              <Text style={styles.balanceText}>
+                {balance >= 0 ? t('surplus') : t('deficit')}
+              </Text>
+              <Text style={styles.balanceText}>{formatAmount(Math.abs(balance))}</Text>
+            </View>
+            
+            <View style={[styles.insightBadge, { backgroundColor: insight.color }]}>
+              <InsightIcon size={16} color="#FFFFFF" />
+              <Text style={styles.insightBadgeText}>{insight.message}</Text>
+            </View>
+          </View>
+        );
+
+      case 'savings':
+        const lowestGoal = getLowestProgressGoal();
+        return savingsGoalsData.length > 0 ? (
+          <View>
+            {lowestGoal && lowestGoal.progress < 50 && (
+              <View style={[styles.insightBadge, { backgroundColor: '#F59E0B' }]}>
+                <AlertCircle size={16} color="#FFFFFF" />
+                <Text style={styles.insightBadgeText}>
+                  {t('lowest_progress')}: {lowestGoal.title} ({lowestGoal.progress.toFixed(0)}%)
+                </Text>
+              </View>
+            )}
+            {savingsGoalsData.map((goal, index) => {
+              const progress = Math.min(goal.progress, 100);
+              const color = progress >= 75 ? '#10B981' : progress >= 50 ? '#3B82F6' : progress >= 25 ? '#F59E0B' : '#EF4444';
+              const isLowest = lowestGoal && goal.id === lowestGoal.id && progress < 50;
+              
+              return (
+                <TouchableOpacity
+                  key={goal.id}
+                  style={[
+                    styles.goalBar,
+                    isLowest && { backgroundColor: '#FEF3C7', padding: 8, borderRadius: 8, marginVertical: 8 }
+                  ]}
+                  onPress={() => router.push(`/goal-details?id=${goal.id}`)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.goalHeader}>
+                    <Text style={styles.goalName} numberOfLines={1}>{goal.title}</Text>
+                    <Text style={styles.goalProgress}>{progress.toFixed(0)}%</Text>
+                  </View>
+                  <View style={styles.goalProgressBar}>
+                    <View style={[styles.goalProgressFill, { 
+                      width: `${progress}%`,
+                      backgroundColor: color
+                    }]}>
+                      {progress > 15 && (
+                        <Text style={styles.goalProgressText}>
+                          {formatAmount(goal.currentAmount)} / {formatAmount(goal.targetAmount)}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : (
+          <View style={styles.emptyChart}>
+            <Text style={styles.emptyChartText}>{t('no_goals_yet')}</Text>
+          </View>
+        );
+
+      case 'health':
+        const savingsRate = data.totalRevenues > 0 ? (data.totalSavings / data.totalRevenues) * 100 : 0;
+        const expenseRate = data.totalRevenues > 0 ? (data.totalExpenses / data.totalRevenues) * 100 : 0;
+        const healthColor = healthScore > 70 ? '#10B981' : healthScore > 50 ? '#3B82F6' : healthScore > 30 ? '#F59E0B' : '#EF4444';
+        
+        return (
+          <View>
+            <View style={styles.healthScoreContainer}>
+              <View style={[styles.healthScoreCircle, { backgroundColor: healthColor }]}>
+                <Text style={styles.healthScoreText}>{healthScore.toFixed(0)}</Text>
+              </View>
+              <Text style={[styles.healthScoreLabel, { color: healthColor }]}>
+                {healthScore > 70 ? '✓ ' : healthScore > 50 ? '✓ ' : healthScore > 30 ? '⚠ ' : '✗ '}
+                {getHealthMessage(healthScore)}
+              </Text>
+            </View>
+
+            <View style={styles.healthMetricsGrid}>
+              <View style={[styles.healthMetricCard, { borderLeftColor: '#10B981' }]}>
+                <Text style={styles.healthMetricCardLabel}>{t('total_revenues')}</Text>
+                <Text style={styles.healthMetricCardValue}>{formatAmount(data.totalRevenues)}</Text>
+              </View>
+              
+              <View style={[styles.healthMetricCard, { borderLeftColor: '#EF4444' }]}>
+                <Text style={styles.healthMetricCardLabel}>{t('total_expenses')}</Text>
+                <Text style={styles.healthMetricCardValue}>{formatAmount(data.totalExpenses)}</Text>
+                <Text style={styles.healthMetricCardPercent}>{expenseRate.toFixed(0)}% of income</Text>
+              </View>
+              
+              <View style={[styles.healthMetricCard, { borderLeftColor: '#F59E0B' }]}>
+                <Text style={styles.healthMetricCardLabel}>{t('savings')}</Text>
+                <Text style={styles.healthMetricCardValue}>{formatAmount(data.totalSavings)}</Text>
+                <Text style={styles.healthMetricCardPercent}>{savingsRate.toFixed(0)}% of income</Text>
+              </View>
+              
+              <View style={[styles.healthMetricCard, { borderLeftColor: remainingBalance >= 0 ? '#10B981' : '#EF4444' }]}>
+                <Text style={styles.healthMetricCardLabel}>{t('remaining_balance')}</Text>
+                <Text style={[styles.healthMetricCardValue, { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }]}>
+                  {formatAmount(remainingBalance)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        );
+      }
+    })();
+
+    return (
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }}
+      >
+        {chartContent}
+      </Animated.View>
+    );
+  };
+
+  const getChartTitle = () => {
+    switch (activeChart) {
+      case 'expenses': return t('expenses_by_category');
+      case 'comparison': return t('income_vs_expenses');
+      case 'savings': return t('savings_progress');
+      case 'health': return t('financial_health');
+    }
+  };
 
   const remainingBalance = data.totalRevenues - data.totalExpenses - data.totalSavings;
 
@@ -119,7 +605,10 @@ export default function Dashboard() {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
+          scrollIndicatorInsets={{ right: 1 }}
+          scrollEventThrottle={16}
+          bounces={true}
         >
           <View style={styles.header}>
             <View style={styles.headerRow}>
@@ -135,45 +624,110 @@ export default function Dashboard() {
               </View>
             </View>
           </View>
-          <View pointerEvents="none">
-
-            <View style={styles.metricsContainer}>
-              <View style={styles.metricCard}>
-                <View style={styles.metricHeader}>
-                  <DollarSign size={24} color="#10B981" />
-                  <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
-                </View>
-                <Text style={styles.metricValue}>{formatAmount(data.totalRevenues)}</Text>
+          <View style={styles.metricsContainer}>
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <DollarSign size={24} color="#10B981" />
+                <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'revenue' ? null : 'revenue')}>
+                  <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
+                </TouchableOpacity>
               </View>
+              <Text style={styles.metricValue}>{formatAmount(data.totalRevenues)}</Text>
+              {showInsight === 'revenue' && (
+                <TouchableOpacity onPress={closeInsight} activeOpacity={1}>
+                  <Animated.View style={{
+                    opacity: insightAnim,
+                    transform: [{ scale: insightScale }],
+                    backgroundColor: '#EFF6FF',
+                    padding: 8,
+                    borderRadius: 8,
+                    marginTop: 6,
+                  }}>
+                    <Text style={{ fontSize: 10, color: '#1E40AF', lineHeight: 14 }}>{getMetricInsight('revenue')}</Text>
+                  </Animated.View>
+                </TouchableOpacity>
+              )}
+            </View>
 
-              <View style={styles.metricCard}>
-                <View style={styles.metricHeader}>
-                  <TrendingUp size={24} color="#EF4444" />
-                  <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
-                </View>
-                <Text style={styles.metricValue}>{formatAmount(data.totalExpenses)}</Text>
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <TrendingUp size={24} color="#EF4444" />
+                <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'expense' ? null : 'expense')}>
+                  <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
+                </TouchableOpacity>
               </View>
+              <Text style={styles.metricValue}>{formatAmount(data.totalExpenses)}</Text>
+              {showInsight === 'expense' && (
+                <TouchableOpacity onPress={closeInsight} activeOpacity={1}>
+                  <Animated.View style={{
+                    opacity: insightAnim,
+                    transform: [{ scale: insightScale }],
+                    backgroundColor: '#FEF2F2',
+                    padding: 8,
+                    borderRadius: 8,
+                    marginTop: 6,
+                  }}>
+                    <Text style={{ fontSize: 10, color: '#991B1B', lineHeight: 14 }}>{getMetricInsight('expense')}</Text>
+                  </Animated.View>
+                </TouchableOpacity>
+              )}
+            </View>
 
-              <View style={styles.metricCard}>
-                <View style={styles.metricHeader}>
-                  <PiggyBank size={24} color="#F59E0B" />
-                  <Text style={styles.metricTitle}>{t('savings')}</Text>
-                </View>
-                <Text style={styles.metricValue}>{formatAmount(data.totalSavings)}</Text>
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <PiggyBank size={24} color="#F59E0B" />
+                <Text style={styles.metricTitle}>{t('savings')}</Text>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'savings' ? null : 'savings')}>
+                  <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
+                </TouchableOpacity>
               </View>
+              <Text style={styles.metricValue}>{formatAmount(data.totalSavings)}</Text>
+              {showInsight === 'savings' && (
+                <TouchableOpacity onPress={closeInsight} activeOpacity={1}>
+                  <Animated.View style={{
+                    opacity: insightAnim,
+                    transform: [{ scale: insightScale }],
+                    backgroundColor: '#FFFBEB',
+                    padding: 8,
+                    borderRadius: 8,
+                    marginTop: 6,
+                  }}>
+                    <Text style={{ fontSize: 10, color: '#92400E', lineHeight: 14 }}>{getMetricInsight('savings')}</Text>
+                  </Animated.View>
+                </TouchableOpacity>
+              )}
+            </View>
 
-              <View style={styles.metricCard}>
-                <View style={styles.metricHeader}>
-                  <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
-                  <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
-                </View>
-                <Text style={[
-                  styles.metricValue,
-                  { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
-                ]}>
-                  {formatAmount(remainingBalance)}
-                </Text>
+            <View style={styles.metricCard}>
+              <View style={styles.metricHeader}>
+                <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
+                <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'balance' ? null : 'balance')}>
+                  <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
+                </TouchableOpacity>
               </View>
+              <Text style={[
+                styles.metricValue,
+                { color: remainingBalance >= 0 ? '#10B981' : '#EF4444' }
+              ]}>
+                {formatAmount(remainingBalance)}
+              </Text>
+              {showInsight === 'balance' && (
+                <TouchableOpacity onPress={closeInsight} activeOpacity={1}>
+                  <Animated.View style={{
+                    opacity: insightAnim,
+                    transform: [{ scale: insightScale }],
+                    backgroundColor: remainingBalance >= 0 ? '#F0FDF4' : '#FEF2F2',
+                    padding: 8,
+                    borderRadius: 8,
+                    marginTop: 6,
+                  }}>
+                    <Text style={{ fontSize: 10, color: remainingBalance >= 0 ? '#166534' : '#991B1B', lineHeight: 14 }}>{getMetricInsight('balance')}</Text>
+                  </Animated.View>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
           <View style={styles.buttonsContainer}>
@@ -193,28 +747,89 @@ export default function Dashboard() {
             </TouchableOpacity>
           </View>
 
-          {pieChartData.length > 0 && (
-            <View style={styles.chartCard}>
-              <Text style={styles.chartTitle}>{t('expenses_by_category')}</Text>
-              <View pointerEvents="none">
-                <PieChart
-                  data={pieChartData}
-                  width={screenWidth - 60}
-                  height={220}
-                  chartConfig={{
-                    backgroundColor: '#FFFFFF',
-                    backgroundGradientFrom: '#FFFFFF',
-                    backgroundGradientTo: '#FFFFFF',
-                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  }}
-                  accessor="amount"
-                  backgroundColor="transparent"
-                  paddingLeft="15"
-                  absolute
-                />
-              </View>
+          <View style={styles.chartCard} collapsable={false}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+              <Text style={styles.chartTitle}>{getChartTitle()}</Text>
+              <TouchableOpacity onPress={() => setShowChartInsight(!showChartInsight)}>
+                <Info size={16} color="#3B82F6" />
+              </TouchableOpacity>
             </View>
-          )}
+            {showChartInsight && (
+              <TouchableOpacity onPress={closeInsight} activeOpacity={1}>
+                <Animated.View style={{
+                  opacity: insightAnim,
+                  transform: [{ scale: insightScale }],
+                  backgroundColor: '#EFF6FF',
+                  padding: 12,
+                  borderRadius: 10,
+                  marginBottom: 12,
+                }}>
+                  <Text style={{ fontSize: 11, color: '#1E40AF', lineHeight: 16 }}>{getChartInsight()}</Text>
+                </Animated.View>
+              </TouchableOpacity>
+            )}
+            <View style={styles.chartSwitcher}>
+              <TouchableOpacity
+                style={[styles.chartTab, activeChart === 'expenses' && styles.chartTabActive]}
+                onPress={() => {
+                  if (activeChart !== 'expenses') {
+                    resetAnimation();
+                    setActiveChart('expenses');
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.chartTabText, activeChart === 'expenses' && styles.chartTabTextActive]}>
+                  {t('expenses')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.chartTab, activeChart === 'comparison' && styles.chartTabActive]}
+                onPress={() => {
+                  if (activeChart !== 'comparison') {
+                    resetAnimation();
+                    setActiveChart('comparison');
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.chartTabText, activeChart === 'comparison' && styles.chartTabTextActive]}>
+                  {t('income_vs_expenses')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.chartTab, activeChart === 'savings' && styles.chartTabActive]}
+                onPress={() => {
+                  if (activeChart !== 'savings') {
+                    resetAnimation();
+                    setActiveChart('savings');
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.chartTabText, activeChart === 'savings' && styles.chartTabTextActive]}>
+                  {t('savings')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.chartTab, activeChart === 'health' && styles.chartTabActive]}
+                onPress={() => {
+                  if (activeChart !== 'health') {
+                    resetAnimation();
+                    setActiveChart('health');
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.chartTabText, activeChart === 'health' && styles.chartTabTextActive]}>
+                  {t('financial_health')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View collapsable={false}>
+              {renderChart()}
+            </View>
+          </View>
 
         </ScrollView>
 
