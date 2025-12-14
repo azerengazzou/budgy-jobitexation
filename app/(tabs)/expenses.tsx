@@ -45,6 +45,7 @@ export default function ExpensesScreen() {
     } catch (error) {
       console.error('Error loading categories:', error);
       setCategories(['rent', 'food', 'transport']);
+      Alert.alert(t('error'), t('failed_to_load_categories'));
     }
   };
 
@@ -52,10 +53,12 @@ export default function ExpensesScreen() {
     loadCategories();
   }, []);
 
+  const memoizedLoadCategories = useCallback(loadCategories, [t]);
+
   useFocusEffect(
     React.useCallback(() => {
-      loadCategories();
-    }, [])
+      memoizedLoadCategories();
+    }, [memoizedLoadCategories])
   );
 
 

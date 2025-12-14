@@ -17,6 +17,7 @@ import { DateFilter, DateFilterType, filterTransactionsByDate } from '@/componen
 import { RevenueModal } from '@/components/RevenueModal';
 import { ExpenseModal } from '@/components/ExpenseModal';
 import { normalizeAmount } from '@/components/NumericInput';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 type CategoryEntry = RevenueTransaction | Expense | SavingsTransaction;
 
@@ -28,6 +29,7 @@ export default function RevenueCategoryDetails() {
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
     const [revenueTransactions, setRevenueTransactions] = useState<RevenueTransaction[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     
     // Modal states
     const [isRevenueModalVisible, setRevenueModalVisible] = useState(false);
@@ -66,8 +68,15 @@ export default function RevenueCategoryDetails() {
     // Load revenue transactions on mount
     React.useEffect(() => {
         const loadTransactions = async () => {
-            const transactions = await storageService.getRevenueTransactionsByType(categoryType as string);
-            setRevenueTransactions(transactions);
+            try {
+                const transactions = await storageService.getRevenueTransactionsByType(categoryType as string);
+                setRevenueTransactions(transactions);
+            } catch (error) {
+                console.error('Error loading revenue transactions:', error);
+                setRevenueTransactions([]);
+            } finally {
+                setIsLoading(false);
+            }
         };
         loadTransactions();
     }, [categoryType]);
@@ -329,6 +338,10 @@ export default function RevenueCategoryDetails() {
         );
     };
 
+    if (isLoading) {
+        return <LoadingScreen />;
+    }
+
     return (
         <LinearGradient colors={['#0A2540', '#4A90E2']} style={revenueCategoryStyles.container}>
             {/* Header */}
@@ -458,7 +471,17 @@ export default function RevenueCategoryDetails() {
                     setExpenseModalVisible(false);
                     setEditingExpense(null);
                 }}
-                onSave={() => {}}
+                onSave={async () => {
+                    try {
+                        await updateExpenses();
+                        await updateRevenues();
+                        setExpenseModalVisible(false);
+                        setEditingExpense(null);
+                    } catch (error) {
+                        console.error('Error saving expense:', error);
+                        Alert.alert(t('error'), t('failed_to_save_expense'));
+                    }
+                }}
                 editingExpense={editingExpense}
                 categories={['rent', 'food', 'transport']}
                 revenues={revenues}

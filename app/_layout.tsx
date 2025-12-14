@@ -16,6 +16,18 @@ export default function RootLayout() {
   useEffect(() => {
     // Initialize app services
     const initializeApp = async () => {
+      try {
+      // Load saved settings first
+      const savedSettings = await storageService.getSettings();
+      if (savedSettings) {
+        // Apply saved language
+        if (savedSettings.language) {
+          const { default: i18n } = await import('../services/i18n');
+          await i18n.changeLanguage(savedSettings.language);
+        }
+        // Currency will be handled by CurrencyContext
+      }
+      
       // Check for first launch and backup restore
       const isFirstLaunch = !(await storageService.getItem('app_initialized'));
       
@@ -38,6 +50,12 @@ export default function RootLayout() {
                   onPress: async () => {
                     const success = await backupService.restoreFromBackup(backupFile);
                     if (success) {
+                      // Reload settings after restore
+                      const restoredSettings = await storageService.getSettings();
+                      if (restoredSettings?.language) {
+                        const { default: i18n } = await import('../services/i18n');
+                        await i18n.changeLanguage(restoredSettings.language);
+                      }
                       Alert.alert('Success', 'Data restored successfully!');
                     } else {
                       Alert.alert('Error', 'Failed to restore data');
@@ -61,9 +79,14 @@ export default function RootLayout() {
       // Setup notifications
       await notificationService.requestPermissions();
       await notificationService.scheduleNotifications();
+      } catch (error) {
+        console.error('Initialization error:', error);
+      }
     };
 
-    initializeApp();
+    initializeApp().catch(error => {
+      console.error('App initialization error:', error);
+    });
   }, []);
 
   return (

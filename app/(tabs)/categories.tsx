@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -42,7 +42,7 @@ export default function Categories() {
   const getTranslatedCategoryName = (category: string, isFixed: boolean) => {
     return isFixed ? t(category) : category;
   };
-  
+
   useEffect(() => {
     loadCategories();
   }, []);
@@ -68,6 +68,7 @@ export default function Categories() {
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading categories:', error);
+      Alert.alert(t('error'), t('failed_to_load_categories'));
       setExpenseCategories([]);
       setRevenueCategories([]);
       setIsLoading(false);
@@ -85,12 +86,12 @@ export default function Categories() {
     if (activeTab === 'expenses') {
       // Check for duplicates in expense categories
       const allExpenseNames = [...fixedExpenseCategories, ...expenseCategories];
-      const isDuplicate = editingIndex !== null 
-        ? allExpenseNames.some((cat, index) => 
-            cat.toLowerCase() === trimmedCategory.toLowerCase() && 
-            index !== (editingIndex + fixedExpenseCategories.length))
+      const isDuplicate = editingIndex !== null
+        ? allExpenseNames.some((cat, index) =>
+          cat.toLowerCase() === trimmedCategory.toLowerCase() &&
+          index !== (editingIndex + fixedExpenseCategories.length))
         : allExpenseNames.some(cat => cat.toLowerCase() === trimmedCategory.toLowerCase());
-      
+
       if (isDuplicate) {
         Alert.alert(t('error'), t('category_already_exists'));
         return;
@@ -104,16 +105,22 @@ export default function Categories() {
         updatedCategories = [...expenseCategories, trimmedCategory];
       }
       setExpenseCategories(updatedCategories);
-      await storageService.saveCategories(updatedCategories);
+      try {
+        await storageService.saveCategories(updatedCategories);
+      } catch (error) {
+        console.error('Error saving expense categories:', error);
+        Alert.alert(t('error'), t('failed_to_save_category'));
+        return;
+      }
     } else {
       // Check for duplicates in revenue categories
       const allRevenueNames = [...fixedRevenueTypes, ...revenueCategories];
-      const isDuplicate = editingIndex !== null 
-        ? allRevenueNames.some((cat, index) => 
-            cat.toLowerCase() === trimmedCategory.toLowerCase() && 
-            index !== (editingIndex + fixedRevenueTypes.length))
+      const isDuplicate = editingIndex !== null
+        ? allRevenueNames.some((cat, index) =>
+          cat.toLowerCase() === trimmedCategory.toLowerCase() &&
+          index !== (editingIndex + fixedRevenueTypes.length))
         : allRevenueNames.some(cat => cat.toLowerCase() === trimmedCategory.toLowerCase());
-      
+
       if (isDuplicate) {
         Alert.alert(t('error'), t('category_already_exists'));
         return;
@@ -127,7 +134,13 @@ export default function Categories() {
         updatedCategories = [...revenueCategories, trimmedCategory];
       }
       setRevenueCategories(updatedCategories);
-      await storageService.setItem('revenue_categories', updatedCategories);
+      try {
+        await storageService.setItem('revenue_categories', updatedCategories);
+      } catch (error) {
+        console.error('Error saving revenue categories:', error);
+        Alert.alert(t('error'), t('failed_to_save_category'));
+        return;
+      }
     }
     closeModal();
   };
@@ -176,19 +189,23 @@ export default function Categories() {
     setNewCategory('');
   };
 
-  const allExpenseCategories = [...fixedExpenseCategories, ...expenseCategories];
-  const filteredExpenseCategories = allExpenseCategories.filter((category) =>
-    category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredExpenseCategories = useMemo(() => {
+    const allExpenseCategories = [...fixedExpenseCategories, ...expenseCategories];
+    return allExpenseCategories.filter((category) =>
+      category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [expenseCategories, searchQuery]);
 
-  const allRevenueCategories = [...fixedRevenueTypes, ...revenueCategories];
-  const filteredRevenueTypes = allRevenueCategories.filter((type) =>
-    type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredRevenueTypes = useMemo(() => {
+    const allRevenueCategories = [...fixedRevenueTypes, ...revenueCategories];
+    return allRevenueCategories.filter((type) =>
+      type.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [revenueCategories, searchQuery]);
 
 
 
-  const renderCategoryItem = ({ item, index }: { item: string; index: number }) => {
+  const renderCategoryItem = useCallback(({ item, index }: { item: string; index: number }) => {
     const isExpense = activeTab === 'expenses';
     const isFixed = isExpense ? fixedExpenseCategories.includes(item) : fixedRevenueTypes.includes(item);
     const actualIndex = isFixed ? -1 : (isExpense ? expenseCategories.indexOf(item) : revenueCategories.indexOf(item));
@@ -205,7 +222,7 @@ export default function Categories() {
             padding: 10,
             marginRight: 12,
           }}>
-            <CategoryIcon 
+            <CategoryIcon
               category={item}
               type={isExpense ? 'expense' : 'revenue'}
               size={24}
@@ -248,7 +265,7 @@ export default function Categories() {
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [activeTab, handleEdit, handleDelete, getTranslatedCategoryName, t, expenseCategories, revenueCategories, fixedExpenseCategories, fixedRevenueTypes]);
 
   const currentData = activeTab === 'expenses' ? filteredExpenseCategories : filteredRevenueTypes;
   const EmptyIcon = activeTab === 'expenses' ? ShoppingBag : DollarSign;

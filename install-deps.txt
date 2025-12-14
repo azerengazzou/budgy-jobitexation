@@ -1,0 +1,5 @@
+Required dependencies to install:
+
+npm install expo-mail-composer react-native-qrcode-generator react-native-qrcode-svg
+
+Note: expo-sharing is already installed in package.json

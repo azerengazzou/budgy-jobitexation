@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
-import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3, Trash2, ArrowLeft } from 'lucide-react-native';
+import { User, Globe, DollarSign, Bell, FileText, PiggyBank, CreditCard as Edit3, Trash2, ArrowLeft, Share, Mail, QrCode, Download, Upload } from 'lucide-react-native';
 import { storageService } from '../../services/storage';
 import { notificationService } from '../../services/notifications';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +21,8 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import { backupService } from '../../services/backup-service';
 import { UserProfile } from '../../components/interfaces/settings';
 import { styles } from '../../components/style/settings.styles';
+import { LoadingScreen } from '../../components/LoadingScreen';
+import { QRBackupModal } from '../../components/QRBackupModal';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -39,6 +41,9 @@ export default function SettingsScreen() {
   });
   const [savingsAmount, setSavingsAmount] = useState('');
   const [lastBackupTime, setLastBackupTime] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isQRModalVisible, setQRModalVisible] = useState(false);
+  const [qrMode, setQRMode] = useState<'generate' | 'restore'>('generate');
 
   const loadSettings = async () => {
     try {
@@ -65,7 +70,11 @@ export default function SettingsScreen() {
   };
 
   useEffect(() => {
-    loadSettings();
+    const initializeSettings = async () => {
+      await loadSettings();
+      setIsLoading(false);
+    };
+    initializeSettings();
   }, []);
 
   const handleSaveProfile = async () => {
@@ -182,6 +191,10 @@ export default function SettingsScreen() {
     setProfileModalVisible(true);
   };
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <LinearGradient colors={['#0A2540', '#4A90E2']} style={styles.container}>
       <View style={styles.header}>
@@ -271,9 +284,11 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Backup */}
+        {/* Backup Options */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Backup</Text>
+          <Text style={styles.sectionTitle}>{t('backup_options')}</Text>
+          
+          {/* Internal Backup */}
           <TouchableOpacity
             style={styles.settingCard}
             activeOpacity={0.7}
@@ -281,25 +296,133 @@ export default function SettingsScreen() {
               try {
                 const filePath = await backupService.createBackup();
                 if (filePath) {
-                  Alert.alert('Success', 'Backup created successfully!');
+                  Alert.alert(t('success'), t('backup_created_successfully'));
                   await loadSettings();
                 } else {
-                  Alert.alert('Error', 'Failed to create backup');
+                  Alert.alert(t('error'), t('failed_to_create_backup'));
                 }
               } catch (error) {
-                Alert.alert('Error', 'Failed to create backup');
+                Alert.alert(t('error'), t('failed_to_create_backup'));
               }
             }}>
             <View style={styles.settingLeft}>
               <FileText size={20} color="#10B981" />
               <View style={styles.settingText}>
-                <Text style={styles.settingTitle}>Manual Backup</Text>
+                <Text style={styles.settingTitle}>{t('internal_backup')}</Text>
                 <Text style={styles.settingSubtitle}>
                   {lastBackupTime
-                    ? `Last backup: ${new Date(lastBackupTime).toLocaleString()}`
-                    : 'No backup created yet'
+                    ? `${t('last_backup')}: ${new Date(lastBackupTime).toLocaleString()}`
+                    : t('no_backup_created_yet')
                   }
                 </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* Local Backup */}
+          <TouchableOpacity
+            style={styles.settingCard}
+            activeOpacity={0.7}
+            onPress={async () => {
+              try {
+                const filePath = await backupService.createLocalBackup();
+                if (filePath) {
+                  Alert.alert(t('success'), `${t('local_backup_saved_successfully')}\n\nLocation: ${filePath}`);
+                } else {
+                  Alert.alert(t('error'), t('failed_to_create_local_backup'));
+                }
+              } catch (error) {
+                Alert.alert(t('error'), t('failed_to_create_backup'));
+              }
+            }}>
+            <View style={styles.settingLeft}>
+              <Download size={20} color="#8B5CF6" />
+              <View style={styles.settingText}>
+                <Text style={styles.settingTitle}>{t('local_backup')}</Text>
+                <Text style={styles.settingSubtitle}>{t('save_to_device_storage')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* Share Backup */}
+          <TouchableOpacity
+            style={styles.settingCard}
+            activeOpacity={0.7}
+            onPress={async () => {
+              try {
+                const success = await backupService.shareBackup();
+                if (!success) {
+                  Alert.alert(t('error'), t('failed_to_share_backup'));
+                }
+              } catch (error) {
+                Alert.alert(t('error'), t('failed_to_share_backup'));
+              }
+            }}>
+            <View style={styles.settingLeft}>
+              <Share size={20} color="#F59E0B" />
+              <View style={styles.settingText}>
+                <Text style={styles.settingTitle}>{t('share_backup')}</Text>
+                <Text style={styles.settingSubtitle}>{t('share_via_apps_cloud')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          {/* Email Backup */}
+          <TouchableOpacity
+            style={styles.settingCard}
+            activeOpacity={0.7}
+            onPress={async () => {
+              try {
+                const success = await backupService.emailBackup();
+                if (!success) {
+                  Alert.alert('Info', t('email_composer_closed'));
+                }
+              } catch (error) {
+                Alert.alert(t('error'), t('failed_to_send_email_backup'));
+              }
+            }}>
+            <View style={styles.settingLeft}>
+              <Mail size={20} color="#EF4444" />
+              <View style={styles.settingText}>
+                <Text style={styles.settingTitle}>{t('email_backup')}</Text>
+                <Text style={styles.settingSubtitle}>{t('send_backup_file_via_email')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Data Backup */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('data_backup')}</Text>
+          
+          <TouchableOpacity
+            style={styles.settingCard}
+            activeOpacity={0.7}
+            onPress={() => {
+              setQRMode('generate');
+              setQRModalVisible(true);
+            }}>
+            <View style={styles.settingLeft}>
+              <QrCode size={20} color="#3B82F6" />
+              <View style={styles.settingText}>
+                <Text style={styles.settingTitle}>{t('generate_backup_data')}</Text>
+                <Text style={styles.settingSubtitle}>{t('create_backup_data_for_emergency')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.settingCard}
+            activeOpacity={0.7}
+            onPress={() => {
+              setQRMode('restore');
+              setQRModalVisible(true);
+            }}>
+            <View style={styles.settingLeft}>
+              <Upload size={20} color="#10B981" />
+              <View style={styles.settingText}>
+                <Text style={styles.settingTitle}>{t('restore_from_backup')}</Text>
+                <Text style={styles.settingSubtitle}>{t('paste_backup_data_to_restore')}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -326,6 +449,12 @@ export default function SettingsScreen() {
         </View>
       </ScrollView>
 
+      {/* QR Backup Modal */}
+      <QRBackupModal
+        isVisible={isQRModalVisible}
+        onClose={() => setQRModalVisible(false)}
+        mode={qrMode}
+      />
 
       {/* Savings Adjustment Modal */}
       <Modal

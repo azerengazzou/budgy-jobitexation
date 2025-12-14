@@ -254,13 +254,13 @@ interface UserProfile {
 - **User profile editing** from settings
 
 ### Data Management & Backup
-- **Automatic backup system** with JSON file storage ( IMPROVEMENTS ARE IN PROGRESS )
-- **Manual backup creation** with timestamped files ( IMPROVEMENTS ARE IN PROGRESS )
-- **Backup detection and restore** on app initialization ( IMPROVEMENTS ARE IN PROGRESS )
-- **Data import/export** functionality via file system ( IMPROVEMENTS ARE IN PROGRESS )
-- **Monthly/Weekly carry-over processing** for unused revenue ( IMPROVEMENTS ARE IN PROGRESS )
-- **Data integrity validation** and error handling
-- **Complete data deletion** with confirmation
+- **Automatic backup system** with JSON file storage and real-time triggers
+- **Manual backup creation** with timestamped files and user feedback
+- **Backup detection and restore** on app initialization with user confirmation
+- **Data import/export** functionality via file system with validation
+- **Monthly/Weekly carry-over processing** for unused revenue with period tracking
+- **Data integrity validation** and comprehensive error handling
+- **Complete data deletion** with confirmation and app restart
 
 ### UI/UX Features
 - **Swipe gestures** for item deletion
@@ -473,13 +473,532 @@ App Launch
 2. Currency change → Context update → Storage save → Amount formatting refresh
 3. Notification toggle → System permissions → Service configuration → Storage save
 
-### Backup Flow
-1. Data changes → Auto-backup trigger → JSON serialization → File system write → Timestamp update
-2. Manual backup → User action → Create backup file → Success notification → Update last backup time
-3. App initialization → Scan for backups → User confirmation → Restore data → Context refresh
+### Backup Data Flow
+
+#### Automatic Backup Flow
+```
+User Action (Add/Edit/Delete)
+    ↓
+Storage Service Method
+    ↓
+Data Validation & Processing
+    ↓
+AsyncStorage Update
+    ↓
+backupService.autoBackup() Trigger
+    ↓
+Data Collection (Promise.all)
+    ↓
+JSON Serialization
+    ↓
+File System Write
+    ↓
+Timestamp Update
+    ↓
+Status Notification
+```
+
+#### Manual Backup Flow
+```
+User Taps Backup Button
+    ↓
+backupService.createBackup()
+    ↓
+Status: 'pending'
+    ↓
+Data Collection from AsyncStorage
+    ↓
+Backup Data Structure Creation
+    ↓
+File Creation with Timestamp
+    ↓
+Status: 'success' | 'failed'
+    ↓
+User Feedback (Alert)
+    ↓
+UI Status Update
+```
+
+#### App Initialization Flow
+```
+App Launch
+    ↓
+Check 'app_initialized' Flag
+    ↓
+If First Launch:
+    ↓
+backupService.scanForBackups()
+    ↓
+If Backup Found:
+    ↓
+User Confirmation Dialog
+    ↓
+If User Confirms:
+    ↓
+backupService.restoreFromBackup()
+    ↓
+Data Validation & Restoration
+    ↓
+Context Refresh
+    ↓
+Set 'app_initialized' = true
+```
+
+#### Backup Restoration Flow
+```
+Restore Request
+    ↓
+File Path Validation
+    ↓
+Read Backup File
+    ↓
+Content Validation
+    ↓
+JSON Parsing
+    ↓
+Data Structure Validation
+    ↓
+AsyncStorage Batch Update
+    ↓
+Success/Failure Response
+    ↓
+UI Feedback
+    ↓
+Data Context Refresh
+```
+
+#### Local Backup Flow
+```
+User Taps Local Backup
+    ↓
+backupService.createLocalBackup()
+    ↓
+Collect Backup Data
+    ↓
+Determine Platform Storage Path
+    ↓
+Create External Directory
+    ↓
+Write JSON File to External Storage
+    ↓
+Success/Failure Response
+    ↓
+User Notification
+```
+
+#### Share Backup Flow
+```
+User Taps Share Backup
+    ↓
+backupService.shareBackup()
+    ↓
+Create Internal Backup File
+    ↓
+Check Sharing Availability
+    ↓
+Open System Share Dialog
+    ↓
+User Selects App/Service
+    ↓
+File Shared Successfully
+```
+
+#### Data Backup Flow
+```
+User Taps Generate Backup
+    ↓
+backupService.generateQRBackup()
+    ↓
+Collect Essential Data Only
+    ↓
+Compress Data for Portability
+    ↓
+Generate Backup String
+    ↓
+Display Data + Copy Option
+    ↓
+User Copies/Shares Data
+```
+
+#### Data Restore Flow
+```
+User Taps Restore
+    ↓
+User Pastes Backup Data
+    ↓
+backupService.restoreFromQR()
+    ↓
+Validate Backup Data
+    ↓
+Restore to AsyncStorage
+    ↓
+Refresh Data Context
+    ↓
+Success Notification
+```
 
 ### Carry-over Flow
-1. App launch → Check last processed period → Compare with current period → Reset revenue amounts → Update storage
+```
+App Launch
+    ↓
+storageService.processCarryOver()
+    ↓
+Get User Carry-over Preference (monthly/weekly)
+    ↓
+Calculate Current Period
+    ↓
+Check Last Processed Period
+    ↓
+If New Period Detected:
+    ↓
+Load All Revenues
+    ↓
+Reset remainingAmount = amount
+    ↓
+Update Storage
+    ↓
+Update Last Processed Timestamp
+    ↓
+Trigger Auto-backup
+```
+
+## Comprehensive Backup System
+
+Budgy implements a robust, multi-layered backup system that ensures data safety and provides seamless data recovery capabilities. The system operates on three levels: automatic backups, manual backups, and app initialization restore.
+
+### System Architecture
+
+The backup system is built around the `BackupService` class which manages all backup operations independently of the main storage services to avoid circular dependencies.
+
+#### Core Components
+
+**BackupService (`services/backup-service.ts`)**
+- Singleton service managing all backup operations
+- Status tracking with real-time notifications
+- File system operations for backup storage
+- Data validation and error handling
+
+**Storage Integration**
+- Main `StorageService` extends backup functionality
+- Automatic backup triggers on all data modifications
+- Backup status integration in settings UI
+
+**App Initialization**
+- Backup scanning on first launch
+- User confirmation for data restoration
+- Graceful handling of backup failures
+
+### Automatic Backup System
+
+#### Trigger Points
+Automatic backups are triggered on every data modification operation:
+
+```typescript
+// Revenue operations
+await storageService.addRevenue(revenue);
+// → Triggers: backupService.autoBackup()
+
+// Expense operations  
+await storageService.addExpense(expense);
+// → Triggers: backupService.autoBackup()
+
+// Goal and savings operations
+await storageService.addGoal(goal);
+// → Triggers: backupService.autoBackup()
+
+// Settings changes
+await storageService.saveSettings(settings);
+// → Triggers: backupService.autoBackup()
+```
+
+#### Data Collection Process
+1. **Direct AsyncStorage Access**: Bypasses storage services to avoid circular dependencies
+2. **Parallel Data Retrieval**: Uses `Promise.all()` for efficient data collection
+3. **Safe JSON Parsing**: Comprehensive null/undefined validation with fallbacks
+4. **Data Normalization**: Ensures consistent data structure across backups
+
+#### Backup Creation Flow
+```typescript
+// 1. Set status to pending
+backupStatus.status = 'pending';
+
+// 2. Collect all app data in parallel
+const [revenues, expenses, categories, ...] = await Promise.all([
+  AsyncStorage.getItem(STORAGE_KEYS.REVENUES),
+  AsyncStorage.getItem(STORAGE_KEYS.EXPENSES),
+  // ... other data sources
+]);
+
+// 3. Create backup data structure
+const backupData = {
+  revenues: safeJsonParse(revenues, []),
+  expenses: safeJsonParse(expenses, []),
+  // ... other data with fallbacks
+  timestamp: new Date().toISOString(),
+  version: '1.1.0'
+};
+
+// 4. Write to file system
+const fileName = `finance_backup_${dateString}.json`;
+const fileUri = `${backupDir}${fileName}`;
+await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(backupData, null, 2));
+
+// 5. Update status and timestamp
+backupStatus.status = 'success';
+await AsyncStorage.setItem('last_backup_time', timestamp);
+```
+
+### Manual Backup System
+
+#### User Interface Integration
+Manual backup is accessible through the Settings screen with real-time status display:
+
+```typescript
+// Settings screen backup button
+<TouchableOpacity onPress={async () => {
+  const filePath = await backupService.createBackup();
+  if (filePath) {
+    Alert.alert('Success', 'Backup created successfully!');
+  } else {
+    Alert.alert('Error', 'Failed to create backup');
+  }
+}}>
+```
+
+#### Status Display
+- **Last backup time**: Formatted timestamp display
+- **Backup status**: Real-time status updates (pending, success, failed)
+- **User feedback**: Success/error alerts with detailed messages
+
+### App Initialization & Restore
+
+#### First Launch Detection
+The app detects first launches and scans for existing backups:
+
+```typescript
+// App initialization in _layout.tsx
+const isFirstLaunch = !(await storageService.getItem('app_initialized'));
+
+if (isFirstLaunch) {
+  const backupFile = await backupService.scanForBackups();
+  
+  if (backupFile) {
+    // Show user confirmation dialog
+    Alert.alert(
+      'Backup Found',
+      'A backup was found. Do you want to restore your data?',
+      [
+        { text: 'Skip', style: 'cancel' },
+        { 
+          text: 'Restore',
+          onPress: async () => {
+            const success = await backupService.restoreFromBackup(backupFile);
+            // Handle success/failure
+          }
+        }
+      ]
+    );
+  }
+}
+```
+
+#### Backup Scanning Process
+1. **Directory Check**: Verifies backup directory exists
+2. **File Discovery**: Scans for files matching `finance_backup_*.json` pattern
+3. **Latest Selection**: Returns most recent backup file
+4. **Error Handling**: Graceful handling of missing directories or files
+
+#### Restoration Process
+```typescript
+async restoreFromBackup(filePath: string): Promise<boolean> {
+  // 1. Read backup file
+  const backupContent = await FileSystem.readAsStringAsync(filePath);
+  
+  // 2. Validate content
+  if (!backupContent || backupContent.trim() === '') {
+    return false;
+  }
+  
+  // 3. Parse and validate JSON
+  const backupData = JSON.parse(backupContent);
+  if (!backupData || typeof backupData !== 'object') {
+    return false;
+  }
+  
+  // 4. Restore data to AsyncStorage
+  await Promise.all([
+    AsyncStorage.setItem(STORAGE_KEYS.REVENUES, JSON.stringify(backupData.revenues || [])),
+    AsyncStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(backupData.expenses || [])),
+    // ... restore all data with fallbacks
+  ]);
+  
+  return true;
+}
+```
+
+### Data Validation & Safety
+
+#### JSON Parsing Safety
+```typescript
+private safeJsonParse(jsonString: string | null, defaultValue: any): any {
+  // Comprehensive null/undefined checks
+  if (!jsonString || 
+      jsonString === 'undefined' || 
+      jsonString === 'null' || 
+      jsonString.trim() === '') {
+    return defaultValue;
+  }
+  
+  try {
+    const parsed = JSON.parse(jsonString);
+    return parsed !== null && parsed !== undefined ? parsed : defaultValue;
+  } catch (error) {
+    console.error('JSON parse error:', error);
+    return defaultValue;
+  }
+}
+```
+
+#### Data Structure Validation
+- **Type checking**: Validates backup data structure before restoration
+- **Fallback values**: Provides safe defaults for missing or corrupted data
+- **Version tracking**: Backup format versioning for future compatibility
+- **Error logging**: Comprehensive error logging for debugging
+
+### Status Management System
+
+#### Real-time Status Tracking
+```typescript
+interface BackupStatus {
+  status: 'success' | 'failed' | 'pending' | 'none';
+  lastBackupTime: string | null;
+  error: string | null;
+}
+```
+
+#### Status Listeners
+- **UI Components**: Can subscribe to backup status changes
+- **Real-time Updates**: Immediate notification of status changes
+- **Error Reporting**: Detailed error messages for troubleshooting
+
+### File System Management
+
+#### Directory Structure
+```
+{DocumentDirectory}/
+└── budgy_backup/
+    ├── finance_backup_20240115103000.json
+    ├── finance_backup_20240114095500.json
+    └── finance_backup_20240113142000.json
+```
+
+#### File Naming Convention
+- **Pattern**: `finance_backup_YYYYMMDDHHMMSS.json`
+- **Timestamp**: ISO date format converted to filename-safe format
+- **Extension**: `.json` for universal compatibility
+- **Sorting**: Lexicographic sorting provides chronological order
+
+#### App Deletion Behavior
+- **Backup file persistence**: **NO** - All backup files are deleted when app is uninstalled
+- **Storage location**: Files are stored in app's document directory (app sandbox)
+- **Data recovery**: Impossible to recover backups after app deletion
+- **User recommendation**: Export backup files to external storage before uninstalling
+- **Future enhancement**: Cloud backup integration for persistent storage
+
+### Error Handling & Recovery
+
+#### Backup Creation Errors
+- **File system errors**: Directory creation failures, write permissions
+- **Data collection errors**: AsyncStorage access failures
+- **JSON serialization errors**: Circular references, invalid data
+- **Status updates**: Error status with detailed error messages
+
+#### Restoration Errors
+- **File access errors**: Missing files, read permissions
+- **Data validation errors**: Invalid JSON, corrupted data structure
+- **Storage errors**: AsyncStorage write failures
+- **Graceful degradation**: Partial restoration with error reporting
+
+### Performance Considerations
+
+#### Optimization Strategies
+- **Parallel operations**: `Promise.all()` for concurrent data operations
+- **Minimal file I/O**: Single file write per backup operation
+- **Efficient scanning**: Directory listing with pattern matching
+- **Status caching**: In-memory status tracking to reduce storage calls
+
+#### Memory Management
+- **Streaming**: Large backup files handled efficiently
+- **Cleanup**: Automatic cleanup of temporary data
+- **Error boundaries**: Isolated error handling prevents memory leaks
+
+### Integration with App Features
+
+#### Settings Screen Integration
+- **Manual backup button**: One-tap backup creation
+- **Status display**: Last backup time and current status
+- **User feedback**: Success/error notifications
+
+#### Data Context Integration
+- **Automatic refresh**: Context refresh after restoration
+- **State synchronization**: Ensures UI reflects restored data
+- **Loading states**: Proper loading indicators during operations
+
+### Enhanced Backup Options
+
+#### Local Backup System
+- **External storage**: Save backups to Downloads (Android) or Documents (iOS) folder
+- **Survives app deletion**: Files remain accessible after app uninstallation
+- **Platform-specific paths**: Automatic detection of appropriate storage location
+- **User accessibility**: Files accessible through file managers and Files app
+
+#### Data Backup & Restore System
+- **Minimal data backup**: Recent transactions and essential data only
+- **Text-based backup**: Generate copyable backup data strings
+- **Manual restore**: Paste backup data for restoration
+- **Size optimization**: Automatic data compression for portability
+- **Clipboard integration**: Copy backup data for manual transfer
+
+#### Email/Share Export System
+- **Multiple sharing options**: Email, messaging apps, cloud storage
+- **Universal compatibility**: JSON format works across platforms
+- **Attachment support**: Email backup files as attachments
+- **Social sharing**: Share via WhatsApp, Telegram, AirDrop, etc.
+- **Cloud integration**: Direct sharing to Google Drive, OneDrive, Dropbox
+
+#### Implementation Details
+```typescript
+// Local backup to external storage
+const localPath = await backupService.createLocalBackup();
+
+// Generate backup data string
+const backupData = await backupService.generateQRBackup();
+
+// Share backup via native sharing
+const shared = await backupService.shareBackup();
+
+// Email backup via native email
+const emailed = await backupService.emailBackup('user@example.com');
+
+// Restore from backup data
+const restored = await backupService.restoreFromQR(backupData);
+```
+
+### Future Enhancements
+
+#### Planned Improvements
+- **Cloud backup**: Integration with cloud storage services
+- **Backup compression**: Reduce file sizes for large datasets
+- **Incremental backups**: Only backup changed data
+- **Backup scheduling**: User-configurable backup intervals
+- **Multiple backup retention**: Keep multiple backup versions
+- **Backup encryption**: Secure backup files with encryption
+
+#### Compatibility Considerations
+- **Version migration**: Handle backup format changes
+- **Cross-platform**: Ensure backups work across iOS/Android
+- **Export formats**: Support for CSV, Excel export
+- **Import validation**: Enhanced validation for imported data
 
 ## Notification System
 
@@ -581,16 +1100,86 @@ StorageService extends RevenueStorageService {
   userStorage: UserStorageService
   expenseStorage: ExpenseStorageService
   savingsStorage: SavingsStorageService
+  
+  // Backup integration methods
+  async addRevenue(revenue) {
+    const result = await super.addRevenue(revenue);
+    await backupService.autoBackup(); // Auto-backup trigger
+    return result;
+  }
+  
+  async addExpense(expense) {
+    const result = await this.expenseStorage.addExpense(expense);
+    await backupService.autoBackup(); // Auto-backup trigger
+    return result;
+  }
+  
+  // ... all data modification methods trigger auto-backup
+}
+
+BackupService {
+  // Independent service to avoid circular dependencies
+  async createBackup(): Promise<string | null>
+  async restoreFromBackup(filePath: string): Promise<boolean>
+  async scanForBackups(): Promise<string | null>
+  async autoBackup(): Promise<void>
+  getBackupStatus(): BackupStatus
 }
 ```
 
-### Backup System
-- **Automatic backups**: Triggered on all data modifications
-- **Manual backups**: User-initiated with success feedback
-- **Backup scanning**: Automatic detection on app launch
-- **Restore functionality**: User confirmation with data validation
-- **Backup format**: JSON with metadata (timestamp, version)
-- **File naming**: `finance_backup_YYYYMMDDHHMMSS.json`
+### Backup System Architecture
+
+#### Automatic Backup Triggers
+- **Revenue operations**: Add, update, delete revenue entries
+- **Expense operations**: Add, update, delete expense entries  
+- **Goal operations**: Add, update, delete savings goals
+- **Savings transactions**: Add savings to goals with revenue deduction
+- **Settings changes**: Currency, language, notification preferences
+- **Category management**: Add, update custom categories
+
+#### Backup File Structure
+```json
+{
+  "revenues": [...],
+  "expenses": [...], 
+  "categories": [...],
+  "revenueCategories": [...],
+  "settings": {...},
+  "userProfile": {...},
+  "savings": [...],
+  "goals": [...],
+  "savingsTransactions": [...],
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "version": "1.1.0"
+}
+```
+
+#### Backup Storage Locations
+- **Internal**: `{DocumentDirectory}/budgy_backup/` (deleted with app)
+- **Local**: `Downloads/` (Android) or `Documents/` (iOS) (survives app deletion)
+- **External**: Via sharing to cloud storage, email, messaging apps
+- **QR Code**: Visual backup for emergency situations
+
+#### Backup Methods
+1. **Internal Backup**: Standard app directory backup
+2. **Local Backup**: External storage backup (survives uninstall)
+3. **Share Backup**: Export via system sharing (apps, cloud, messaging)
+4. **Email Backup**: Open email app with backup data
+5. **Data Backup**: Generate copyable backup data string
+6. **Data Restore**: Paste backup data to restore
+
+#### File Formats & Naming
+- **Standard**: `finance_backup_YYYYMMDDHHMMSS.json`
+- **Data String**: Compressed JSON with recent data only
+- **Format**: JSON with metadata and version tracking
+- **Size**: Uncompressed for readability, compressed for QR codes
+
+#### Backup Status Management
+- **Real-time status**: Success, failed, pending, none
+- **Status listeners**: UI components can subscribe to backup status changes
+- **Error handling**: Detailed error messages and graceful fallbacks
+- **Last backup tracking**: Timestamp storage and display in settings
+- **Method tracking**: Track which backup method was used
 
 ## Business Rules
 

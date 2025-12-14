@@ -83,28 +83,31 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const updateRevenues = useCallback(async () => {
     const data = await storageService.getRevenues();
     setRevenues(normalizeRevenues(data));
+    await backupService.autoBackup();
   }, [normalizeRevenues]);
 
   const updateExpenses = useCallback(async () => {
     const data = await storageService.getExpenses();
     setExpenses(filterExpenses(data));
+    await backupService.autoBackup();
   }, [filterExpenses]);
-
-
 
   const updateSavings = useCallback(async () => {
     const data = await storageService.getSavings();
     setSavings(data);
+    await backupService.autoBackup();
   }, []);
 
   const updateGoals = useCallback(async () => {
     const data = await storageService.getGoals();
     setGoals(data);
+    await backupService.autoBackup();
   }, []);
 
   const updateSavingsTransactions = useCallback(async () => {
     const data = await storageService.getSavingsTransactions();
     setSavingsTransactions(data);
+    await backupService.autoBackup();
   }, []);
 
   const refreshData = useCallback(async () => {
@@ -114,6 +117,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   useEffect(() => {
     loadAllData();
+    backupService.initializeBackupStatus();
   }, [loadAllData]);
 
   return (

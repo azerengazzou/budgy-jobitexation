@@ -14,11 +14,25 @@ class StorageService extends RevenueStorageService {
   private savingsStorage = new SavingsStorageService();
 
   // User Profile methods
-  async saveUserProfile(profile: any) { return this.userStorage.saveUserProfile(profile); }
-  async getUserProfile() { return this.userStorage.getUserProfile(); }
-  async setOnboardingComplete() { return this.userStorage.setOnboardingComplete(); }
-  async isOnboardingComplete() { return this.userStorage.isOnboardingComplete(); }
-  async getSettings() { return this.userStorage.getSettings(); }
+  async saveUserProfile(profile: any) {
+    return this.userStorage.saveUserProfile(profile);
+  }
+
+  async getUserProfile() {
+    return this.userStorage.getUserProfile();
+  }
+
+  async setOnboardingComplete() {
+    return this.userStorage.setOnboardingComplete();
+  }
+
+  async isOnboardingComplete() {
+    return this.userStorage.isOnboardingComplete();
+  }
+
+  async getSettings() {
+    return this.userStorage.getSettings();
+  }
   async saveSettings(settings: any) {
     const result = await this.userStorage.saveSettings(settings);
     await backupService.autoBackup();
@@ -31,10 +45,21 @@ class StorageService extends RevenueStorageService {
     return result;
   }
   async getItem(key: string): Promise<any> {
-    return await this.userStorage.getItem(key);
+    try {
+      return await this.userStorage.getItem(key);
+    } catch (error) {
+      console.error(`Error getting item ${key}:`, error);
+      throw error;
+    }
   }
+
   async setItem(key: string, value: any): Promise<void> {
-    return await this.userStorage.setItem(key, value);
+    try {
+      return await this.userStorage.setItem(key, value);
+    } catch (error) {
+      console.error(`Error setting item ${key}:`, error);
+      throw error;
+    }
   }
 
   // Expense methods
@@ -74,11 +99,16 @@ class StorageService extends RevenueStorageService {
     return result;
   }
   async deleteGoal(id: string) {
-    // Delete related savings transactions
-    await this.savingsStorage.deleteTransactionsByGoalId(id);
-    const result = await this.expenseStorage.deleteGoal(id);
-    await backupService.autoBackup();
-    return result;
+    try {
+      // Delete related savings transactions
+      await this.savingsStorage.deleteTransactionsByGoalId(id);
+      const result = await this.expenseStorage.deleteGoal(id);
+      await backupService.autoBackup();
+      return result;
+    } catch (error) {
+      console.error(`Error deleting goal ${id}:`, error);
+      throw error;
+    }
   }
 
   // Savings Transactions methods
@@ -86,46 +116,48 @@ class StorageService extends RevenueStorageService {
     return this.savingsStorage.getSavingsTransactions();
   }
   async addSavingsTransaction(transaction: SavingsTransaction) {
-    const normalizedTransaction = {
-      ...transaction,
-      amount: normalizeAmount(transaction.amount)
-    };
-    await this.savingsStorage.addSavingsTransaction(normalizedTransaction);
+    try {
+      const normalizedTransaction = {
+        ...transaction,
+        amount: normalizeAmount(transaction.amount)
+      };
+      await this.savingsStorage.addSavingsTransaction(normalizedTransaction);
 
-    // Update goal's current amount
-    const currentAmount = normalizeAmount(await this.savingsStorage.calculateGoalCurrentAmount(transaction.goalId));
+      // Update goal's current amount
+      const currentAmount = normalizeAmount(await this.savingsStorage.calculateGoalCurrentAmount(transaction.goalId));
 
-    const goals = await this.getGoals();
-    const goalIndex = goals.findIndex(g => g.id === transaction.goalId);
+      const goals = await this.getGoals();
+      const goalIndex = goals.findIndex(g => g.id === transaction.goalId);
 
-    if (goalIndex !== -1) {
-      goals[goalIndex].currentAmount = currentAmount;
-      goals[goalIndex].updatedAt = new Date().toISOString();
+      if (goalIndex !== -1) {
+        goals[goalIndex].currentAmount = currentAmount;
+        goals[goalIndex].updatedAt = new Date().toISOString();
 
-      // Check if goal is completed
-      if (currentAmount >= goals[goalIndex].targetAmount && goals[goalIndex].status === 'active') {
-        goals[goalIndex].status = 'completed';
-        goals[goalIndex].completedAt = new Date().toISOString();
+        // Check if goal is completed
+        if (currentAmount >= goals[goalIndex].targetAmount && goals[goalIndex].status === 'active') {
+          goals[goalIndex].status = 'completed';
+          goals[goalIndex].completedAt = new Date().toISOString();
+        }
+
+        await this.expenseStorage.updateGoal(goals[goalIndex]);
       }
 
-      await this.expenseStorage.updateGoal(goals[goalIndex]);
+      await backupService.autoBackup();
+    } catch (error) {
+      console.error('Error adding savings transaction:', error);
+      throw error;
     }
-
-    await backupService.autoBackup();
   }
   async getTransactionsByGoalId(goalId: string): Promise<SavingsTransaction[]> {
     return this.savingsStorage.getTransactionsByGoalId(goalId);
   }
+
   async deleteSavingsTransaction(transactionId: string) {
     const transactions = await this.getSavingsTransactions();
     const updatedTransactions = transactions.filter(t => t.id !== transactionId);
     await this.setItem('savings_transactions', updatedTransactions);
     await backupService.autoBackup();
   }
-
-
-
-
 
   // Override revenue methods to add backup triggers
   async addRevenue(revenue: any) {
@@ -148,20 +180,25 @@ class StorageService extends RevenueStorageService {
 
   // Deduct from revenue when saving
   async deductFromRevenueForSaving(revenueId: string, amount: number): Promise<void> {
-    await this.deductFromRevenue(revenueId, normalizeAmount(amount));
+    try {
+      await this.deductFromRevenue(revenueId, normalizeAmount(amount));
+    } catch (error) {
+      console.error(`Error deducting from revenue ${revenueId}:`, error);
+      throw error;
+    }
   }
 
   // Monthly carry-over logic
   async processCarryOver(): Promise<void> {
     const profile = await this.getUserProfile();
     const carryOverType = profile?.carryOverPreference || 'monthly';
-    
+
     const lastProcessedKey = `last_processed_${carryOverType}`;
     const lastProcessed = await AsyncStorage.getItem(lastProcessedKey);
-    
+
     const now = new Date();
     let currentPeriod = '';
-    
+
     if (carryOverType === 'weekly') {
       const startOfYear = new Date(now.getFullYear(), 0, 1);
       const weekNumber = Math.ceil(((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
@@ -169,16 +206,21 @@ class StorageService extends RevenueStorageService {
     } else {
       currentPeriod = now.toISOString().slice(0, 7);
     }
-    
+
     if (lastProcessed !== currentPeriod) {
-      const revenues = await this.getRevenues();
-      const updatedRevenues = revenues.map(revenue => ({
-        ...revenue,
-        remainingAmount: normalizeAmount(revenue.amount),
-      }));
-      
-      await this.setItem(STORAGE_KEYS.REVENUES, updatedRevenues);
-      await AsyncStorage.setItem(lastProcessedKey, currentPeriod);
+      try {
+        const revenues = await this.getRevenues();
+        const updatedRevenues = revenues.map(revenue => ({
+          ...revenue,
+          remainingAmount: normalizeAmount(revenue.amount),
+        }));
+
+        await this.setItem(STORAGE_KEYS.REVENUES, updatedRevenues);
+        await AsyncStorage.setItem(lastProcessedKey, currentPeriod);
+      } catch (error) {
+        console.error('Carry-over processing error:', error);
+        throw error;
+      }
     }
   }
 }

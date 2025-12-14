@@ -23,29 +23,31 @@ export default function GeneralScreen() {
   }, []);
 
   const loadSettings = async () => {
-    try {
       const settings = await storageService.getSettings();
       if (settings) {
         setNotificationsEnabled(settings.notificationsEnabled ?? true);
       }
-    } catch (error) {
-      console.error('Error loading settings:', error);
-    }
   };
 
   const handleNotificationToggle = async (value: boolean) => {
-    setNotificationsEnabled(value);
-    const settings = await storageService.getSettings();
-    await storageService.saveSettings({
-      currency: settings?.currency || 'EUR',
-      language: settings?.language || 'en',
-      notificationsEnabled: value,
-    });
+    try {
+      setNotificationsEnabled(value);
+      const settings = await storageService.getSettings();
+      await storageService.saveSettings({
+        currency: settings?.currency || 'EUR',
+        language: settings?.language || 'en',
+        notificationsEnabled: value,
+      });
 
-    if (value) {
-      await notificationService.scheduleNotifications();
-    } else {
-      await notificationService.cancelNotifications();
+      if (value) {
+        await notificationService.scheduleNotifications();
+      } else {
+        await notificationService.cancelNotifications();
+      }
+    } catch (error) {
+      console.error('Error toggling notifications:', error);
+      Alert.alert(t('error'), t('failed_to_update_settings'));
+      setNotificationsEnabled(!value);
     }
   };
 
@@ -104,7 +106,7 @@ export default function GeneralScreen() {
                 fontSize: 12,
                 fontWeight: 'bold',
                 textAlign: 'center',
-              }}>Soon</Text>
+              }}>{t('soon_badge')}</Text>
             </View>
           </View>
         </View>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Receipt, Trash2, Edit3 } from 'lucide-react-native';
@@ -13,6 +13,7 @@ import { CategoryIcon } from '@/components/CategoryIcons';
 import { DateFilter, DateFilterType, filterTransactionsByDate } from '@/components/DateFilter';
 import { ExpenseModal } from '@/components/ExpenseModal';
 import { expenseCategoryStyles } from '@/components/style/expense-category-details.styles';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 export default function ExpenseCategoryDetails() {
     const { t } = useTranslation();
@@ -21,6 +22,7 @@ export default function ExpenseCategoryDetails() {
     const { categoryType } = useLocalSearchParams();
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
+    const [isLoading, setIsLoading] = useState(true);
     
     // Modal states
     const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
@@ -36,6 +38,10 @@ export default function ExpenseCategoryDetails() {
 
     const categoryExpenses = expenses.filter(e => e.category === categoryType);
 
+    useEffect(() => {
+        setIsLoading(false);
+    }, [categoryExpenses]);
+
     const allEntries: Expense[] = useMemo(() => {
         const entries = categoryExpenses
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -45,14 +51,13 @@ export default function ExpenseCategoryDetails() {
     const totalAmount = categoryExpenses.reduce((s, e) => s + e.amount, 0);
     const expenseCount = categoryExpenses.length;
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
+    const formatDate = useCallback((dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric'
         });
-    };
+    }, []);
 
     const handleDeleteTransaction = async (item: Expense) => {
         Alert.alert(
@@ -92,7 +97,7 @@ export default function ExpenseCategoryDetails() {
         setExpenseModalVisible(true);
     };
 
-    const renderTransaction = ({ item }: { item: Expense }) => {
+    const renderTransaction = useCallback(({ item }: { item: Expense }) => {
         return (
             <View style={expenseCategoryStyles.transactionCard}>
                 <View style={expenseCategoryStyles.transactionRow}>
@@ -158,7 +163,11 @@ export default function ExpenseCategoryDetails() {
                 </View>
             </View>
         );
-    };
+    }, [formatAmount, handleEditTransaction, handleDeleteTransaction]);
+
+    if (isLoading) {
+        return <LoadingScreen />;
+    }
 
     return (
         <LinearGradient colors={['#0A2540', '#4A90E2']} style={expenseCategoryStyles.container}>
@@ -167,7 +176,14 @@ export default function ExpenseCategoryDetails() {
                 <View style={expenseCategoryStyles.headerRow}>
                     <TouchableOpacity
                         style={expenseCategoryStyles.backButton}
-                        onPress={() => router.back()}
+                        onPress={() => {
+                            try {
+                                router.back();
+                            } catch (error) {
+                                console.error('Navigation error:', error);
+                                router.push('/(tabs)/expenses');
+                            }
+                        }}
                         activeOpacity={0.7}
                     >
                         <ArrowLeft size={20} color="white" />
@@ -197,8 +213,12 @@ export default function ExpenseCategoryDetails() {
             <DateFilter
                 selectedFilter={dateFilter}
                 onFilterChange={(filter, customDates) => {
-                    setDateFilter(filter);
-                    setCustomDateRange(customDates);
+                    try {
+                        setDateFilter(filter);
+                        setCustomDateRange(customDates);
+                    } catch (error) {
+                        console.error('Filter change error:', error);
+                    }
                 }}
                 t={t}
             />
@@ -236,10 +256,21 @@ export default function ExpenseCategoryDetails() {
             <ExpenseModal
                 visible={isExpenseModalVisible}
                 onClose={() => {
-                    setExpenseModalVisible(false);
-                    setEditingExpense(null);
+                    try {
+                        setExpenseModalVisible(false);
+                        setEditingExpense(null);
+                    } catch (error) {
+                        console.error('Modal close error:', error);
+                    }
                 }}
-                onSave={() => {}}
+                onSave={async () => {
+                    try {
+                        // Save handled by ExpenseModal internally
+                    } catch (error) {
+                        console.error('Save error:', error);
+                        Alert.alert(t('error'), t('failed_to_save'));
+                    }
+                }}
                 editingExpense={editingExpense}
                 categories={['rent', 'food', 'transport']}
                 revenues={revenues}

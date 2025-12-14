@@ -14,6 +14,7 @@ import { CreateGoalModal } from '@/components/CreateGoalModal';
 import { GoalCompletionAnimation } from '@/components/GoalCompletionAnimation';
 import { useGoalCompletionAnimation } from '@/hooks/useGoalCompletionAnimation';
 import { ActivityIndicator } from 'react-native';
+import { LoadingScreen } from '@/components/LoadingScreen';
 
 export default function GoalDetailsScreen() {
   // ✅ ALL HOOKS AT THE TOP - ALWAYS CALLED IN SAME ORDER
@@ -89,13 +90,7 @@ export default function GoalDetailsScreen() {
   };
 
   if (isLoading) {
-    return (
-      <LinearGradient colors={['#0A2540', '#4A90E2']} style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color="white" />
-        </View>
-      </LinearGradient>
-    );
+    return <LoadingScreen />;
   }
 
   // ✅ VALIDATION AFTER ALL HOOKS - Safe to return early now

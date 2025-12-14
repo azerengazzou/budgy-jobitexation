@@ -1,8 +1,11 @@
 import { Tabs } from 'expo-router';
 import { View, Text } from 'react-native';
 import { Home, TrendingUp, Target, ChartPie as PieChart, Tag } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+  
   return (
     <Tabs
       screenOptions={{
@@ -25,21 +28,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: t('dashboard'),
           tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="revenues"
         options={{
-          title: 'Revenues',
+          title: t('revenues'),
           tabBarIcon: ({ size, color }) => <TrendingUp size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="expenses"
         options={{
-          title: 'Expenses',
+          title: t('expenses'),
           tabBarIcon: ({ size, color }) => <PieChart size={size} color={color} />,
         }}
       />
@@ -47,14 +50,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="goals"
         options={{
-          title: 'Savings',
+          title: t('savings'),
           tabBarIcon: ({ size, color }) => <Target size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="categories"
         options={{
-          title: 'Categories',
+          title: t('categories'),
           tabBarIcon: ({ size, color }) => <Tag size={size} color={color} />,
         }}
       />

@@ -12,6 +12,7 @@ import { PieChart } from 'react-native-chart-kit';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { DollarSign, TrendingUp, PiggyBank, Settings, User } from 'lucide-react-native';
+import { BackupStatusIndicator } from '../../components/BackupStatusIndicator';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
 import { styles } from '../../components/style/dashboard.styles';
@@ -124,6 +125,7 @@ export default function Dashboard() {
             <View style={styles.headerRow}>
               <Text style={styles.headerTitle}>{formatDate()}</Text>
               <View style={styles.iconsContainer}>
+                <BackupStatusIndicator />
                 <TouchableOpacity onPress={() => router.push('/profile')}>
                   <User size={20} color="#FFFFFF" style={styles.userIcon} />
                 </TouchableOpacity>
