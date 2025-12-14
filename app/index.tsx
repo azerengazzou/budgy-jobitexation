@@ -9,21 +9,19 @@ export default function IndexScreen() {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        // Load onboarding status and user data in parallel
         const [isOnboardingComplete, userProfile] = await Promise.all([
           storageService.isOnboardingComplete(),
           storageService.getUserProfile(),
         ]);
 
-        // ✅ Main decision point
         if (isOnboardingComplete && userProfile) {
           router.replace('/(tabs)');
         } else {
-          router.replace('/onboarding');
+          router.replace('/splash');
         }
       } catch (error) {
         console.error('Error checking onboarding status:', error);
-        router.replace('/onboarding');
+        router.replace('/splash');
       } finally {
         setIsLoading(false);
       }

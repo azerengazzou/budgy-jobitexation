@@ -9,7 +9,7 @@ import {
   Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, User, UserCheck, Save, Edit3 } from 'lucide-react-native';
+import { ArrowLeft, User, UserCheck, Save, Edit3, RefreshCw } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { storageService } from '../services/storage';
 import { useTranslation } from 'react-i18next';
@@ -243,6 +243,15 @@ export default function ProfileScreen() {
             </View>
           )}
 
+          {/* Test Button - Redirect to Onboarding */}
+          <TouchableOpacity
+            style={profileStyles.testButton}
+            onPress={() => router.push('/splash')}
+          >
+            <RefreshCw size={20} color="#F59E0B" />
+            <Text style={profileStyles.testButtonText}>Test Onboarding</Text>
+          </TouchableOpacity>
+
         </View>
       </ScrollView>
     </LinearGradient>
@@ -359,5 +368,22 @@ const profileStyles = {
     fontSize: 14,
     fontWeight: '600' as const,
     color: '#FFFFFF',
+  },
+  testButton: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    backgroundColor: '#FEF3C7',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 24,
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+    gap: 8,
+  },
+  testButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#F59E0B',
   },
 };

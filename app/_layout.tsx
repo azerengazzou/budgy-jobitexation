@@ -93,13 +93,14 @@ export default function RootLayout() {
     <CurrencyProvider>
       <DataProvider>
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="splash" />
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="profile" />
           <Stack.Screen name="revenue-category-details" />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <StatusBar style="auto" />
+        <StatusBar style="light" />
       </DataProvider>
     </CurrencyProvider>
   );
