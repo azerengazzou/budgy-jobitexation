@@ -180,39 +180,42 @@ export default function Dashboard() {
     }
   }, [showChartInsight]);
 
-  const getChartInsight = () => {
+  const getAdviceForChart = () => {
     const expenseRate = data.totalRevenues > 0 ? (data.totalExpenses / data.totalRevenues) * 100 : 0;
     const savingsRate = data.totalRevenues > 0 ? (data.totalSavings / data.totalRevenues) * 100 : 0;
     const topCategory = getTopSpendingCategory();
     
     switch(activeChart) {
       case 'expenses':
-        if (!topCategory) return t('expense_chart_insight_empty');
-        return expenseRate > 70 
-          ? t('expense_chart_insight_high').replace('{category}', topCategory.name).replace('{percent}', topCategory.percentage)
-          : t('expense_chart_insight_normal').replace('{category}', topCategory.name);
+        if (!topCategory) return { text: t('advice_start_tracking'), type: 'info', action: t('add_expense') };
+        if (parseFloat(topCategory.percentage) > 40) 
+          return { text: t('advice_high_category').replace('{category}', topCategory.name).replace('{percent}', topCategory.percentage), type: 'warning', action: t('review_category') };
+        if (expenseRate > 70)
+          return { text: t('advice_high_expenses'), type: 'critical', action: t('reduce_spending') };
+        return { text: t('advice_expenses_ok'), type: 'success', action: null };
       
       case 'comparison':
-        if (expenseRate > 80) return t('comparison_chart_insight_critical');
-        if (savingsRate < 10) return t('comparison_chart_insight_low_savings');
-        if (remainingBalance < 0) return t('comparison_chart_insight_deficit');
-        return t('comparison_chart_insight_healthy');
+        if (remainingBalance < 0) return { text: t('advice_deficit'), type: 'critical', action: t('create_budget') };
+        if (expenseRate > 80) return { text: t('advice_critical_expenses'), type: 'critical', action: t('cut_expenses') };
+        if (savingsRate < 10 && data.totalRevenues > 0) return { text: t('advice_low_savings'), type: 'warning', action: t('increase_savings') };
+        if (savingsRate >= 20) return { text: t('advice_excellent_balance'), type: 'success', action: null };
+        return { text: t('advice_good_balance'), type: 'success', action: null };
       
       case 'savings':
         const lowestGoal = getLowestProgressGoal();
-        if (!lowestGoal) return t('savings_chart_insight_empty');
-        if (lowestGoal.progress < 25) return t('savings_chart_insight_low').replace('{goal}', lowestGoal.title);
-        if (savingsGoalsData.every(g => g.progress > 50)) return t('savings_chart_insight_excellent');
-        return t('savings_chart_insight_normal');
+        if (!lowestGoal) return { text: t('advice_create_goals'), type: 'info', action: t('add_goal') };
+        if (lowestGoal.progress < 25) return { text: t('advice_goal_behind').replace('{goal}', lowestGoal.title), type: 'warning', action: t('contribute') };
+        if (savingsGoalsData.every(g => g.progress > 70)) return { text: t('advice_goals_excellent'), type: 'success', action: null };
+        return { text: t('advice_goals_steady'), type: 'success', action: null };
       
       case 'health':
-        if (healthScore > 70) return t('health_chart_insight_excellent');
-        if (healthScore > 50) return t('health_chart_insight_good');
-        if (healthScore > 30) return t('health_chart_insight_fair');
-        return t('health_chart_insight_poor');
+        if (healthScore < 30) return { text: t('advice_health_poor'), type: 'critical', action: t('take_action') };
+        if (healthScore < 50) return { text: t('advice_health_fair'), type: 'warning', action: t('improve_habits') };
+        if (healthScore < 70) return { text: t('advice_health_good'), type: 'success', action: null };
+        return { text: t('advice_health_excellent'), type: 'success', action: null };
       
       default:
-        return '';
+        return { text: '', type: 'info', action: null };
     }
   };
 
@@ -748,26 +751,43 @@ export default function Dashboard() {
           </View>
 
           <View style={styles.chartCard} collapsable={false}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <Text style={styles.chartTitle}>{getChartTitle()}</Text>
-              <TouchableOpacity onPress={() => setShowChartInsight(!showChartInsight)}>
-                <Info size={16} color="#3B82F6" />
-              </TouchableOpacity>
             </View>
-            {showChartInsight && (
-              <TouchableOpacity onPress={closeInsight} activeOpacity={1}>
-                <Animated.View style={{
-                  opacity: insightAnim,
-                  transform: [{ scale: insightScale }],
-                  backgroundColor: '#EFF6FF',
-                  padding: 12,
-                  borderRadius: 10,
-                  marginBottom: 12,
-                }}>
-                  <Text style={{ fontSize: 11, color: '#1E40AF', lineHeight: 16 }}>{getChartInsight()}</Text>
-                </Animated.View>
-              </TouchableOpacity>
-            )}
+            {(() => {
+              const advice = getAdviceForChart();
+              const adviceColors = {
+                critical: { bg: '#FEE2E2', text: '#991B1B', border: '#EF4444', icon: AlertCircle },
+                warning: { bg: '#FEF3C7', text: '#92400E', border: '#F59E0B', icon: AlertCircle },
+                success: { bg: '#D1FAE5', text: '#065F46', border: '#10B981', icon: CheckCircle },
+                info: { bg: '#DBEAFE', text: '#1E40AF', border: '#3B82F6', icon: Info }
+              };
+              const colors = adviceColors[advice.type];
+              const AdviceIcon = colors.icon;
+              
+              return (
+                <View style={[styles.adviceCard, { backgroundColor: colors.bg, borderLeftColor: colors.border }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <AdviceIcon size={16} color={colors.border} style={{ marginTop: 2 }} />
+                    <View style={{ flex: 1, marginLeft: 8 }}>
+                      <Text style={[styles.adviceText, { color: colors.text }]}>{advice.text}</Text>
+                      {advice.action && (
+                        <TouchableOpacity 
+                          style={[styles.adviceAction, { backgroundColor: colors.border }]}
+                          onPress={() => {
+                            if (activeChart === 'expenses') router.push('/(tabs)/expenses');
+                            else if (activeChart === 'savings') router.push('/(tabs)/goals');
+                            else if (activeChart === 'comparison') router.push('/(tabs)/expenses');
+                          }}
+                        >
+                          <Text style={styles.adviceActionText}>{advice.action}</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                </View>
+              );
+            })()}
             <View style={styles.chartSwitcher}>
               <TouchableOpacity
                 style={[styles.chartTab, activeChart === 'expenses' && styles.chartTabActive]}

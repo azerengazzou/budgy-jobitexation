@@ -438,5 +438,28 @@ export const styles = StyleSheet.create({
     manageCategoriesButton: {
         width: 150,
         flex: 0,
-    }
+    },
+    adviceCard: {
+        padding: 12,
+        borderRadius: 10,
+        marginBottom: 15,
+        borderLeftWidth: 4,
+    },
+    adviceText: {
+        fontSize: 12,
+        lineHeight: 18,
+        fontWeight: '500',
+    },
+    adviceAction: {
+        marginTop: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 6,
+        alignSelf: 'flex-start',
+    },
+    adviceActionText: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#FFFFFF',
+    },
 });
