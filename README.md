@@ -232,10 +232,113 @@ interface UserProfile {
 - **Real-time financial overview** with animated metrics
 - **Interactive pie charts** showing expense breakdowns by category
 - **Total revenues, expenses, savings, and remaining balance** display
-- **Quick access buttons** to manage categories and goals
+- **Budgy Insights** - Smart financial advisor with personalized recommendations
 - **Responsive design** for all screen sizes
 - **Date-aware display** with localized formatting
 - **Profile and settings access** from dashboard
+
+### Budgy Insights - Smart Financial Advisor
+- **Intelligent Analysis**: Analyzes revenues, expenses, savings, and goals to detect patterns and risks
+- **Priority-Based Recommendations**: Critical, high, medium, and low priority advice sorted by urgency
+- **Actionable Insights**: Each recommendation includes specific actions with direct navigation
+- **Collapsible Interface**: Toggle visibility for a personalized, clutter-free experience
+- **Real-Time Updates**: Advice dynamically updates as financial situation changes
+- **Data-Driven**: Recommendations based on actual spending patterns and financial health metrics
+- **Minimal Design**: Clean, professional presentation with color-coded priority indicators
+- **Multi-Language Support**: Fully translated advice in English, French, and Arabic
+
+#### Insight Categories
+1. **Critical Alerts** (Red)
+   - Budget deficit detection
+   - Spending exceeds 85% of income
+   - Immediate action required
+
+2. **High Priority** (Orange)
+   - Category consuming 40%+ of budget
+   - Savings rate below 10%
+   - Important financial adjustments needed
+
+3. **Medium Priority** (Blue)
+   - Goals below 30% progress
+   - No income sources tracked
+   - No savings goals set
+   - Recommended improvements
+
+4. **Low Priority** (Green)
+   - Savings optimization tips (10-20% rate)
+   - Excellent financial health celebration
+   - Positive reinforcement
+
+#### Financial Advisor Engine
+**Location**: `services/financial-advisor.ts`
+
+**Analysis Capabilities**:
+- Total revenues, expenses, and savings calculations
+- Expense rate: `(totalExpenses / totalRevenues) * 100`
+- Savings rate: `(totalSavings / totalRevenues) * 100`
+- Category-level spending analysis
+- Goal progress tracking
+- Balance and liquidity monitoring
+- Pattern detection across all financial areas
+
+**Advice Generation Logic**:
+```typescript
+class FinancialAdvisor {
+  // Analyzes user data
+  constructor(revenues, expenses, goals)
+  
+  // Generates prioritized advice
+  generateAdvice(): FinancialAdvice[]
+  
+  // Returns top N recommendations
+  getTopAdvice(limit = 3): FinancialAdvice[]
+}
+```
+
+**Advice Structure**:
+```typescript
+interface FinancialAdvice {
+  id: string;                    // Unique identifier
+  category: AdviceCategory;      // spending | income | savings | goals | health
+  priority: AdvicePriority;      // critical | high | medium | low
+  title: string;                 // Localized title key
+  message: string;               // Localized message key
+  action?: string;               // Optional action button text
+  actionRoute?: string;          // Navigation route for action
+  icon: string;                  // Icon type identifier
+}
+```
+
+#### UI Implementation
+**Location**: `app/(tabs)/index.tsx`
+
+**Features**:
+- Collapsible header with chevron indicator
+- Info icon in light blue circle
+- One-line description: "Data-driven recommendations based on your financial activity"
+- Color-coded left borders for priority visualization
+- Clean card layout with icon, title, message, and action button
+- Arrow icon for action navigation
+- Minimal shadows and subtle styling
+
+**User Controls**:
+- Tap header to expand/collapse
+- Shows top 3 most important recommendations
+- Maintains toggle state during session
+- Updates automatically on data changes
+
+#### Integration Points
+- **Dashboard**: Displayed between metrics and charts
+- **Data Context**: Recalculates on every data change
+- **Navigation**: Action buttons link to relevant screens
+- **Translations**: Full i18n support with context-aware messages
+
+#### Example Recommendations
+1. **Deficit Detected**: "Your spending exceeds income. Immediate action required to restore balance." → Create Budget
+2. **High Category Spending**: "One category consumes 40%+ of your budget. Review for savings opportunities." → Review Category
+3. **Low Savings Rate**: "Saving less than 10%. Experts recommend 20% for financial security." → Increase Savings
+4. **Goals Behind Schedule**: "Some goals are below 30% progress. Increase contributions to stay on track." → Contribute
+5. **Excellent Health**: "You're spending <60% and saving 20%+. Outstanding money management!" → (Celebration)
 
 ### Smart Notifications
 - **Daily expense logging reminders** (8:41 PM)
@@ -391,9 +494,12 @@ App Launch
 
 ### Dashboard Screen (`app/(tabs)/index.tsx`)
 - Real-time financial metrics with animated counters
-- Interactive pie chart for expense breakdown by category
+- **Budgy Insights** - Collapsible smart financial advisor section
+- Interactive pie charts with 4 chart types (expenses, comparison, savings, health)
+- Chart switcher tabs for different financial views
+- Context-aware advice cards for each chart type
 - Profile modal with editable user information
-- Settings navigation and quick access buttons
+- Settings navigation
 - Date-aware header with localized formatting
 - Remaining balance calculation with color-coded display
 - Pull-to-refresh functionality

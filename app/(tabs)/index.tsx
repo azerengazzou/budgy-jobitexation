@@ -12,7 +12,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { useData } from '../../contexts/DataContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
-import { DollarSign, TrendingUp, PiggyBank, Settings, User, AlertCircle, TrendingDown, CheckCircle, Info } from 'lucide-react-native';
+import { DollarSign, TrendingUp, PiggyBank, Settings, User, AlertCircle, TrendingDown, CheckCircle, Info, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react-native';
+import { FinancialAdvisor, FinancialAdvice } from '../../services/financial-advisor';
 import { BackupStatusIndicator } from '../../components/BackupStatusIndicator';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
@@ -52,6 +53,9 @@ export default function Dashboard() {
     monthlyData: [],
   });
   const [refreshing, setRefreshing] = useState(false);
+  const [smartAdvice, setSmartAdvice] = useState<FinancialAdvice[]>([]);
+  const [dismissedAdvice, setDismissedAdvice] = useState<Set<string>>(new Set());
+  const [insightsExpanded, setInsightsExpanded] = useState(true);
 
 
   const calculateData = React.useCallback(() => {
@@ -76,9 +80,13 @@ export default function Dashboard() {
       expensesByCategory,
       monthlyData: [],
     });
+
+    const advisor = new FinancialAdvisor(revenues, expenses, goals);
+    const advice = advisor.getTopAdvice(3);
+    setSmartAdvice(advice.filter(a => !dismissedAdvice.has(a.id)));
     
     setIsLoading(false);
-  }, [revenues, expenses, goals]);
+  }, [revenues, expenses, goals, dismissedAdvice]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -733,22 +741,63 @@ export default function Dashboard() {
               )}
             </View>
           </View>
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
-              onPress={() => router.push('/(tabs)/categories')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.actionButtonText}>{t('manage_categories')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.actionButtonShadow, styles.manageCategoriesButton]}
-              onPress={() => router.push('/(tabs)/goals')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.actionButtonText}>{t('goals')}</Text>
-            </TouchableOpacity>
-          </View>
+          {smartAdvice.length > 0 && (
+            <View style={styles.insightsContainer}>
+              <TouchableOpacity 
+                style={styles.insightsHeader}
+                onPress={() => setInsightsExpanded(!insightsExpanded)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.insightsHeaderLeft}>
+                  <View style={styles.insightsIconCircle}>
+                    <Info size={16} color="#3B82F6" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.insightsTitle}>{t('budgy_insights')}</Text>
+                    <Text style={styles.insightsSubtitle}>{t('insights_description')}</Text>
+                  </View>
+                </View>
+                {insightsExpanded ? <ChevronUp size={20} color="#6B7280" /> : <ChevronDown size={20} color="#6B7280" />}
+              </TouchableOpacity>
+              
+              {insightsExpanded && (
+                <View style={styles.insightsContent}>
+                  {smartAdvice.map((advice) => {
+                    const priorityColors = {
+                      critical: { border: '#EF4444', text: '#1F2937', icon: '#EF4444' },
+                      high: { border: '#F59E0B', text: '#1F2937', icon: '#F59E0B' },
+                      medium: { border: '#3B82F6', text: '#1F2937', icon: '#3B82F6' },
+                      low: { border: '#10B981', text: '#1F2937', icon: '#10B981' }
+                    };
+                    const colors = priorityColors[advice.priority];
+                    const IconComponent = advice.icon === 'alert' ? AlertCircle : advice.icon === 'warning' ? AlertCircle : advice.icon === 'success' ? CheckCircle : Info;
+
+                    return (
+                      <View key={advice.id} style={[styles.insightCard, { borderLeftColor: colors.border }]}>
+                        <View style={styles.insightRow}>
+                          <IconComponent size={18} color={colors.icon} style={{ marginTop: 2 }} />
+                          <View style={{ flex: 1, marginLeft: 12 }}>
+                            <Text style={[styles.insightCardTitle, { color: colors.text }]}>{t(advice.title)}</Text>
+                            <Text style={styles.insightCardMessage}>{t(advice.message)}</Text>
+                            {advice.action && advice.actionRoute && (
+                              <TouchableOpacity 
+                                style={styles.insightCardAction}
+                                onPress={() => router.push(advice.actionRoute as any)}
+                                activeOpacity={0.7}
+                              >
+                                <Text style={[styles.insightCardActionText, { color: colors.icon }]}>{t(advice.action)}</Text>
+                                <ArrowRight size={14} color={colors.icon} />
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+          )}
 
           <View style={styles.chartCard} collapsable={false}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -756,13 +805,13 @@ export default function Dashboard() {
             </View>
             {(() => {
               const advice = getAdviceForChart();
-              const adviceColors = {
+              const adviceColors: Record<string, { bg: string; text: string; border: string; icon: typeof AlertCircle }> = {
                 critical: { bg: '#FEE2E2', text: '#991B1B', border: '#EF4444', icon: AlertCircle },
                 warning: { bg: '#FEF3C7', text: '#92400E', border: '#F59E0B', icon: AlertCircle },
                 success: { bg: '#D1FAE5', text: '#065F46', border: '#10B981', icon: CheckCircle },
                 info: { bg: '#DBEAFE', text: '#1E40AF', border: '#3B82F6', icon: Info }
               };
-              const colors = adviceColors[advice.type];
+              const colors = adviceColors[advice.type] || adviceColors.info;
               const AdviceIcon = colors.icon;
               
               return (
