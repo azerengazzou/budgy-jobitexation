@@ -224,12 +224,19 @@ export const filterTransactionsByDate = (transactions: any[], filter: DateFilter
   
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  today.setHours(0, 0, 0, 0);
   
   return transactions.filter(transaction => {
-    const transactionDate = new Date(transaction.createdAt);
+    const dateStr = transaction.date || transaction.createdAt;
+    const transactionDate = new Date(dateStr);
+    transactionDate.setHours(0, 0, 0, 0);
     
     if (filter === 'custom' && customDates) {
-      return transactionDate >= customDates.start && transactionDate <= customDates.end;
+      const start = new Date(customDates.start);
+      const end = new Date(customDates.end);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      return transactionDate >= start && transactionDate <= end;
     }
     
     switch (filter) {

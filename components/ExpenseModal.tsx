@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView, Platform } from 'react-native';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -281,6 +281,50 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                 </TouchableOpacity>
               ))}
             </View>
+
+            <RequiredFieldIndicator label={t('date')} required={false} />
+            {Platform.OS === 'ios' ? (
+              <View style={{ marginBottom: 15 }}>
+                <DateTimePicker
+                  value={formData.date}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    if (selectedDate) {
+                      setFormData({ ...formData, date: selectedDate });
+                    }
+                  }}
+                  style={{ alignSelf: 'flex-start' }}
+                />
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#D1D5DB',
+                  borderRadius: 12,
+                  padding: 15,
+                  marginBottom: 15,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={{ fontSize: 16, color: '#374151' }}>
+                  {formData.date.toLocaleDateString()}
+                </Text>
+                <Calendar size={20} color="#6B7280" />
+              </TouchableOpacity>
+            )}
+            {Platform.OS === 'android' && showDatePicker && (
+              <DateTimePicker
+                value={formData.date}
+                mode="date"
+                display="default"
+                onChange={onDateChange}
+              />
+            )}
 
             <RequiredFieldIndicator label={`${t('description')} (${t('optional')})`} required={false} />
             <TextInput

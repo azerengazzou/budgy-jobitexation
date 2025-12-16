@@ -82,12 +82,16 @@ export default function RevenuesScreen() {
     const openModalForNew = () => openModalSmooth();
 
     const openModalForEdit = useCallback((revenue: Revenue) => {
-        setEditingRevenue(revenue);
+        // Find the actual revenue from the grouped display
+        const actualRevenue = revenues.find(r => r.type === revenue.type);
+        if (!actualRevenue) return;
+        
+        setEditingRevenue(actualRevenue);
         setFormData({
-            name: revenue.name,
-            amount: revenue.amount.toString(),
-            type: revenue.type,
-            date: new Date(revenue.createdAt),
+            name: actualRevenue.name,
+            amount: actualRevenue.amount.toString(),
+            type: actualRevenue.type,
+            date: new Date(actualRevenue.createdAt),
         });
 
         setShowAnimatedModal(true);
@@ -97,7 +101,7 @@ export default function RevenuesScreen() {
             duration: 180,
             useNativeDriver: true,
         }).start(() => setModalVisible(true));
-    }, []);
+    }, [revenues]);
 
     const handleCloseModal = () => {
         setModalVisible(false);

@@ -44,7 +44,11 @@ export default function ExpenseCategoryDetails() {
 
     const allEntries: Expense[] = useMemo(() => {
         const entries = categoryExpenses
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            .sort((a, b) => {
+                const aDate = new Date(a.date || a.createdAt).getTime();
+                const bDate = new Date(b.date || b.createdAt).getTime();
+                return bDate - aDate;
+            });
         return filterTransactionsByDate(entries, dateFilter, customDateRange);
     }, [categoryExpenses, dateFilter, customDateRange]);
 
@@ -121,7 +125,7 @@ export default function ExpenseCategoryDetails() {
                             </Text>
                             <View style={expenseCategoryStyles.transactionMeta}>
                                 <Text style={expenseCategoryStyles.transactionDate}>
-                                    {formatDate(item.createdAt)}
+                                    {formatDate(item.date || item.createdAt)}
                                 </Text>
                                 {item.description && (
                                     <Text style={expenseCategoryStyles.transactionCategory}>

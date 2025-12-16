@@ -5,14 +5,16 @@ import {
     Text,
     TouchableOpacity,
     TextInput,
-    ScrollView
+    ScrollView,
+    Platform
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { X } from 'lucide-react-native';
+import { X, Calendar } from 'lucide-react-native';
 import { RequiredFieldIndicator } from './RequiredFieldIndicator';
 import { NumericInput } from './NumericInput';
 import { KeyboardDismissWrapper } from './KeyboardDismissWrapper';
 import { CategoryIcon } from './CategoryIcons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export const RevenueModal = ({
     visible,
@@ -132,6 +134,55 @@ export const RevenueModal = ({
                                 ))}
                             </View>
                         </View>
+
+                        <RequiredFieldIndicator label={t('date')} required={false} />
+                        {Platform.OS === 'ios' ? (
+                            <View style={{ marginBottom: 15 }}>
+                                <DateTimePicker
+                                    value={formData.date}
+                                    mode="date"
+                                    display="default"
+                                    onChange={(event, selectedDate) => {
+                                        if (selectedDate) {
+                                            setFormData(prev => ({ ...prev, date: selectedDate }));
+                                        }
+                                    }}
+                                    style={{ alignSelf: 'flex-start' }}
+                                />
+                            </View>
+                        ) : (
+                            <TouchableOpacity
+                                style={{
+                                    borderWidth: 1,
+                                    borderColor: '#D1D5DB',
+                                    borderRadius: 12,
+                                    padding: 15,
+                                    marginBottom: 15,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between'
+                                }}
+                                onPress={() => setFormData(prev => ({ ...prev, showDatePicker: true }))}
+                            >
+                                <Text style={{ fontSize: 16, color: '#374151' }}>
+                                    {formData.date.toLocaleDateString()}
+                                </Text>
+                                <Calendar size={20} color="#6B7280" />
+                            </TouchableOpacity>
+                        )}
+                        {Platform.OS === 'android' && (formData as any).showDatePicker && (
+                            <DateTimePicker
+                                value={formData.date}
+                                mode="date"
+                                display="default"
+                                onChange={(event, selectedDate) => {
+                                    setFormData(prev => ({ ...prev, showDatePicker: false }));
+                                    if (selectedDate) {
+                                        setFormData(prev => ({ ...prev, date: selectedDate }));
+                                    }
+                                }}
+                            />
+                        )}
 
                         <RequiredFieldIndicator label={t('revenue_type')} required={true} />
                         <View style={{ marginBottom: 20 }}>

@@ -247,6 +247,7 @@ const resources = {
       completed_on: 'Completed on',
 
       // Error messages
+      failed_to_save: 'Failed to save',
       failed_to_save_revenue: 'Failed to save revenue',
       failed_to_save_expense: 'Failed to save expense',
       failed_to_save_goal: 'Failed to save goal',
@@ -286,6 +287,9 @@ const resources = {
       fixed: 'FIXED',
 
       // Revenue Components
+      date: 'Date',
+      are_you_sure_delete: 'Are you sure you want to delete this',
+      failed_to_delete: 'Failed to delete',
       delete_revenue: 'Delete Revenue',
       failed_to_delete_revenue: 'Failed to delete revenue',
       all_expenses_related_will_be_deleted: 'All expenses related to this revenue will also be deleted.',
@@ -742,6 +746,7 @@ const resources = {
       completed_on: 'Terminé le',
 
       // Error messages
+      failed_to_save: 'Échec de l\'enregistrement',
       failed_to_save_revenue: 'Échec de l\'enregistrement du revenu',
       failed_to_save_expense: 'Échec de l\'enregistrement de la dépense',
       failed_to_save_goal: 'Échec de l\'enregistrement de l\'objectif',
@@ -782,6 +787,9 @@ const resources = {
       fixed: 'FIXE',
 
       // Revenue Components
+      date: 'Date',
+      are_you_sure_delete: 'Êtes-vous sûr de vouloir supprimer ce',
+      failed_to_delete: 'Échec de la suppression',
       total_amount: 'Montant total',
       delete_revenue: 'Supprimer le revenu',
       failed_to_delete_revenue: 'Échec de la suppression du revenu',
@@ -1222,6 +1230,7 @@ const resources = {
       completed_on: 'اكتمل في',
 
       // Error messages
+      failed_to_save: 'فشل في الحفظ',
       failed_to_save_revenue: 'فشل في حفظ الإيراد',
       failed_to_save_expense: 'فشل في حفظ المصروف',
       failed_to_save_goal: 'فشل في حفظ الهدف',
@@ -1261,6 +1270,9 @@ const resources = {
       fixed: 'ثابت',
 
       // Revenue Components
+      date: 'التاريخ',
+      are_you_sure_delete: 'هل أنت متأكد من حذف هذا',
+      failed_to_delete: 'فشل في الحذف',
       total_amount: 'المبلغ الإجمالي',
       delete_revenue: 'حذف الإيراد',
       failed_to_delete_revenue: 'فشل في حذف الإيراد',

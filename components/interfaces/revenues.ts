@@ -21,4 +21,5 @@ export type RevenueForm = {
     amount: string;
     type: Revenue['type'];
     date: Date;
+    showDatePicker?: boolean;
 };
