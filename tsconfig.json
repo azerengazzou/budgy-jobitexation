@@ -5,6 +5,7 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "module": "esnext",
     "moduleResolution": "bundler",
     "allowJs": true,
     "baseUrl": ".",

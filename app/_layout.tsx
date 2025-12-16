@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Alert } from 'react-native';
 import { useFrameworkReady } from '../hooks/useFrameworkReady';
 import { storageService } from '../services/storage';
-import { notificationService } from '../services/notifications';
+import { smartNotificationService } from '../services/notifications';
 import { backupService } from '../services/backup-service';
 import { DataProvider } from '../contexts/DataContext';
 import { CurrencyProvider } from '../contexts/CurrencyContext';
@@ -77,15 +77,15 @@ export default function RootLayout() {
       await storageService.processCarryOver();
 
       // Setup notifications
-      await notificationService.requestPermissions();
-      await notificationService.scheduleNotifications();
+      await smartNotificationService.requestPermissions();
+      await smartNotificationService.scheduleDailyAdvice();
       } catch (error) {
-        console.error('Initialization error:', error);
+        console.error('Initialization error:', error instanceof Error ? error.message : String(error));
       }
     };
 
     initializeApp().catch(error => {
-      console.error('App initialization error:', error);
+      console.error('App initialization error:', error instanceof Error ? error.message : String(error));
     });
   }, []);
 
