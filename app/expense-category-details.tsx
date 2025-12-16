@@ -23,7 +23,27 @@ export default function ExpenseCategoryDetails() {
     const [dateFilter, setDateFilter] = useState<DateFilterType>('all');
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
     const [isLoading, setIsLoading] = useState(true);
-    
+    const [categories, setCategories] = useState<string[]>([]);
+
+    const loadCategories = async () => {
+        try {
+            const expenseData = await storageService.getCategories();
+            const customCategories = Array.isArray(expenseData) && expenseData.length > 0
+                ? expenseData.map((item: any) => typeof item === 'string' ? item : (item?.name || String(item)))
+                : [];
+            const fixedCategories = ['rent', 'food', 'transport'];
+            setCategories([...fixedCategories, ...customCategories]);
+        } catch (error) {
+            console.error('Error loading categories:', error);
+            setCategories(['rent', 'food', 'transport']);
+            Alert.alert(t('error'), t('failed_to_load_categories'));
+        }
+    };
+
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
     // Modal states
     const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
     const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
@@ -276,7 +296,7 @@ export default function ExpenseCategoryDetails() {
                     }
                 }}
                 editingExpense={editingExpense}
-                categories={['rent', 'food', 'transport']}
+                categories={categories}
                 revenues={revenues}
                 formData={expenseFormData}
                 setFormData={setExpenseFormData}

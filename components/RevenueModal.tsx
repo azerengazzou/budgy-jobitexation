@@ -37,12 +37,6 @@ export const RevenueModal = ({
 }) => {
     const revenueTypes = ['salary', 'freelance'];
     const quickAmounts = [500, 1000, 2000, 3000, 5000];
-    const commonRevenueNames = {
-        salary: ['Monthly Salary', 'Bonus', 'Overtime'],
-        freelance: ['Project Payment', 'Consulting', 'Design Work'],
-    };
-
-
 
     return (
         <Modal
@@ -54,66 +48,151 @@ export const RevenueModal = ({
             <KeyboardDismissWrapper style={{ flex: 0 }}>
                 <View style={{
                     backgroundColor: '#FFFFFF',
-                    borderTopLeftRadius: 20,
-                    borderTopRightRadius: 20,
+                    borderTopLeftRadius: 24,
+                    borderTopRightRadius: 24,
                     maxHeight: '90%',
-                    paddingTop: 20
+                    paddingTop: 24
                 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 25, marginBottom: 20 }}>
-                        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1F2937' }}>
-                            {editingRevenue ? t('edit_revenue') : t('add_revenue')}
+                    <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                            <Text style={{ fontSize: 28, fontWeight: '700', color: '#0F172A', letterSpacing: -0.5 }}>
+                                {editingRevenue ? t('edit_revenue') : t('add_revenue')}
+                            </Text>
+                            <TouchableOpacity
+                                onPress={onClose}
+                                style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: 18,
+                                    backgroundColor: '#F1F5F9',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <X size={20} color="#64748B" />
+                            </TouchableOpacity>
+                        </View>
+                        <Text style={{ fontSize: 14, color: '#64748B', fontWeight: '500' }}>
+                            {editingRevenue ? 'Update your income source information' : 'Add a new income source to track'}
                         </Text>
-                        <TouchableOpacity onPress={onClose}>
-                            <X size={24} color="#6B7280" />
-                        </TouchableOpacity>
                     </View>
 
-                    <ScrollView style={{ paddingHorizontal: 25 }} showsVerticalScrollIndicator={false}>
+                    <ScrollView style={{ paddingHorizontal: 24 }} showsVerticalScrollIndicator={false}>
 
-                        <RequiredFieldIndicator label={t('revenue_name')} required={true} />
-                        <TextInput
-                            style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16 }}
-                            placeholder={t('revenue_name')}
-                            value={formData.name}
-                            onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
-                            autoFocus={!editingRevenue}
-                        />
-                        <RequiredFieldIndicator label={t('amount')} required={true} />
-                        <NumericInput
-                            style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 10, fontSize: 16 }}
-                            placeholder={t('0.000')}
-                            value={formData.amount}
-                            onChangeText={(text) => setFormData(prev => ({ ...prev, amount: text }))}
-                        />
+                        <View style={{ marginBottom: 20 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                {t('revenue_name')} <Text style={{ color: '#EF4444' }}>*</Text>
+                            </Text>
+                            <TextInput
+                                style={{
+                                    borderWidth: 1.5,
+                                    borderColor: '#E2E8F0',
+                                    borderRadius: 12,
+                                    padding: 16,
+                                    fontSize: 16,
+                                    color: '#0F172A',
+                                    backgroundColor: '#F8FAFC',
+                                    fontWeight: '500'
+                                }}
+                                placeholder={t('revenue_name')}
+                                placeholderTextColor="#94A3B8"
+                                value={formData.name}
+                                onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
+                                autoFocus={!editingRevenue}
+                            />
+                        </View>
 
-                        {/* Quick Amount Buttons */}
-                        <View style={{ marginBottom: 15 }}>
-                            <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{t('quick_amounts')}</Text>
-                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                        <View style={{ marginBottom: 20 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                {t('amount')} <Text style={{ color: '#EF4444' }}>*</Text>
+                            </Text>
+                            <NumericInput
+                                style={{
+                                    borderWidth: 1.5,
+                                    borderColor: '#E2E8F0',
+                                    borderRadius: 12,
+                                    padding: 16,
+                                    fontSize: 24,
+                                    color: '#0F172A',
+                                    backgroundColor: '#F8FAFC',
+                                    fontWeight: '700',
+                                    letterSpacing: -0.5
+                                }}
+                                placeholder="0.00"
+                                placeholderTextColor="#CBD5E1"
+                                value={formData.amount}
+                                onChangeText={(text) => setFormData(prev => ({ ...prev, amount: text }))}
+                            />
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
                                 {quickAmounts.map((amount) => (
                                     <TouchableOpacity
                                         key={amount}
                                         style={{
-                                            backgroundColor: formData.amount === amount.toString() ? '#10B981' : '#F3F4F6',
+                                            backgroundColor: formData.amount === amount.toString() ? '#3B82F6' : '#F1F5F9',
                                             paddingHorizontal: 16,
-                                            paddingVertical: 8,
-                                            borderRadius: 20,
+                                            paddingVertical: 10,
+                                            borderRadius: 10,
+                                            borderWidth: 1.5,
+                                            borderColor: formData.amount === amount.toString() ? '#3B82F6' : '#E2E8F0',
                                         }}
                                         onPress={() => setFormData(prev => ({ ...prev, amount: amount.toString() }))}
                                     >
                                         <Text style={{
-                                            color: formData.amount === amount.toString() ? 'white' : '#374151',
+                                            color: formData.amount === amount.toString() ? '#FFFFFF' : '#475569',
                                             fontSize: 14,
-                                            fontWeight: '500'
+                                            fontWeight: '600'
                                         }}>{amount}</Text>
                                     </TouchableOpacity>
                                 ))}
                             </View>
                         </View>
 
-                        <RequiredFieldIndicator label={t('date')} required={false} />
-                        {Platform.OS === 'ios' ? (
-                            <View style={{ marginBottom: 15 }}>
+                        <View style={{ marginBottom: 20 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                {t('revenue_type')} <Text style={{ color: '#EF4444' }}>*</Text>
+                            </Text>
+                            <View style={{ flexDirection: 'row', gap: 12 }}>
+                                {revenueTypes.map((type) => {
+                                    const isSelected = formData.type === type;
+                                    return (
+                                        <TouchableOpacity
+                                            key={type}
+                                            style={{
+                                                flex: 1,
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                backgroundColor: isSelected ? '#3B82F6' : '#F8FAFC',
+                                                borderWidth: 1.5,
+                                                borderColor: isSelected ? '#3B82F6' : '#E2E8F0',
+                                                paddingVertical: 14,
+                                                borderRadius: 12,
+                                                gap: 8,
+                                            }}
+                                            onPress={() => setFormData(prev => ({ ...prev, type: type as Revenue['type'] }))}
+                                        >
+                                            <CategoryIcon
+                                                category={type}
+                                                type="revenue"
+                                                size={20}
+                                                color={isSelected ? '#FFFFFF' : '#64748B'}
+                                            />
+                                            <Text style={{
+                                                color: isSelected ? '#FFFFFF' : '#475569',
+                                                fontSize: 15,
+                                                fontWeight: '600'
+                                            }}>{t(type)}</Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        </View>
+
+                        <View style={{ marginBottom: 24 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                {t('date')}
+                            </Text>
+                            {Platform.OS === 'ios' ? (
                                 <DateTimePicker
                                     value={formData.date}
                                     mode="date"
@@ -125,78 +204,39 @@ export const RevenueModal = ({
                                     }}
                                     style={{ alignSelf: 'flex-start' }}
                                 />
-                            </View>
-                        ) : (
-                            <TouchableOpacity
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: '#D1D5DB',
-                                    borderRadius: 12,
-                                    padding: 15,
-                                    marginBottom: 15,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between'
-                                }}
-                                onPress={() => setFormData(prev => ({ ...prev, showDatePicker: true }))}
-                            >
-                                <Text style={{ fontSize: 16, color: '#374151' }}>
-                                    {formData.date.toLocaleDateString()}
-                                </Text>
-                                <Calendar size={20} color="#6B7280" />
-                            </TouchableOpacity>
-                        )}
-                        {Platform.OS === 'android' && (formData as any).showDatePicker && (
-                            <DateTimePicker
-                                value={formData.date}
-                                mode="date"
-                                display="default"
-                                onChange={(event, selectedDate) => {
-                                    setFormData(prev => ({ ...prev, showDatePicker: false }));
-                                    if (selectedDate) {
-                                        setFormData(prev => ({ ...prev, date: selectedDate }));
-                                    }
-                                }}
-                            />
-                        )}
-
-                        <RequiredFieldIndicator label={t('revenue_type')} required={true} />
-                        <View style={{ marginBottom: 20 }}>
-                            <View style={{ flexDirection: 'row', gap: 12 }}>
-                                {revenueTypes.map((type) => {
-                                    const isSelected = formData.type === type;
-                                    return (
-                                        <TouchableOpacity
-                                            key={type}
-                                            style={{
-                                                flex: 1,
-                                                flexDirection: 'row',
-                                                alignItems: 'center',
-                                                backgroundColor: isSelected ? '#10B981' : '#F3F4F6',
-                                                paddingHorizontal: 16,
-                                                paddingVertical: 12,
-                                                borderRadius: 12,
-                                                gap: 8,
-                                            }}
-                                            onPress={() => setFormData(prev => ({ ...prev, type: type as Revenue['type'] }))}
-                                        >
-                                            <CategoryIcon
-                                                category={type}
-                                                type="revenue"
-                                                size={20}
-                                                color={isSelected ? 'white' : '#6B7280'}
-                                            />
-                                            <Text style={{
-                                                color: isSelected ? 'white' : '#374151',
-                                                fontSize: 16,
-                                                fontWeight: '500',
-                                                flex: 1,
-                                                textAlign: 'center'
-                                            }}>{t(type)}</Text>
-                                        </TouchableOpacity>
-                                    );
-                                })}
-                            </View>
+                            ) : (
+                                <TouchableOpacity
+                                    style={{
+                                        borderWidth: 1.5,
+                                        borderColor: '#E2E8F0',
+                                        borderRadius: 12,
+                                        padding: 16,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        backgroundColor: '#F8FAFC'
+                                    }}
+                                    onPress={() => setFormData(prev => ({ ...prev, showDatePicker: true }))}
+                                >
+                                    <Text style={{ fontSize: 15, color: '#0F172A', fontWeight: '500' }}>
+                                        {formData.date.toLocaleDateString()}
+                                    </Text>
+                                    <Calendar size={20} color="#64748B" />
+                                </TouchableOpacity>
+                            )}
+                            {Platform.OS === 'android' && (formData as any).showDatePicker && (
+                                <DateTimePicker
+                                    value={formData.date}
+                                    mode="date"
+                                    display="default"
+                                    onChange={(event, selectedDate) => {
+                                        setFormData(prev => ({ ...prev, showDatePicker: false }));
+                                        if (selectedDate) {
+                                            setFormData(prev => ({ ...prev, date: selectedDate }));
+                                        }
+                                    }}
+                                />
+                            )}
                         </View>
 
                     </ScrollView>

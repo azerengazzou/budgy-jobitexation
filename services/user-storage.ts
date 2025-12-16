@@ -35,9 +35,10 @@ export class UserStorageService extends BaseStorageService {
 
   async getCategories(): Promise<string[]> {
     const categories = await this.getItem(STORAGE_KEYS.CATEGORIES);
+        console.log(categories)
     return (categories as string[]) || [];
   }
-
+  
   async saveCategories(categories: string[]): Promise<void> {
     await this.setItem(STORAGE_KEYS.CATEGORIES, categories);
   }

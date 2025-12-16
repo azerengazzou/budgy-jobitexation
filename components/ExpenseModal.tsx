@@ -159,11 +159,33 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
               autoFocus={!editingExpense}
             />
 
+            {/* Quick Name Suggestions */}
+            {!editingExpense && commonExpenseNames[formData.category as keyof typeof commonExpenseNames] && (
+              <View style={{ marginBottom: 15 }}>
+                <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{t('quick_suggestions')}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {commonExpenseNames[formData.category as keyof typeof commonExpenseNames].map((name) => (
+                    <TouchableOpacity
+                      key={name}
+                      style={{
+                        backgroundColor: '#F3F4F6',
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        borderRadius: 16,
+                      }}
+                      onPress={() => setFormData({ ...formData, name })}
+                    >
+                      <Text style={{ color: '#374151', fontSize: 14 }}>{name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
 
             <RequiredFieldIndicator label={t('amount')} required={true} />
             <NumericInput
               style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 10, fontSize: 16 }}
-              placeholder={t('0.000')}
+              placeholder={t('amount')}
               value={formData.amount}
               onChangeText={(text) => setFormData({ ...formData, amount: text })}
             />
@@ -197,8 +219,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             <View style={{ marginBottom: 15 }}>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                 {categories.slice(0, 6).map((category) => {
-                  const fixedCategories = ['rent', 'food', 'transport'];
-                  const label = fixedCategories.includes(category) ? t(category) : category;
+                  const label = category ? t(category) : category;
                   const isSelected = formData.category === category;
                   return (
                     <TouchableOpacity
