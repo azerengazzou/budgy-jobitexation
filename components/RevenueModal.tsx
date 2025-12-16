@@ -45,17 +45,17 @@ export const RevenueModal = ({
 
 
     return (
-        <Modal 
-            isVisible={visible} 
-            onBackdropPress={onClose} 
+        <Modal
+            isVisible={visible}
+            onBackdropPress={onClose}
             style={{ justifyContent: 'flex-end', margin: 0 }}
             propagateSwipe
         >
             <KeyboardDismissWrapper style={{ flex: 0 }}>
-                <View style={{ 
-                    backgroundColor: '#FFFFFF', 
-                    borderTopLeftRadius: 20, 
-                    borderTopRightRadius: 20, 
+                <View style={{
+                    backgroundColor: '#FFFFFF',
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
                     maxHeight: '90%',
                     paddingTop: 20
                 }}>
@@ -67,7 +67,7 @@ export const RevenueModal = ({
                             <X size={24} color="#6B7280" />
                         </TouchableOpacity>
                     </View>
-                    
+
                     <ScrollView style={{ paddingHorizontal: 25 }} showsVerticalScrollIndicator={false}>
 
                         <RequiredFieldIndicator label={t('revenue_name')} required={true} />
@@ -78,38 +78,14 @@ export const RevenueModal = ({
                             onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
                             autoFocus={!editingRevenue}
                         />
-                        
-                        {/* Quick Name Suggestions */}
-                        {!editingRevenue && commonRevenueNames[formData.type] && (
-                            <View style={{ marginBottom: 15 }}>
-                                <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{t('quick_suggestions')}</Text>
-                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                                    {commonRevenueNames[formData.type].map((name) => (
-                                        <TouchableOpacity
-                                            key={name}
-                                            style={{
-                                                backgroundColor: '#F3F4F6',
-                                                paddingHorizontal: 12,
-                                                paddingVertical: 6,
-                                                borderRadius: 16,
-                                            }}
-                                            onPress={() => setFormData(prev => ({ ...prev, name }))}
-                                        >
-                                            <Text style={{ color: '#374151', fontSize: 14 }}>{name}</Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-                            </View>
-                        )}
-
                         <RequiredFieldIndicator label={t('amount')} required={true} />
                         <NumericInput
                             style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 10, fontSize: 16 }}
-                            placeholder={t('amount')}
+                            placeholder={t('0.000')}
                             value={formData.amount}
                             onChangeText={(text) => setFormData(prev => ({ ...prev, amount: text }))}
                         />
-                        
+
                         {/* Quick Amount Buttons */}
                         <View style={{ marginBottom: 15 }}>
                             <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{t('quick_amounts')}</Text>
@@ -125,8 +101,8 @@ export const RevenueModal = ({
                                         }}
                                         onPress={() => setFormData(prev => ({ ...prev, amount: amount.toString() }))}
                                     >
-                                        <Text style={{ 
-                                            color: formData.amount === amount.toString() ? 'white' : '#374151', 
+                                        <Text style={{
+                                            color: formData.amount === amount.toString() ? 'white' : '#374151',
                                             fontSize: 14,
                                             fontWeight: '500'
                                         }}>{amount}</Text>
@@ -204,14 +180,14 @@ export const RevenueModal = ({
                                             }}
                                             onPress={() => setFormData(prev => ({ ...prev, type: type as Revenue['type'] }))}
                                         >
-                                            <CategoryIcon 
+                                            <CategoryIcon
                                                 category={type}
                                                 type="revenue"
                                                 size={20}
                                                 color={isSelected ? 'white' : '#6B7280'}
                                             />
-                                            <Text style={{ 
-                                                color: isSelected ? 'white' : '#374151', 
+                                            <Text style={{
+                                                color: isSelected ? 'white' : '#374151',
                                                 fontSize: 16,
                                                 fontWeight: '500',
                                                 flex: 1,
@@ -224,10 +200,10 @@ export const RevenueModal = ({
                         </View>
 
                     </ScrollView>
-                    
-                    <View style={{ 
-                        flexDirection: 'row', 
-                        padding: 25, 
+
+                    <View style={{
+                        flexDirection: 'row',
+                        padding: 25,
                         paddingTop: 15,
                         borderTopWidth: 1,
                         borderTopColor: '#F3F4F6',
@@ -240,10 +216,10 @@ export const RevenueModal = ({
                             <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '600', color: '#6B7280' }}>{t('cancel')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={{ 
-                                flex: 2, 
-                                backgroundColor: '#10B981', 
-                                borderRadius: 12, 
+                            style={{
+                                flex: 2,
+                                backgroundColor: '#3B82F6',
+                                borderRadius: 12,
                                 padding: 16,
                                 opacity: (!formData.name || !formData.amount) ? 0.5 : 1
                             }}
