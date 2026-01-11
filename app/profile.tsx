@@ -243,14 +243,6 @@ export default function ProfileScreen() {
             </View>
           )}
 
-          {/* Test Button - Redirect to Onboarding */}
-          <TouchableOpacity
-            style={profileStyles.testButton}
-            onPress={() => router.push('/splash')}
-          >
-            <RefreshCw size={20} color="#F59E0B" />
-            <Text style={profileStyles.testButtonText}>Test Onboarding</Text>
-          </TouchableOpacity>
 
         </View>
       </ScrollView>
