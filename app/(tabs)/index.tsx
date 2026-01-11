@@ -336,20 +336,22 @@ export default function Dashboard() {
       case 'expenses':
         const topCategory = getTopSpendingCategory();
         return pieChartData.length > 0 ? (
-          <View>
-            <PieChart
-              data={pieChartData}
-              width={screenWidth - 60}
-              height={200}
-              chartConfig={{
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              }}
-              accessor="amount"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              absolute
-              hasLegend={false}
-            />
+          <View pointerEvents="box-none">
+            <View pointerEvents="none">
+              <PieChart
+                data={pieChartData}
+                width={screenWidth - 60}
+                height={200}
+                chartConfig={{
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                }}
+                accessor="amount"
+                backgroundColor="transparent"
+                paddingLeft="15"
+                absolute
+                hasLegend={false}
+              />
+            </View>
             {topCategory && (
               <View style={[styles.insightBadge, { backgroundColor: '#F59E0B' }]}>
                 <AlertCircle size={16} color="#FFFFFF" />
@@ -358,7 +360,7 @@ export default function Dashboard() {
                 </Text>
               </View>
             )}
-            <View style={styles.chartLegend}>
+            <View style={styles.chartLegend} pointerEvents="box-none">
               {pieChartData.map((item, index) => (
                 <TouchableOpacity
                   key={index}
@@ -371,6 +373,7 @@ export default function Dashboard() {
                     router.push('/(tabs)/expenses');
                   }}
                   activeOpacity={0.7}
+                  hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
                 >
                   <View style={styles.legendLeft}>
                     <View style={[styles.legendColor, { backgroundColor: item.color }]} />
@@ -397,11 +400,12 @@ export default function Dashboard() {
         const InsightIcon = insight.icon;
         
         return (
-          <View>
+          <View pointerEvents="box-none">
             <TouchableOpacity
               style={styles.comparisonBar}
               onPress={() => router.push('/(tabs)/revenues')}
               activeOpacity={0.7}
+              hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
             >
               <Text style={styles.comparisonLabel}>{t('revenues')}</Text>
               <View style={styles.comparisonBarContainer}>
@@ -419,6 +423,7 @@ export default function Dashboard() {
               style={styles.comparisonBar}
               onPress={() => router.push('/(tabs)/expenses')}
               activeOpacity={0.7}
+              hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
             >
               <Text style={styles.comparisonLabel}>{t('expenses')}</Text>
               <View style={styles.comparisonBarContainer}>
@@ -436,6 +441,7 @@ export default function Dashboard() {
               style={styles.comparisonBar}
               onPress={() => router.push('/(tabs)/goals')}
               activeOpacity={0.7}
+              hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
             >
               <Text style={styles.comparisonLabel}>{t('savings')}</Text>
               <View style={styles.comparisonBarContainer}>
@@ -468,7 +474,7 @@ export default function Dashboard() {
       case 'savings':
         const lowestGoal = getLowestProgressGoal();
         return savingsGoalsData.length > 0 ? (
-          <View>
+          <View pointerEvents="box-none">
             {lowestGoal && lowestGoal.progress < 50 && (
               <View style={[styles.insightBadge, { backgroundColor: '#F59E0B' }]}>
                 <AlertCircle size={16} color="#FFFFFF" />
@@ -491,6 +497,7 @@ export default function Dashboard() {
                   ]}
                   onPress={() => router.push(`/goal-details?id=${goal.id}`)}
                   activeOpacity={0.7}
+                  hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }}
                 >
                   <View style={styles.goalHeader}>
                     <Text style={styles.goalName} numberOfLines={1}>{goal.title}</Text>
@@ -524,7 +531,7 @@ export default function Dashboard() {
         const healthColor = healthScore > 70 ? '#10B981' : healthScore > 50 ? '#3B82F6' : healthScore > 30 ? '#F59E0B' : '#EF4444';
         
         return (
-          <View>
+          <View pointerEvents="box-none">
             <View style={styles.healthScoreContainer}>
               <View style={[styles.healthScoreCircle, { backgroundColor: healthColor }]}>
                 <Text style={styles.healthScoreText}>{healthScore.toFixed(0)}</Text>
@@ -635,12 +642,12 @@ export default function Dashboard() {
               </View>
             </View>
           </View>
-          <View style={styles.metricsContainer}>
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
+          <View style={styles.metricsContainer} pointerEvents="box-none">
+            <View style={styles.metricCard} pointerEvents="box-none">
+              <View style={styles.metricHeader} pointerEvents="box-none">
                 <DollarSign size={24} color="#10B981" />
                 <Text style={styles.metricTitle}>{t('total_revenues')}</Text>
-                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'revenue' ? null : 'revenue')}>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'revenue' ? null : 'revenue')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                   <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
                 </TouchableOpacity>
               </View>
@@ -661,11 +668,11 @@ export default function Dashboard() {
               )}
             </View>
 
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
+            <View style={styles.metricCard} pointerEvents="box-none">
+              <View style={styles.metricHeader} pointerEvents="box-none">
                 <TrendingUp size={24} color="#EF4444" />
                 <Text style={styles.metricTitle}>{t('total_expenses')}</Text>
-                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'expense' ? null : 'expense')}>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'expense' ? null : 'expense')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                   <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
                 </TouchableOpacity>
               </View>
@@ -686,11 +693,11 @@ export default function Dashboard() {
               )}
             </View>
 
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
+            <View style={styles.metricCard} pointerEvents="box-none">
+              <View style={styles.metricHeader} pointerEvents="box-none">
                 <PiggyBank size={24} color="#F59E0B" />
                 <Text style={styles.metricTitle}>{t('savings')}</Text>
-                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'savings' ? null : 'savings')}>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'savings' ? null : 'savings')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                   <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
                 </TouchableOpacity>
               </View>
@@ -711,11 +718,11 @@ export default function Dashboard() {
               )}
             </View>
 
-            <View style={styles.metricCard}>
-              <View style={styles.metricHeader}>
+            <View style={styles.metricCard} pointerEvents="box-none">
+              <View style={styles.metricHeader} pointerEvents="box-none">
                 <DollarSign size={24} color={remainingBalance >= 0 ? '#10B981' : '#EF4444'} />
                 <Text style={styles.metricTitle}>{t('remaining_balance')}</Text>
-                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'balance' ? null : 'balance')}>
+                <TouchableOpacity onPress={() => setShowInsight(showInsight === 'balance' ? null : 'balance')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                   <Info size={14} color="#3B82F6" style={{ marginLeft: 'auto' }} />
                 </TouchableOpacity>
               </View>
@@ -742,11 +749,12 @@ export default function Dashboard() {
             </View>
           </View>
           {smartAdvice.length > 0 && (
-            <View style={styles.insightsContainer}>
+            <View style={styles.insightsContainer} pointerEvents="box-none">
               <TouchableOpacity 
                 style={styles.insightsHeader}
                 onPress={() => setInsightsExpanded(!insightsExpanded)}
                 activeOpacity={0.7}
+                hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
               >
                 <View style={styles.insightsHeaderLeft}>
                   <View style={styles.insightsIconCircle}>
@@ -761,7 +769,7 @@ export default function Dashboard() {
               </TouchableOpacity>
               
               {insightsExpanded && (
-                <View style={styles.insightsContent}>
+                <View style={styles.insightsContent} pointerEvents="box-none">
                   {smartAdvice.map((advice) => {
                     const priorityColors = {
                       critical: { border: '#EF4444', text: '#1F2937', icon: '#EF4444' },
@@ -773,7 +781,7 @@ export default function Dashboard() {
                     const IconComponent = advice.icon === 'alert' ? AlertCircle : advice.icon === 'warning' ? AlertCircle : advice.icon === 'success' ? CheckCircle : Info;
 
                     return (
-                      <View key={advice.id} style={[styles.insightCard, { borderLeftColor: colors.border }]}>
+                      <View key={advice.id} style={[styles.insightCard, { borderLeftColor: colors.border }]} pointerEvents="box-none">
                         <View style={styles.insightRow}>
                           <IconComponent size={18} color={colors.icon} style={{ marginTop: 2 }} />
                           <View style={{ flex: 1, marginLeft: 12 }}>
@@ -799,7 +807,7 @@ export default function Dashboard() {
             </View>
           )}
 
-          <View style={styles.chartCard} collapsable={false}>
+          <View style={styles.chartCard} collapsable={false} pointerEvents="box-none">
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <Text style={styles.chartTitle}>{getChartTitle()}</Text>
             </View>

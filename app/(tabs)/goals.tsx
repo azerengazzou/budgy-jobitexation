@@ -7,7 +7,6 @@ import { useRouter } from 'expo-router';
 import { useData } from '@/contexts/DataContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { GoalCard } from '@/components/GoalCard';
-import { SwipeToDelete } from '@/components/SwipeToDelete';
 import { AddSavingsModal } from '@/components/AddSavingsModal';
 import AddGoalModal from '../addGoalModal';
 import { Goal, SavingsTransaction } from '@/components/interfaces/savings';
@@ -21,6 +20,8 @@ export default function GoalsScreen() {
   const { goals, revenues, refreshData } = useData();
   const { formatAmount } = useCurrency();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [showAddSavingsModal, setShowAddSavingsModal] = useState(false);
   const [showCreateGoalModal, setShowCreateGoalModal] = useState(false);
@@ -45,6 +46,7 @@ export default function GoalsScreen() {
 
 
   const handleAddSavings = async (transaction: SavingsTransaction, revenueSourceId?: string) => {
+    setIsSaving(true);
     try {
       await storageService.addSavingsTransaction(transaction);
       if (revenueSourceId) {
@@ -53,30 +55,44 @@ export default function GoalsScreen() {
       await refreshData();
     } catch (error) {
       console.error('Error adding savings:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleDeleteGoal = useCallback(async (goal: Goal, onCancel?: () => void) => {
+  const handleDeleteGoal = useCallback(async (goal: Goal) => {
     Alert.alert(
       t('delete_goal'),
       t('are_you_sure_delete') + ' "' + goal.title + '"?',
       [
         { 
           text: t('cancel'), 
-          style: 'cancel',
-          onPress: onCancel
+          style: 'cancel'
         },
         {
           text: t('delete'),
           style: 'destructive',
           onPress: async () => {
+            setIsDeleting(true);
             try {
+              // Get all transactions for this goal
+              const transactions = await storageService.getTransactionsByGoalId(goal.id);
+              
+              // Return amounts to revenue sources
+              for (const transaction of transactions) {
+                if (transaction.revenueSourceId && transaction.type === 'deposit') {
+                  await storageService.addToRevenue(transaction.revenueSourceId, transaction.amount);
+                }
+              }
+              
+              // Delete the goal
               await storageService.deleteGoal(goal.id);
               await refreshData();
             } catch (error) {
               console.error('Error deleting goal:', error);
               Alert.alert(t('error'), t('failed_to_delete'));
-              onCancel?.();
+            } finally {
+              setIsDeleting(false);
             }
           },
         },
@@ -85,14 +101,11 @@ export default function GoalsScreen() {
   }, [t, refreshData]);
 
   const renderGoalCard = ({ item }: { item: Goal }) => (
-    <SwipeToDelete
-      onDelete={(onCancel) => handleDeleteGoal(item, onCancel)}
-    >
-      <GoalCard
-        goal={item}
-        onPress={() => handleGoalPress(item)}
-      />
-    </SwipeToDelete>
+    <GoalCard
+      goal={item}
+      onPress={() => handleGoalPress(item)}
+      onDelete={() => handleDeleteGoal(item)}
+    />
   );
 
   useEffect(() => {
@@ -101,7 +114,7 @@ export default function GoalsScreen() {
     }
   }, [goals]);
 
-  if (isLoading) {
+  if (isLoading || isSaving || isDeleting) {
     return <LoadingScreen />;
   }
 

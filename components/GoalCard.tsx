@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Plane, Home, Car, GraduationCap, DollarSign } from 'lucide-react-native';
+import { AlertTriangle, Plane, Home, Car, GraduationCap, DollarSign, Trash2 } from 'lucide-react-native';
 import { Goal } from '@/components/interfaces/savings';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { savingsStyles } from '@/components/style/savings.styles';
@@ -10,9 +10,10 @@ import { CompletionCelebration } from '@/components/CompletionCelebration';
 interface GoalCardProps {
   goal: Goal;
   onPress: () => void;
+  onDelete?: () => void;
 }
 
-export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
+export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress, onDelete }) => {
   const { formatAmount } = useCurrency();
   const { t } = useTranslation();
 
@@ -83,6 +84,21 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onPress }) => {
           <Text style={savingsStyles.goalTitle}>{goal.title}</Text>
           <Text style={savingsStyles.goalCategory}>{goal.category ? t(goal.category) : t('general')}</Text>
         </View>
+        {onDelete && (
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            style={{
+              padding: 8,
+              marginRight: 8,
+            }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Trash2 size={20} color="#EF4444" />
+          </TouchableOpacity>
+        )}
         {isCompleted ? (
           <View style={{
             backgroundColor: '#10B981',
