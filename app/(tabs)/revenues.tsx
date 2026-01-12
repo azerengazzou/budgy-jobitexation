@@ -47,11 +47,15 @@ export default function RevenuesScreen() {
 
     useEffect(() => {
         const loadRevenueCategories = async () => {
-            const categories = await storageService.getItem('revenue_categories');
-            setRevenueCategories(Array.isArray(categories) ? categories : []);
+            try {
+                const categories = await storageService.getItem('revenue_categories');
+                setRevenueCategories(Array.isArray(categories) ? categories : []);
+            } catch (error) {
+                setRevenueCategories([]);
+            }
         };
         loadRevenueCategories();
-    }, []);
+    }, [isModalVisible]);
 
     const openModalSmooth = () => {
         resetForm();

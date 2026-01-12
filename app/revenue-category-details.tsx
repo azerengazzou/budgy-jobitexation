@@ -30,6 +30,7 @@ export default function RevenueCategoryDetails() {
     const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date } | undefined>();
     const [revenueTransactions, setRevenueTransactions] = useState<RevenueTransaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [revenueCategories, setRevenueCategories] = useState<string[]>([]);
     
     // Modal states
     const [isRevenueModalVisible, setRevenueModalVisible] = useState(false);
@@ -65,20 +66,24 @@ export default function RevenueCategoryDetails() {
         return "goalId" in item && "type" in item;
     };
 
-    // Load revenue transactions on mount
     React.useEffect(() => {
-        const loadTransactions = async () => {
+        const loadData = async () => {
             try {
-                const transactions = await storageService.getRevenueTransactionsByType(categoryType as string);
+                const [transactions, categories] = await Promise.all([
+                    storageService.getRevenueTransactionsByType(categoryType as string),
+                    storageService.getItem('revenue_categories')
+                ]);
                 setRevenueTransactions(transactions);
+                setRevenueCategories(Array.isArray(categories) ? categories : []);
             } catch (error) {
-                console.error('Error loading revenue transactions:', error);
+                console.error('Error loading data:', error);
                 setRevenueTransactions([]);
+                setRevenueCategories([]);
             } finally {
                 setIsLoading(false);
             }
         };
-        loadTransactions();
+        loadData();
     }, [categoryType]);
 
     const categoryRevenues = revenues.filter(r => r.type === categoryType);
@@ -462,6 +467,7 @@ export default function RevenueCategoryDetails() {
                 setFormData={setRevenueFormData}
                 editingRevenue={editingRevenueTransaction ? null : editingRevenue}
                 hasSalarySet={false}
+                revenueCategories={revenueCategories}
                 t={t}
             />
 
