@@ -91,7 +91,7 @@ export const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 16,
         padding: 20,
-        marginBottom: 40,
+        marginBottom: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,

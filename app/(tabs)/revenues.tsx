@@ -39,10 +39,19 @@ export default function RevenuesScreen() {
         type: 'salary',
         date: new Date(),
     });
+    const [revenueCategories, setRevenueCategories] = useState<string[]>([]);
 
     const hasSalarySet = revenues.some(
         (rev) => rev.type === 'salary'
     );
+
+    useEffect(() => {
+        const loadRevenueCategories = async () => {
+            const categories = await storageService.getItem('revenue_categories');
+            setRevenueCategories(Array.isArray(categories) ? categories : []);
+        };
+        loadRevenueCategories();
+    }, []);
 
     const openModalSmooth = () => {
         resetForm();
@@ -403,6 +412,7 @@ export default function RevenuesScreen() {
                         setFormData={setFormData}
                         editingRevenue={editingRevenue}
                         hasSalarySet={hasSalarySet}
+                        revenueCategories={revenueCategories}
                         t={t}
                     />
                 </LinearGradient>
@@ -459,6 +469,7 @@ export default function RevenuesScreen() {
                     setFormData={setFormData}
                     editingRevenue={editingRevenue}
                     hasSalarySet={hasSalarySet}
+                    revenueCategories={revenueCategories}
                     t={t}
                 />
             </LinearGradient>

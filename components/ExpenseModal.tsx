@@ -135,89 +135,133 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
       <KeyboardDismissWrapper style={{ flex: 0 }}>
         <View style={{
           backgroundColor: '#FFFFFF',
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
           maxHeight: '90%',
-          paddingTop: 20
+          paddingTop: 24
         }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 25, marginBottom: 20 }}>
-            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1F2937' }}>
-              {editingExpense ? t('edit_expense') : t('add_expense')}
+          <View style={{ paddingHorizontal: 24, marginBottom: 24 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={{ fontSize: 28, fontWeight: '700', color: '#0F172A', letterSpacing: -0.5 }}>
+                {editingExpense ? t('edit_expense') : t('add_expense')}
+              </Text>
+              <TouchableOpacity
+                onPress={onClose}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: '#F1F5F9',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={20} color="#64748B" />
+              </TouchableOpacity>
+            </View>
+            <Text style={{ fontSize: 14, color: '#64748B', fontWeight: '500' }}>
+              {editingExpense ? 'Update your expense information' : 'Add a new expense to track'}
             </Text>
-            <TouchableOpacity onPress={onClose}>
-              <X size={24} color="#6B7280" />
-            </TouchableOpacity>
           </View>
 
-          <ScrollView style={{ paddingHorizontal: 25 }} showsVerticalScrollIndicator={false}>
-            <RequiredFieldIndicator label={t('expense_name')} required={true} />
-            <TextInput
-              style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 15, fontSize: 16 }}
-              placeholder={t('enter_expense_name')}
-              value={formData.name}
-              onChangeText={(text) => setFormData({ ...formData, name: text })}
-              autoFocus={!editingExpense}
-            />
+          <ScrollView style={{ paddingHorizontal: 24 }} showsVerticalScrollIndicator={false}>
+            <View style={{ marginBottom: 20 }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {t('expense_name')} <Text style={{ color: '#EF4444' }}>*</Text>
+              </Text>
+              <TextInput
+                style={{
+                  borderWidth: 1.5,
+                  borderColor: '#E2E8F0',
+                  borderRadius: 12,
+                  padding: 16,
+                  fontSize: 16,
+                  color: '#0F172A',
+                  backgroundColor: '#F8FAFC',
+                  fontWeight: '500'
+                }}
+                placeholder={t('enter_expense_name')}
+                placeholderTextColor="#94A3B8"
+                value={formData.name}
+                onChangeText={(text) => setFormData({ ...formData, name: text })}
+                autoFocus={!editingExpense}
+              />
+            </View>
 
-            {/* Quick Name Suggestions */}
             {!editingExpense && commonExpenseNames[formData.category as keyof typeof commonExpenseNames] && (
-              <View style={{ marginBottom: 15 }}>
-                <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{t('quick_suggestions')}</Text>
+              <View style={{ marginBottom: 20 }}>
+                <Text style={{ fontSize: 12, color: '#64748B', marginBottom: 8, fontWeight: '500' }}>Quick Suggestions</Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                   {commonExpenseNames[formData.category as keyof typeof commonExpenseNames].map((name) => (
                     <TouchableOpacity
                       key={name}
                       style={{
-                        backgroundColor: '#F3F4F6',
+                        backgroundColor: '#F1F5F9',
                         paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        borderRadius: 16,
+                        paddingVertical: 8,
+                        borderRadius: 10,
+                        borderWidth: 1.5,
+                        borderColor: '#E2E8F0',
                       }}
                       onPress={() => setFormData({ ...formData, name })}
                     >
-                      <Text style={{ color: '#374151', fontSize: 14 }}>{name}</Text>
+                      <Text style={{ color: '#475569', fontSize: 13, fontWeight: '600' }}>{name}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
               </View>
             )}
 
-            <RequiredFieldIndicator label={t('amount')} required={true} />
-            <NumericInput
-              style={{ borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 12, padding: 15, marginBottom: 10, fontSize: 16 }}
-              placeholder={t('amount')}
-              value={formData.amount}
-              onChangeText={(text) => setFormData({ ...formData, amount: text })}
-            />
-
-            {/* Quick Amount Buttons */}
-            <View style={{ marginBottom: 15 }}>
-              <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 8 }}>{t('quick_amounts')}</Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ marginBottom: 20 }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {t('amount')} <Text style={{ color: '#EF4444' }}>*</Text>
+              </Text>
+              <NumericInput
+                style={{
+                  borderWidth: 1.5,
+                  borderColor: '#E2E8F0',
+                  borderRadius: 12,
+                  padding: 16,
+                  fontSize: 24,
+                  color: '#0F172A',
+                  backgroundColor: '#F8FAFC',
+                  fontWeight: '700',
+                  letterSpacing: -0.5
+                }}
+                placeholder="0.00"
+                placeholderTextColor="#CBD5E1"
+                value={formData.amount}
+                onChangeText={(text) => setFormData({ ...formData, amount: text })}
+              />
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
                 {quickAmounts.map((amount) => (
                   <TouchableOpacity
                     key={amount}
                     style={{
-                      backgroundColor: formData.amount === amount.toString() ? '#3B82F6' : '#F3F4F6',
+                      backgroundColor: formData.amount === amount.toString() ? '#3B82F6' : '#F1F5F9',
                       paddingHorizontal: 16,
-                      paddingVertical: 8,
-                      borderRadius: 20,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      borderWidth: 1.5,
+                      borderColor: formData.amount === amount.toString() ? '#3B82F6' : '#E2E8F0',
                     }}
                     onPress={() => setFormData({ ...formData, amount: amount.toString() })}
                   >
                     <Text style={{
-                      color: formData.amount === amount.toString() ? 'white' : '#374151',
+                      color: formData.amount === amount.toString() ? '#FFFFFF' : '#475569',
                       fontSize: 14,
-                      fontWeight: '500'
+                      fontWeight: '600'
                     }}>{amount}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
 
-            <RequiredFieldIndicator label={t('category')} required={true} />
-            <View style={{ marginBottom: 15 }}>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ marginBottom: 20 }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {t('category')} <Text style={{ color: '#EF4444' }}>*</Text>
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                 {categories.slice(0, 6).map((category) => {
                   const label = category ? t(category) : category;
                   const isSelected = formData.category === category;
@@ -227,24 +271,27 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        backgroundColor: isSelected ? '#3B82F6' : '#F3F4F6',
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderRadius: 20,
-                        gap: 6,
+                        justifyContent: 'center',
+                        backgroundColor: isSelected ? '#3B82F6' : '#F8FAFC',
+                        borderWidth: 1.5,
+                        borderColor: isSelected ? '#3B82F6' : '#E2E8F0',
+                        paddingVertical: 14,
+                        paddingHorizontal: 16,
+                        borderRadius: 12,
+                        gap: 8,
                       }}
                       onPress={() => setFormData({ ...formData, category })}
                     >
                       <CategoryIcon
                         category={category}
                         type="expense"
-                        size={16}
-                        color={isSelected ? 'white' : '#6B7280'}
+                        size={20}
+                        color={isSelected ? '#FFFFFF' : '#64748B'}
                       />
                       <Text style={{
-                        color: isSelected ? 'white' : '#374151',
-                        fontSize: 14,
-                        fontWeight: '500'
+                        color: isSelected ? '#FFFFFF' : '#475569',
+                        fontSize: 15,
+                        fontWeight: '600'
                       }}>{label}</Text>
                     </TouchableOpacity>
                   );
@@ -252,8 +299,10 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
               </View>
             </View>
 
-            <RequiredFieldIndicator label={t('income_source')} required={true} />
-            <View style={{ marginBottom: 15 }}>
+            <View style={{ marginBottom: 20 }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {t('income_source')} <Text style={{ color: '#EF4444' }}>*</Text>
+              </Text>
               {revenues.map((revenue) => (
                 <TouchableOpacity
                   key={revenue.id}

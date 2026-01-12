@@ -27,7 +27,7 @@ type ChartType = 'expenses' | 'comparison' | 'savings' | 'health';
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
-  const [activeChart, setActiveChart] = useState<ChartType>('expenses');
+  const [activeChart, setActiveChart] = useState<ChartType>('comparison');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showInsight, setShowInsight] = useState<string | null>(null);
   const [showChartInsight, setShowChartInsight] = useState(false);
@@ -617,17 +617,20 @@ export default function Dashboard() {
       colors={['#0A2540', '#4A90E2']}
       style={styles.container}
     >
-      <KeyboardDismissWrapper>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          showsVerticalScrollIndicator={true}
-          scrollIndicatorInsets={{ right: 1 }}
-          scrollEventThrottle={16}
-          bounces={true}
-        >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={true}
+        scrollIndicatorInsets={{ right: 1 }}
+        scrollEventThrottle={16}
+        bounces={true}
+        alwaysBounceVertical={true}
+        directionalLockEnabled={false}
+        nestedScrollEnabled={true}
+      >
+        <KeyboardDismissWrapper style={{ flex: 0 }}>
           <View style={styles.header}>
             <View style={styles.headerRow}>
               <Text style={styles.headerTitle}>{formatDate()}</Text>
@@ -847,20 +850,6 @@ export default function Dashboard() {
             })()}
             <View style={styles.chartSwitcher}>
               <TouchableOpacity
-                style={[styles.chartTab, activeChart === 'expenses' && styles.chartTabActive]}
-                onPress={() => {
-                  if (activeChart !== 'expenses') {
-                    resetAnimation();
-                    setActiveChart('expenses');
-                  }
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.chartTabText, activeChart === 'expenses' && styles.chartTabTextActive]}>
-                  {t('expenses')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={[styles.chartTab, activeChart === 'comparison' && styles.chartTabActive]}
                 onPress={() => {
                   if (activeChart !== 'comparison') {
@@ -872,6 +861,20 @@ export default function Dashboard() {
               >
                 <Text style={[styles.chartTabText, activeChart === 'comparison' && styles.chartTabTextActive]}>
                   {t('income_vs_expenses')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.chartTab, activeChart === 'expenses' && styles.chartTabActive]}
+                onPress={() => {
+                  if (activeChart !== 'expenses') {
+                    resetAnimation();
+                    setActiveChart('expenses');
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.chartTabText, activeChart === 'expenses' && styles.chartTabTextActive]}>
+                  {t('expenses')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -908,10 +911,8 @@ export default function Dashboard() {
             </View>
           </View>
 
-        </ScrollView>
-
-
-      </KeyboardDismissWrapper>
+        </KeyboardDismissWrapper>
+      </ScrollView>
     </LinearGradient>
   );
 }

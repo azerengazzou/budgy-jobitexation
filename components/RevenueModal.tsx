@@ -25,6 +25,7 @@ export const RevenueModal = ({
     editingRevenue,
     t,
     hasSalarySet,
+    revenueCategories = [],
 }: {
     visible: boolean;
     onClose: () => void;
@@ -34,8 +35,10 @@ export const RevenueModal = ({
     editingRevenue: Revenue | null;
     t: (key: string) => string;
     hasSalarySet: boolean;
+    revenueCategories?: string[];
 }) => {
-    const revenueTypes = ['salary', 'freelance'];
+    const fixedRevenueTypes = ['salary', 'freelance'];
+    const allRevenueTypes = [...fixedRevenueTypes, ...revenueCategories];
     const quickAmounts = [500, 1000, 2000, 3000, 5000];
 
     return (
@@ -151,14 +154,14 @@ export const RevenueModal = ({
                             <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                 {t('revenue_type')} <Text style={{ color: '#EF4444' }}>*</Text>
                             </Text>
-                            <View style={{ flexDirection: 'row', gap: 12 }}>
-                                {revenueTypes.map((type) => {
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                                {allRevenueTypes.map((type) => {
                                     const isSelected = formData.type === type;
+                                    const isFixed = fixedRevenueTypes.includes(type);
                                     return (
                                         <TouchableOpacity
                                             key={type}
                                             style={{
-                                                flex: 1,
                                                 flexDirection: 'row',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
@@ -166,6 +169,7 @@ export const RevenueModal = ({
                                                 borderWidth: 1.5,
                                                 borderColor: isSelected ? '#3B82F6' : '#E2E8F0',
                                                 paddingVertical: 14,
+                                                paddingHorizontal: 16,
                                                 borderRadius: 12,
                                                 gap: 8,
                                             }}
@@ -181,7 +185,7 @@ export const RevenueModal = ({
                                                 color: isSelected ? '#FFFFFF' : '#475569',
                                                 fontSize: 15,
                                                 fontWeight: '600'
-                                            }}>{t(type)}</Text>
+                                            }}>{isFixed ? t(type) : type}</Text>
                                         </TouchableOpacity>
                                     );
                                 })}
