@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { X } from 'lucide-react-native';
 import { CategoryIcon } from './CategoryIcons';
 import { SwipeToDelete } from './SwipeToDelete';
 import { Expense } from './interfaces/expenses';
@@ -31,37 +32,56 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
     <SwipeToDelete
       onDelete={(onCancel) => onDelete(item, onCancel)}
     >
-      <TouchableOpacity
-        onPress={() => onPress(item)}
-        style={[genStyles.goalCard, { marginBottom: 12 }]}
-      >
-        <View style={genStyles.goalHeader}>
-          <View style={{
+      <View style={[genStyles.goalCard, { marginBottom: 12 }]}>
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation();
+            onDelete(item, () => {});
+          }}
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 10,
+            padding: 3,
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             borderRadius: 10,
-            padding: 10,
-            marginRight: 12,
-          }}>
-            <CategoryIcon
-              category={item.category}
-              type="expense"
-              size={24}
-              color="#EF4444"
-            />
-          </View>
-          <View style={genStyles.goalInfo}>
-            <Text style={genStyles.goalTitle}>
-              {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
+          }}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <X size={14} color="#EF4444" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => onPress(item)}
+        >
+          <View style={genStyles.goalHeader}>
+            <View style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderRadius: 10,
+              padding: 10,
+              marginRight: 12,
+            }}>
+              <CategoryIcon
+                category={item.category}
+                type="expense"
+                size={24}
+                color="#EF4444"
+              />
+            </View>
+            <View style={genStyles.goalInfo}>
+              <Text style={genStyles.goalTitle}>
+                {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
+              </Text>
+              <Text style={genStyles.goalCategory}>
+                {formatAmount(categoryTotal)} {t('in')} {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
+              </Text>
+            </View>
+            <Text style={genStyles.progressPercentage}>
+              {formatAmount(item.amount)}
             </Text>
-            <Text style={genStyles.goalCategory}>
-              {formatAmount(categoryTotal)} {t('in')} {['rent', 'food', 'transport'].includes(item.category) ? t(item.category) : item.category}
-            </Text>
           </View>
-          <Text style={genStyles.progressPercentage}>
-            {formatAmount(item.amount)}
-          </Text>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
     </SwipeToDelete>
   );
 };
