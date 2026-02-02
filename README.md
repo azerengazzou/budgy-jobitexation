@@ -4,7 +4,7 @@ A comprehensive React Native mobile application for managing personal finances, 
 
 ## Project Overview
 
-**Version:** 1.1.7  
+**Version:** 1.1.8  
 **Platform:** React Native with Expo  
 **Languages:** TypeScript  
 **Target:** iOS & Android  
