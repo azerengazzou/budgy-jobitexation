@@ -2,7 +2,7 @@
   "expo": {
     "name": "Budgy",
     "slug": "budgy",
-    "version": "1.1.8",
+    "version": "1.1.9",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -13,10 +13,10 @@
     "scheme": "budgy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
-    "runtimeVersion": "1.1.8",
+    "runtimeVersion": "1.1.9",
     "android": {
       "package": "com.budgy.app",
-      "versionCode": 118,
+      "versionCode": 119,
       "compileSdkVersion": 35,
       "targetSdkVersion": 35,
       "minSdkVersion": 23,
@@ -37,7 +37,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.budgy.app",
-      "buildNumber": "1.1.8",
+      "buildNumber": "1.1.9",
       "infoPlist": {
         "CFBundleDisplayName": "Budgy"
       }
