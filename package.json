@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "expo start",
+    "web": "expo start --web",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
     "android": "expo run:android",

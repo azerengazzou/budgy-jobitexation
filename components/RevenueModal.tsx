@@ -9,6 +9,7 @@ import {
     Platform
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { Picker } from '@react-native-picker/picker';
 import { X, Calendar } from 'lucide-react-native';
 import { RequiredFieldIndicator } from './RequiredFieldIndicator';
 import { NumericInput } from './NumericInput';
@@ -42,7 +43,7 @@ export const RevenueModal = ({
     const quickAmounts = [500, 1000, 2000, 3000, 5000];
 
     return (
-        <Modal
+        <Modal pointerEvents="box-none"
             isVisible={visible}
             onBackdropPress={onClose}
             style={{ justifyContent: 'flex-end', margin: 0 }}
@@ -154,42 +155,52 @@ export const RevenueModal = ({
                             <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                 {t('revenue_type')} <Text style={{ color: '#EF4444' }}>*</Text>
                             </Text>
-                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-                                {allRevenueTypes.map((type) => {
-                                    const isSelected = formData.type === type;
-                                    const isFixed = fixedRevenueTypes.includes(type);
-                                    return (
-                                        <TouchableOpacity
-                                            key={type}
-                                            style={{
-                                                flexDirection: 'row',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                backgroundColor: isSelected ? '#3B82F6' : '#F8FAFC',
-                                                borderWidth: 1.5,
-                                                borderColor: isSelected ? '#3B82F6' : '#E2E8F0',
-                                                paddingVertical: 14,
-                                                paddingHorizontal: 16,
-                                                borderRadius: 12,
-                                                gap: 8,
-                                            }}
-                                            onPress={() => setFormData(prev => ({ ...prev, type: type as Revenue['type'] }))}
-                                        >
-                                            <CategoryIcon
-                                                category={type}
-                                                type="revenue"
-                                                size={20}
-                                                color={isSelected ? '#FFFFFF' : '#64748B'}
+                            <View style={{
+                                borderWidth: 1.5,
+                                borderColor: '#E2E8F0',
+                                borderRadius: 12,
+                                backgroundColor: '#F8FAFC',
+                                overflow: 'hidden'
+                            }}>
+                                <Picker
+                                    selectedValue={formData.type}
+                                    onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as Revenue['type'] }))}
+                                    style={{ height: 50 }}
+                                >
+                                    <Picker.Item label={t('select_type')} value="" />
+                                    {allRevenueTypes.map((type) => {
+                                        const isFixed = fixedRevenueTypes.includes(type);
+                                        return (
+                                            <Picker.Item
+                                                key={type}
+                                                label={isFixed ? t(type) : type}
+                                                value={type}
                                             />
-                                            <Text style={{
-                                                color: isSelected ? '#FFFFFF' : '#475569',
-                                                fontSize: 15,
-                                                fontWeight: '600'
-                                            }}>{isFixed ? t(type) : type}</Text>
-                                        </TouchableOpacity>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </Picker>
                             </View>
+                            {formData.type && (
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    marginTop: 12,
+                                    padding: 12,
+                                    backgroundColor: '#EBF4FF',
+                                    borderRadius: 10
+                                }}>
+                                    <CategoryIcon
+                                        category={formData.type}
+                                        type="revenue"
+                                        size={24}
+                                        color="#3B82F6"
+                                    />
+                                    <Text style={{ fontSize: 15, fontWeight: '600', color: '#1E40AF' }}>
+                                        {fixedRevenueTypes.includes(formData.type) ? t(formData.type) : formData.type}
+                                    </Text>
+                                </View>
+                            )}
                         </View>
 
                         <View style={{ marginBottom: 24 }}>

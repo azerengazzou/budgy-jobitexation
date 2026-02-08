@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView, Platform } 
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Calendar, X } from 'lucide-react-native';
+import { Calendar, X, ChevronDown } from 'lucide-react-native';
 import { RequiredFieldIndicator } from './RequiredFieldIndicator';
 import { NumericInput, normalizeAmount } from './NumericInput';
 import { KeyboardDismissWrapper } from './KeyboardDismissWrapper';
@@ -126,7 +126,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
   };
 
   return (
-    <Modal
+    <Modal pointerEvents="box-none"
       isVisible={visible}
       onBackdropPress={onClose}
       style={{ justifyContent: 'flex-end', margin: 0 }}
@@ -212,7 +212,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
               </View>
             )}
 
-            <View style={{ marginBottom: 20 }}>
+            <View pointerEvents="box-none" style={{ marginBottom: 20 }}>
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {t('amount')} <Text style={{ color: '#EF4444' }}>*</Text>
               </Text>
@@ -257,46 +257,53 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
               </View>
             </View>
 
-            <View style={{ marginBottom: 20 }}>
+            <View pointerEvents="box-none" style={{ marginBottom: 20 }}>
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {t('category')} <Text style={{ color: '#EF4444' }}>*</Text>
               </Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-                {categories.slice(0, 6).map((category) => {
-                  const label = category ? t(category) : category;
-                  const isSelected = formData.category === category;
-                  return (
-                    <TouchableOpacity
+              <View style={{
+                borderWidth: 1.5,
+                borderColor: '#E2E8F0',
+                borderRadius: 12,
+                backgroundColor: '#F8FAFC',
+                overflow: 'hidden'
+              }}>
+                <Picker
+                  selectedValue={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  style={{ height: 50 }}
+                >
+                  <Picker.Item label={t('select_category')} value="" />
+                  {categories.map((category) => (
+                    <Picker.Item
                       key={category}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: isSelected ? '#3B82F6' : '#F8FAFC',
-                        borderWidth: 1.5,
-                        borderColor: isSelected ? '#3B82F6' : '#E2E8F0',
-                        paddingVertical: 14,
-                        paddingHorizontal: 16,
-                        borderRadius: 12,
-                        gap: 8,
-                      }}
-                      onPress={() => setFormData({ ...formData, category })}
-                    >
-                      <CategoryIcon
-                        category={category}
-                        type="expense"
-                        size={20}
-                        color={isSelected ? '#FFFFFF' : '#64748B'}
-                      />
-                      <Text style={{
-                        color: isSelected ? '#FFFFFF' : '#475569',
-                        fontSize: 15,
-                        fontWeight: '600'
-                      }}>{label}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
+                      label={category ? t(category) : category}
+                      value={category}
+                    />
+                  ))}
+                </Picker>
               </View>
+              {formData.category && (
+                <View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginTop: 12,
+                  padding: 12,
+                  backgroundColor: '#EBF4FF',
+                  borderRadius: 10
+                }}>
+                  <CategoryIcon
+                    category={formData.category}
+                    type="expense"
+                    size={24}
+                    color="#3B82F6"
+                  />
+                  <Text style={{ fontSize: 15, fontWeight: '600', color: '#1E40AF' }}>
+                    {t(formData.category)}
+                  </Text>
+                </View>
+              )}
             </View>
 
             <View style={{ marginBottom: 20 }}>

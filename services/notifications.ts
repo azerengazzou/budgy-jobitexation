@@ -207,6 +207,7 @@ class SmartNotificationService {
         body: i18n.t('notif_check_finances'),
       },
       trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour: 9,
         minute: 0,
         repeats: true,
